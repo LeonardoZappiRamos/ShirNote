@@ -25,7 +25,7 @@ A Fase 2 (parser de produto) começa em 03/11/2026; o release do MVP está previ
 | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI     | pronto                                                            |
 | Modelo musical neutro (`src/music`) com testes                         | pronto                                                            |
-| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes      | pronto                                                            |
+| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes      | pronto, validado contra o XSD oficial                             |
 | Arquivo `.enc` renderizado no OSMD (`src/components`)                  | pronto, sem Web Worker                                            |
 | Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                            |
 | Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                |
@@ -116,7 +116,8 @@ partituras reais ainda estão a confirmar.
 - O bundle inclui o OSMD e passa de 500 kB (aviso do Vite); avaliar code splitting quando a UI
   estabilizar.
 - Sem cursor/playback: o OSMD é usado só para desenhar a partitura.
-- A interface só verifica a extensão do arquivo; o magic `SCOW` ainda não é validado (RF-03).
+- Ainda não exibidos: barras de colcheia, ligaduras de expressão, símbolos e textos; a interface avisa
+  quando o arquivo os contém. Troca de clave no meio do compasso aparece no início dele.
 - O formato só está comprovado para até duas partes e duas pautas, com até duas vozes por pauta. O
   restante está na seção 8 de `docs/enc-format.md`.
 - Só o Encore `0xC4` é suportado; outras versões geram erro (ADR 0002).

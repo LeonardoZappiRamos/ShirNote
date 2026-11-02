@@ -1,4 +1,5 @@
 export type {
+  Barline,
   Clef,
   ClefSign,
   Dots,

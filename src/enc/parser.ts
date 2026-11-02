@@ -6,6 +6,7 @@
  * `EncoreFormatError` (RF-03).
  */
 import type {
+  Barline,
   Clef,
   Dots,
   Measure,
@@ -81,7 +82,7 @@ interface RawEvent {
 interface RawMeasure {
   readonly beats: number;
   readonly beatType: number;
-  readonly hasBarline: boolean;
+  readonly barline?: Barline;
   readonly events: readonly RawEvent[];
 }
 
@@ -154,10 +155,7 @@ export function parseEncore(bytes: Uint8Array): EncoreParseResult {
       measures.push({
         beats: byte(bytes, payload + 8),
         beatType: byte(bytes, payload + 9),
-        hasBarline:
-          byte(bytes, payload + 12) === 2 ||
-          [4, 5, 6].includes(byte(bytes, payload + 13)) ||
-          byte(bytes, payload + 14) === 0xc0,
+        barline: barlineOf(bytes, payload),
         events: readEvents(bytes, view, payload + MEASURE_HEADER, chunk.endOffset, measures.length),
       });
     } else if (chunk.tag === 'TITL') {
@@ -248,9 +246,6 @@ function decodeMeasures(
       );
       return 0;
     };
-    if (measure.hasBarline) {
-      warnings.add('barline', 'Barras de repetição, casas e barras duplas ainda não são exibidas.');
-    }
 
     // Troca de armadura (0x20) e de clave (0x10): `+5` = código novo. A clave vale a partir do tick.
     const clefChanges: { tick: number; staff: number; clef: number }[] = [];
@@ -353,6 +348,7 @@ function decodeMeasures(
         .map(([voice, events]) => ({ id: String(voice), events }));
       return {
         number,
+        ...(measure.barline ? { barline: measure.barline } : {}),
         attributes: {
           key: { fifths: fifthsOf(keys[firstStaff] ?? 0, warnings) },
           time: { beats: measure.beats, beatType: measure.beatType },
@@ -362,6 +358,20 @@ function decodeMeasures(
       };
     });
   });
+}
+
+/** Cabeçalho de `MEAS`: `+12` = 2 início de repetição; `+13` = 4 fim de repetição, 5 final, 6 dupla;
+ * `+14` = C0 casa, com o número em `+15` (docs/enc-format.md seção 6). */
+function barlineOf(bytes: Uint8Array, payload: number): Barline | undefined {
+  const end = ({ 4: 'repeat', 5: 'final', 6: 'double' } as const)[
+    byte(bytes, payload + 13) as 4 | 5 | 6
+  ];
+  const barline: Barline = {
+    ...(byte(bytes, payload + 12) === 2 ? { repeatStart: true } : {}),
+    ...(end ? { end } : {}),
+    ...(byte(bytes, payload + 14) === 0xc0 ? { ending: byte(bytes, payload + 15) } : {}),
+  };
+  return Object.keys(barline).length > 0 ? barline : undefined;
 }
 
 function noteOf(

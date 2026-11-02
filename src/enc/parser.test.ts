@@ -22,9 +22,6 @@ function readXml(path: string): string {
   return bytes.toString(bytes[1] === 0 ? 'utf16le' : 'utf8').replace(/^\uFEFF/, '');
 }
 
-// ponytail: barras de repetição, casas e barras duplas ainda não estão no modelo (aviso `barline`).
-const BARLINE_FIELDS = ['repeatStart', 'repeatEnd', 'finalBar', 'doubleBar', 'ending'];
-
 /** O Encore exporta a pausa de compasso vazio sem `<voice>`. */
 const isMeasureRest = (event: Record<string, unknown>) =>
   event.kind === 'rest' && event.type === 'whole' && event.tick === 0;
@@ -33,9 +30,7 @@ function comparable(score: ReferenceScore) {
   return {
     ...score,
     measures: score.measures.map((measure) => ({
-      ...Object.fromEntries(
-        Object.entries(measure).filter(([key]) => !BARLINE_FIELDS.includes(key)),
-      ),
+      ...measure,
       events: measure.events.map((event) => {
         if (!isMeasureRest(event)) return event;
         return Object.fromEntries(Object.entries(event).filter(([key]) => key !== 'voice'));
@@ -79,6 +74,7 @@ describe('parseEncore', () => {
   it('avisa, sem falhar, o que ainda não exibe', () => {
     const { warnings } = parseEncore(readBytes('tests/fixtures/samples/justica-flauta2.enc'));
 
-    expect(warnings.map((warning) => warning.code)).toEqual(expect.arrayContaining(['barline']));
+    // 0x30: ligaduras de expressão.
+    expect(warnings.map((warning) => warning.code)).toEqual(expect.arrayContaining(['event-48']));
   });
 });

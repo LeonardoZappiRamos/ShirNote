@@ -1,5 +1,6 @@
 import { divisionsFor, durationInDivisions } from '../music/duration';
 import type {
+  Barline,
   Clef,
   Measure,
   MeasureAttributes,
@@ -109,6 +110,8 @@ function measureXml(
   staves: number | undefined,
 ): XmlElement {
   const children: XmlElement[] = [];
+  const left = leftBarlineXml(measure.barline);
+  if (left) children.push(left);
 
   const attributes = attributesXml(measure.attributes, divisions, state, isFirstMeasure, staves);
   if (attributes) children.push(attributes);
@@ -136,7 +139,40 @@ function measureXml(
     );
   });
 
+  const right = rightBarlineXml(measure.barline);
+  if (right) children.push(right);
+
   return { tag: 'measure', attributes: { number: String(measure.number) }, children };
+}
+
+/** Barra da esquerda: início de repetição e começo da casa. */
+function leftBarlineXml(barline: Barline | undefined): XmlElement | null {
+  if (!barline?.repeatStart && barline?.ending === undefined) return null;
+  const children: XmlElement[] = [];
+  if (barline.repeatStart) children.push({ tag: 'bar-style', text: 'heavy-light' });
+  if (barline.ending !== undefined) children.push(endingXml(barline.ending, 'start'));
+  if (barline.repeatStart) children.push({ tag: 'repeat', attributes: { direction: 'forward' } });
+  return { tag: 'barline', attributes: { location: 'left' }, children };
+}
+
+/** Barra da direita: final, dupla, fim de repetição e fim da casa. */
+function rightBarlineXml(barline: Barline | undefined): XmlElement | null {
+  if (!barline?.end && barline?.ending === undefined) return null;
+  const children: XmlElement[] = [];
+  if (barline.end) {
+    children.push({
+      tag: 'bar-style',
+      text: barline.end === 'double' ? 'light-light' : 'light-heavy',
+    });
+  }
+  if (barline.ending !== undefined) children.push(endingXml(barline.ending, 'stop'));
+  if (barline.end === 'repeat')
+    children.push({ tag: 'repeat', attributes: { direction: 'backward' } });
+  return { tag: 'barline', attributes: { location: 'right' }, children };
+}
+
+function endingXml(number: number, type: 'start' | 'stop'): XmlElement {
+  return { tag: 'ending', attributes: { number: String(number), type } };
 }
 
 function attributesXml(

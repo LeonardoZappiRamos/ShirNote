@@ -84,9 +84,20 @@ export interface MeasureAttributes {
   readonly clefs?: readonly Clef[];
 }
 
+/** Barras do compasso. Ausente equivale a barra simples dos dois lados. */
+export interface Barline {
+  /** Início de repetição, à esquerda. */
+  readonly repeatStart?: boolean;
+  /** Barra da direita: final, dupla ou fim de repetição (que também é grossa). */
+  readonly end?: 'final' | 'double' | 'repeat';
+  /** Casa de repetição (1ª, 2ª…) que ocupa este compasso. */
+  readonly ending?: number;
+}
+
 export interface Measure {
   /** Número do compasso como aparece na partitura (começa em 1). */
   readonly number: number;
+  readonly barline?: Barline;
   /** Presente só quando algo muda em relação ao compasso anterior. */
   readonly attributes?: MeasureAttributes;
   readonly voices: readonly Voice[];
