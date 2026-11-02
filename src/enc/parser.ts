@@ -298,7 +298,8 @@ function decodeMeasures(
     for (const event of ordered) {
       const kind = event.type & 0xf0;
       if (kind !== 0x90 && kind !== 0x80) {
-        if (event.type !== 0x10 && event.type !== 0x20 && kind !== 0x40) {
+        // 0x30 é a curva de uma ligadura de valor, que já sai das flags da nota (`+6`).
+        if (event.type !== 0x10 && event.type !== 0x20 && event.type !== 0x30 && kind !== 0x40) {
           warnings.add(`event-${event.type}`, ignoredMessage(event.type));
         }
         continue;
@@ -556,7 +557,6 @@ function readEvents(
 }
 
 const IGNORED: Readonly<Record<number, string>> = {
-  0x30: 'ligaduras de expressão',
   0x50: 'símbolos e textos',
 };
 

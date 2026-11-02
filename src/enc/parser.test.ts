@@ -76,7 +76,7 @@ describe('parseEncore', () => {
   it('avisa, sem falhar, o que ainda não exibe', () => {
     const { warnings } = parseEncore(readBytes('tests/fixtures/samples/justica-flauta2.enc'));
 
-    // 0x30: ligaduras de expressão.
-    expect(warnings.map((warning) => warning.code)).toEqual(expect.arrayContaining(['event-48']));
+    // 0x50 (80): símbolos, como segno e coda.
+    expect(warnings.map((warning) => warning.code)).toEqual(['event-80']);
   });
 });

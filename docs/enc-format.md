@@ -1,6 +1,6 @@
-# Formato `.enc` do Encore — v0.10
+# Formato `.enc` do Encore — v0.11
 
-**Versão:** 0.10 · **Data:** 02/11/2026
+**Versão:** 0.11 · **Data:** 02/11/2026
 **Base:** 14 partituras reais (1.024 compassos, 2.945 notas) e 24 amostras controladas, todas com
 **MusicXML de referência** exportado pelo próprio Encore · **Portão G1:** aprovado (seção 11)
 
@@ -197,7 +197,7 @@ Offsets abaixo contam a partir do tick. O `+0` das versões anteriores deste doc
 | `0x90`–`0x97` | 28 | nota; nibble baixo = voz − 1 | comprovado para voz 1 e 2 (`controle-18`) |
 | `0x80` | 18 | pausa | comprovado |
 | `0x10` | 16 | troca de clave, código de `LINE +1` em `+5` | comprovado (`controle-15`, `controle-20`) |
-| `0x30` | 18 | curva de ligadura | hipótese forte: 28/1/19 eventos e o mesmo número de ligaduras iniciadas |
+| `0x30` | 18 | desenho da curva de uma ligadura de valor; a ligadura em si vem das flags da nota | comprovado: 289 eventos e 289 `<tie type="start">` nas 14 partituras reais, uma a uma por arquivo. O acervo não tem ligadura de expressão (`<slur>`), que segue sem amostra |
 | `0x40`, `0x41` | 14 + 16n | barra de colcheia; nibble baixo = voz − 1; vai do tick do evento ao tick em `+20`; `n` em `+5` conta as entradas de 16 B a partir de `+14`, e as seguintes à primeira são barras secundárias, por posição `x` | comprovado (grupo principal): confere com `<beam number="1">` nas 38 amostras; só na nota principal do acorde. Barras secundárias: hipótese |
 | `0x50` | 16 | símbolo, código em `+5` | hipótese forte: 13 em justica (segno/coda), 1 em alegrei (dinâmica) |
 | `0x50` | 86 | texto | hipótese forte: 2 em tora, 1 em alegrei, como as `<words>` |
@@ -326,7 +326,7 @@ Afeta o MVP (RF-05, RF-06, RF-07):
 3. Quiálteras além de 3:2.
 4. Terceira parte em diante e segunda pauta de uma segunda parte (regra de `+4` extrapolada).
 
-Não afeta o MVP: significado dos eventos `0x30` e `0x50`; barras secundárias de `0x40`; bytes `+14`, `+21` da nota;
+Não afeta o MVP: significado do evento `0x50`; codificação da ligadura de expressão (sem amostra); barras secundárias de `0x40`; bytes `+14`, `+21` da nota;
 restante de `TK00` e do cabeçalho; `0x04`; versão do Encore.
 
 **Versão:** não há como comprovar o campo com uma versão só (seção 4). Falta uma amostra salva em outra
@@ -348,7 +348,8 @@ truncar: depois do primeiro `</part>` vem o resto do arquivo antigo. O spike lê
 limpar, apague o `.xml` antes de reexportar.
 
 Nenhum experimento pendente decide o MVP. Os próximos, se forem úteis, cobrem a seção 8: vozes 3 e 4,
-pausa em voz 2, quiáltera 5:4, sol oitavada abaixo, três partes e uma segunda parte com duas pautas.
+pausa em voz 2, quiáltera 5:4, sol oitavada abaixo, três partes, uma segunda parte com duas pautas
+e ligadura de expressão entre notas diferentes.
 
 ## 10. Como reproduzir
 
