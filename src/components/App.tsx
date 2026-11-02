@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { inspectBinary, type BinarySnapshot } from '../enc';
+import { EncoreFormatError, inspectBinary, parseEncore, type BinarySnapshot } from '../enc';
 import { simpleMelody, validateScore } from '../music';
 import { generateMusicXml } from '../musicxml';
 import { FileUploader } from './FileUploader';
@@ -11,8 +11,7 @@ const demoWarnings = validateScore(simpleMelody).map((issue) => issue.message);
 
 const INITIAL_STATUS: ViewerStatus = {
   stage: 'ready',
-  message:
-    'Partitura de exemplo carregada. Ela vem de dados sintéticos, não de um arquivo .enc — o pipeline modelo → MusicXML → OSMD é o mesmo que o parser vai usar.',
+  message: 'Partitura de exemplo carregada. Abra um arquivo .enc para ver a sua partitura.',
   warnings: demoWarnings,
 };
 
@@ -24,6 +23,7 @@ interface LoadedFile {
 export function App() {
   const [status, setStatus] = useState<ViewerStatus>(INITIAL_STATUS);
   const [loadedFile, setLoadedFile] = useState<LoadedFile | null>(null);
+  const [musicXml, setMusicXml] = useState(demoMusicXml);
   const [zoom, setZoom] = useState(1);
 
   const handleFile = useCallback(async (file: File) => {
@@ -41,15 +41,22 @@ export function App() {
     try {
       const buffer = await file.arrayBuffer();
       setLoadedFile({ fileName: file.name, snapshot: inspectBinary(buffer) });
+      // ponytail: parse na thread principal; leva milissegundos nas amostras. Web Worker (tarefa 3.4)
+      // se partituras grandes travarem a interface.
+      const { score, warnings } = parseEncore(new Uint8Array(buffer));
+      setMusicXml(generateMusicXml(score));
       setStatus({
         stage: 'ready',
-        message: `"${file.name}" (${formatBytes(buffer.byteLength)}) foi lido no navegador. O parser do Encore ainda não existe, então a partitura exibida continua sendo o exemplo sintético.`,
-        warnings: ['Nenhum byte saiu da página: o arquivo ficou apenas na memória do navegador.'],
+        message: `"${file.name}" (${formatBytes(buffer.byteLength)}) foi lido no navegador.`,
+        warnings: warnings.map((warning) => warning.message),
       });
     } catch (error) {
       setStatus({
         stage: 'error',
-        message: `Falha ao ler "${file.name}": ${describeError(error)}`,
+        message:
+          error instanceof EncoreFormatError
+            ? `Não foi possível abrir "${file.name}": ${error.message}`
+            : `Falha ao ler "${file.name}": ${describeError(error)}`,
         warnings: [],
       });
     }
@@ -119,7 +126,7 @@ export function App() {
               </button>
             </div>
           </div>
-          <ScoreViewer musicXml={demoMusicXml} zoom={zoom} onError={handleRenderError} />
+          <ScoreViewer musicXml={musicXml} zoom={zoom} onError={handleRenderError} />
         </section>
       </main>
     </div>
@@ -151,8 +158,7 @@ function BinaryPreview({
         </dd>
       </dl>
       <p className="binary__note">
-        Ferramenta da Fase 1 (catálogo de amostras): sem o parser, estes bytes não confirmam que o
-        arquivo é do Encore.
+        Ferramenta de diagnóstico: os primeiros bytes do arquivo, como estão no disco.
       </p>
     </details>
   );

@@ -26,12 +26,12 @@ A Fase 2 (parser de produto) começa em 03/11/2026; o release do MVP está previ
 | Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI     | pronto                                                            |
 | Modelo musical neutro (`src/music`) com testes                         | pronto                                                            |
 | Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes      | pronto                                                            |
-| Partitura sintética renderizada no OSMD (`src/components`)             | pronto                                                            |
+| Arquivo `.enc` renderizado no OSMD (`src/components`)                  | pronto, sem Web Worker                                            |
 | Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                            |
 | Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                |
 | Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                            |
 | Formato documentado (`docs/enc-format.md` v0.9)                        | pronto para até duas partes e duas pautas, com lacunas declaradas |
-| Parser de produto (Fase 2)                                             | **em andamento** — confere nas 38 amostras, falta ligar à UI      |
+| Parser de produto (Fase 2)                                             | **em andamento** — confere nas 38 amostras e abre na interface    |
 
 O que se sabe sobre o formato, com base em 14 partituras reais (1.024 compassos), 24 amostras controladas
 e MusicXML exportado pelo Encore para todas:
