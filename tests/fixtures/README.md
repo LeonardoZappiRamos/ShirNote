@@ -24,5 +24,5 @@ Análise consolidada em [`docs/enc-format.md`](../../docs/enc-format.md) (v0.2).
 - Amostras controladas (uma nota, um compasso, outra tonalidade) devem ser identificáveis no nome,
   por exemplo `controle-1nota-c4.enc`.
 - Para inspecionar bytes sem o parser: `node scripts/enc-dump.mjs <arquivo> --chunks` (cadeia de
-  blocos) ou `--tags` (inventário de tags), ou suba o arquivo na tela do ShirNote e abra
-  "Diagnóstico do cabeçalho".
+  blocos), `--tags` (inventário de tags) ou `--notes` (candidatos a nota — hipótese, não
+  especificação), ou suba o arquivo na tela do ShirNote e abra "Diagnóstico do cabeçalho".

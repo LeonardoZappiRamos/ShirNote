@@ -6,6 +6,8 @@
  *   node scripts/enc-dump.mjs "tests/fixtures/samples/arquivo.enc"
  *   node scripts/enc-dump.mjs arquivo.enc --offset 512 --length 256
  *   node scripts/enc-dump.mjs arquivo.enc --strings --min 6
+ *   node scripts/enc-dump.mjs arquivo.enc --chunks
+ *   node scripts/enc-dump.mjs arquivo.enc --notes
  *   node scripts/enc-dump.mjs arquivo.enc --json
  */
 import { readFile } from 'node:fs/promises';
@@ -34,7 +36,7 @@ function numericFlag(name, fallback) {
 const file = args.find((arg) => !arg.startsWith('--') && !/^\d+$/.test(arg));
 if (!file) {
   console.error(
-    'Uso: node scripts/enc-dump.mjs <arquivo.enc> [--offset N] [--length N] [--strings] [--min N] [--json]',
+    'Uso: node scripts/enc-dump.mjs <arquivo.enc> [--offset N] [--length N] [--strings] [--min N] [--tags] [--chunks] [--notes] [--json]',
   );
   process.exit(1);
 }
@@ -47,6 +49,7 @@ const onlyStrings = args.includes('--strings');
 const asJson = args.includes('--json');
 const tagsMode = args.includes('--tags');
 const chunksMode = args.includes('--chunks');
+const notesMode = args.includes('--notes');
 
 const slice = data.subarray(offset, offset + length);
 
@@ -156,14 +159,53 @@ function chunkChain(bytes) {
   return best;
 }
 
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+/** Converte um número MIDI em nome legível (ex.: 62 → “D4”). */
+function midiName(number) {
+  return `${NOTE_NAMES[number % 12]}${Math.floor(number / 12) - 1}`;
+}
+
+/**
+ * Extrai candidatos a nota dos blocos `MEAS`: o par `50 40` marca o registro e os 8 bytes
+ * anteriores seguem `uint16 x, uint16 y, uint8 ?, uint8 altura, uint16 duração`.
+ *
+ * **Isto é uma hipótese** (docs/enc-format.md §6); o resultado serve para inspeção visual,
+ * não para alimentar o parser.
+ */
+function hypothesisNotes(bytes, chunks) {
+  const measures = [];
+  const measuresChunks = chunks.filter((chunk) => chunk.tag === 'MEAS');
+  measuresChunks.forEach((chunk, index) => {
+    const body = bytes.subarray(chunk.payload, chunk.end);
+    const notes = [];
+    for (let position = 8; position + 1 < body.length; position += 1) {
+      if (body[position] !== 0x50 || body[position + 1] !== 0x40) continue;
+      const pitch = body[position - 3];
+      notes.push({
+        offset: chunk.payload + position,
+        x: body.readUInt16LE(position - 8),
+        y: body.readUInt16LE(position - 6),
+        byte4: body[position - 4],
+        pitch,
+        name: midiName(pitch),
+        duration: body.readUInt16LE(position - 2),
+      });
+    }
+    measures.push({ index, chunkOffset: chunk.offset, payloadLength: chunk.length, notes });
+  });
+  return measures;
+}
+
 const result = {
   file,
   byteLength: data.length,
   range: { offset, length: slice.length },
-  rows: onlyStrings || tagsMode || chunksMode ? [] : hexDump(slice),
+  rows: onlyStrings || tagsMode || chunksMode || notesMode ? [] : hexDump(slice),
   strings: stringsOf(slice),
   tags: tagsMode ? tagsOf(slice) : [],
-  chunks: chunksMode ? chunkChain(data).chunks : [],
+  chunks: chunksMode || notesMode ? chunkChain(data).chunks : [],
+  notes: notesMode ? hypothesisNotes(data, chunkChain(data).chunks) : [],
 };
 
 if (asJson) {
@@ -195,7 +237,7 @@ if (asJson) {
       console.log(`  ${entry.tag}  ${String(entry.count).padStart(3)}x  ${offsets}`);
     }
   }
-  if (result.chunks.length > 0) {
+  if (result.chunks.length > 0 && chunksMode) {
     console.log(`\nblocos (${result.chunks.length}):`);
     for (const chunk of result.chunks) {
       const offsetHex = chunk.offset.toString(16).toUpperCase().padStart(8, '0');
@@ -205,6 +247,27 @@ if (asJson) {
           .toUpperCase()
           .padStart(8, '0')}${chunk.trailer > 0 ? `  +trailer ${chunk.trailer}` : ''}`,
       );
+    }
+  }
+  if (result.notes.length > 0) {
+    const total = result.notes.reduce((sum, measure) => sum + measure.notes.length, 0);
+    console.log('\nnotas (HIPÓTESE — docs/enc-format.md §6; não usar no parser):');
+    console.log(`  ${result.notes.length} compassos, ${total} candidatos a nota`);
+    for (const measure of result.notes) {
+      const label = `#${String(measure.index).padStart(2, '0')}`;
+      if (measure.notes.length === 0) {
+        console.log(`  ${label}  (nenhum candidato)`);
+        continue;
+      }
+      const notes = measure.notes
+        .map(
+          (note) =>
+            `${note.name}(${note.pitch}) x${note.x} y${note.y} dur${note.duration}${
+              note.byte4 !== 0 ? ` ?${note.byte4}` : ''
+            }`,
+        )
+        .join('  ');
+      console.log(`  ${label}  ${notes}`);
     }
   }
 }

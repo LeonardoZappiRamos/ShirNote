@@ -18,7 +18,8 @@ Nada aqui deve ser tratado como especificação até ter ao menos uma amostra qu
 | Parte (texto em `TITL`) | `Flauta C 02` | `Sax tenor Bb` | `Sax alto Eb` |
 | Título (texto em `TITL`) | `A2 - A JUSTIÇA (BASE BÍBLICA DE 2007)` | `A TORÁ DE ADONAI` | `ALEGREI-ME QUANDO ME D. (SALMO 122)` |
 
-Ferramenta: `scripts/enc-dump.mjs` (hexadecimal, strings, tags candidatas e reconstrução de blocos).
+Ferramenta: `scripts/enc-dump.mjs` (hexadecimal, strings, tags candidatas, reconstrução de blocos e
+candidatos a nota da hipótese da seção 6).
 As três amostras são de obras distintas; nenhuma foi produzida em ambiente controlado.
 
 ```bash
@@ -342,6 +343,9 @@ node scripts/enc-dump.mjs "tests/fixtures/samples/alegrei-sax-alto.enc" --offset
 
 # anomalia do compasso de 2 bytes
 node scripts/enc-dump.mjs "tests/fixtures/samples/justica-flauta2.enc" --offset 0x261E --length 64
+
+# candidatos a nota da hipótese da seção 6 (rótulos x, y, altura e duração)
+node scripts/enc-dump.mjs "tests/fixtures/samples/alegrei-sax-alto.enc" --notes
 
 # testes do contêiner
 npx vitest run src/enc/container.test.ts
