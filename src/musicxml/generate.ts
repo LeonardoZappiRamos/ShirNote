@@ -285,6 +285,10 @@ function eventXml(event: MusicEvent, divisions: number, voiceId: string): XmlEle
     children.push({ tag: 'staff', text: String(event.staff) });
   }
 
+  if (event.type === 'note' && event.beam) {
+    children.push({ tag: 'beam', attributes: { number: '1' }, text: event.beam });
+  }
+
   if (ties.length > 0) {
     children.push({
       tag: 'notations',

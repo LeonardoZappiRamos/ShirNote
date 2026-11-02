@@ -342,8 +342,11 @@ function readReference(path) {
   );
 }
 
-/** Lê um MusicXML (do Encore ou do ShirNote) na forma que `compare` usa. */
-export function readReferenceXml(xml) {
+/**
+ * Lê um MusicXML (do Encore ou do ShirNote) na forma que `compare` usa. Com `beams`, cada nota traz
+ * também a barra de colcheia principal (`<beam number="1">`), que o spike não lê.
+ */
+export function readReferenceXml(xml, { beams = false } = {}) {
   const value = (text, pattern) => text.match(pattern)?.[1];
   const divisions = Number(value(xml, /<divisions>(\d+)/) ?? 0);
   // Armadura, fórmula e clave da pauta 1 em vigor ao fim de cada compasso.
@@ -407,6 +410,7 @@ export function readReferenceXml(xml) {
           chord,
           tieStart: ties.includes('start'),
           tieStop: ties.includes('stop'),
+          ...(beams ? { beam: value(item, /<beam number="1">([^<]+)/) ?? '' } : {}),
         };
         // O Encore grafa pela armadura a nota que termina uma ligadura (C♯ ligado vira D♭ em ANA
         // BEKOACH - Trombone). No `.enc` ela tem o mesmo `y` da que começa; a grafia vem desta.

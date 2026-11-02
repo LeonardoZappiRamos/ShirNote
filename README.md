@@ -116,7 +116,7 @@ partituras reais ainda estão a confirmar.
 - O bundle inclui o OSMD e passa de 500 kB (aviso do Vite); avaliar code splitting quando a UI
   estabilizar.
 - Sem cursor/playback: o OSMD é usado só para desenhar a partitura.
-- Ainda não exibidos: barras de colcheia, ligaduras de expressão, símbolos e textos; a interface avisa
+- Ainda não exibidos: ligaduras de expressão, símbolos e textos; a interface avisa
   quando o arquivo os contém. Troca de clave no meio do compasso aparece no início dele.
 - O formato só está comprovado para até duas partes e duas pautas, com até duas vozes por pauta. O
   restante está na seção 8 de `docs/enc-format.md`.

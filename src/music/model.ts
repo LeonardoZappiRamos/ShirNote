@@ -42,6 +42,8 @@ export interface Note {
   readonly tie?: 'start' | 'stop' | 'continue';
   /** Soa junto com a nota anterior da mesma voz e não avança o tempo. */
   readonly chord?: boolean;
+  /** Barra de colcheia principal; as secundárias saem das durações. */
+  readonly beam?: 'begin' | 'continue' | 'end';
 }
 
 export interface Rest {

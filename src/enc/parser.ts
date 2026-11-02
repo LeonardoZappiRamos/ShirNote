@@ -285,10 +285,20 @@ function decodeMeasures(
       (event.type & 0xf0) === 0x90 ? byte(event.body, 6) & 0x40 : 0;
     const ordered = [...measure.events].sort((a, b) => a.tick - b.tick || chordOf(a) - chordOf(b));
     const positions = new Map<string, number>();
+    // Barra de colcheia (0x40 + voz − 1): do tick do evento até o tick em `+20`. As entradas
+    // seguintes (`+5` > 1) são barras secundárias, que o renderizador deduz das durações.
+    const beams = measure.events
+      .filter((event) => (event.type & 0xf0) === 0x40)
+      .map((event) => ({
+        staff: staffOf(event.body),
+        voice: (event.type & 0x0f) + 1,
+        start: event.tick,
+        end: uint16(event.body, 20),
+      }));
     for (const event of ordered) {
       const kind = event.type & 0xf0;
       if (kind !== 0x90 && kind !== 0x80) {
-        if (event.type !== 0x10 && event.type !== 0x20) {
+        if (event.type !== 0x10 && event.type !== 0x20 && kind !== 0x40) {
           warnings.add(`event-${event.type}`, ignoredMessage(event.type));
         }
         continue;
@@ -296,6 +306,22 @@ function decodeMeasures(
       const globalStaff = staffOf(event.body);
       const slot = slots[globalStaff] ?? { part: 0, staff: 1 };
       const voice = (event.type & 0x0f) + 1;
+      const group = beams.find(
+        (beam) =>
+          beam.staff === globalStaff &&
+          beam.voice === voice &&
+          beam.start <= event.tick &&
+          event.tick <= beam.end,
+      );
+      // A barra fica só na nota principal do acorde, como no MusicXML do Encore.
+      const beam =
+        kind !== 0x90 || !group || chordOf(event)
+          ? undefined
+          : event.tick === group.start
+            ? 'begin'
+            : event.tick === group.end
+              ? 'end'
+              : 'continue';
       const music =
         kind === 0x90
           ? noteOf(
@@ -306,6 +332,7 @@ function decodeMeasures(
               ticksPerQuarter,
               number,
               warnings,
+              beam,
             )
           : restOf(event, slot.staff, ticksPerQuarter, number, warnings);
       filled[globalStaff] = true;
@@ -382,6 +409,7 @@ function noteOf(
   ticksPerQuarter: number,
   number: number,
   warnings: Warnings,
+  beam: Note['beam'],
 ): Note {
   const { body } = event;
   if (!clef) warnings.add('unknown-clef', 'Clave sem amostra: notas lidas como clave de sol.');
@@ -415,6 +443,7 @@ function noteOf(
     ...staffField(staff),
     ...(tie ? { tie } : {}),
     ...(flags & 0x40 ? { chord: true } : {}),
+    ...(beam ? { beam } : {}),
   };
 }
 
@@ -528,8 +557,6 @@ function readEvents(
 
 const IGNORED: Readonly<Record<number, string>> = {
   0x30: 'ligaduras de expressão',
-  0x40: 'barras de colcheia',
-  0x41: 'barras de colcheia',
   0x50: 'símbolos e textos',
 };
 

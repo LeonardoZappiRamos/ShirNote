@@ -22,6 +22,8 @@ function readXml(path: string): string {
   return bytes.toString(bytes[1] === 0 ? 'utf16le' : 'utf8').replace(/^\uFEFF/, '');
 }
 
+const BEAMS = { beams: true };
+
 /** O Encore exporta a pausa de compasso vazio sem `<voice>`. */
 const isMeasureRest = (event: Record<string, unknown>) =>
   event.kind === 'rest' && event.type === 'whole' && event.tick === 0;
@@ -44,8 +46,8 @@ describe.each(CHECKED)('parser contra a referência — %s', (path) => {
   it('gera MusicXML com os mesmos compassos, notas, pausas, claves e armaduras', () => {
     const { score } = parseEncore(readBytes(path));
     // 240 por semínima, como o Encore, para comparar os ticks.
-    const generated = readReferenceXml(generateMusicXml(score, { divisions: 240 }));
-    const expected = readReferenceXml(readXml(referenceOf(path)));
+    const generated = readReferenceXml(generateMusicXml(score, { divisions: 240 }), BEAMS);
+    const expected = readReferenceXml(readXml(referenceOf(path)), BEAMS);
 
     expect(comparable(generated)).toEqual(comparable(expected));
   });
