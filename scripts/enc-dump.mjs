@@ -166,30 +166,47 @@ function midiName(number) {
   return `${NOTE_NAMES[number % 12]}${Math.floor(number / 12) - 1}`;
 }
 
+/** Figura deduzida do byte `+3` do registro (docs/enc-format.md §6). */
+const FIGURES = ['?', 'semibreve', 'mínima', 'semínima', 'colcheia', 'semicolcheia'];
+
 /**
- * Extrai candidatos a nota dos blocos `MEAS`: o par `50 40` marca o registro e os 8 bytes
- * anteriores seguem `uint16 x, uint16 y, uint8 ?, uint8 altura, uint16 duração`.
+ * Lê os registros de nota dos blocos `MEAS`.
  *
- * **Isto é uma hipótese** (docs/enc-format.md §6); o resultado serve para inspeção visual,
- * não para alimentar o parser.
+ * O registro é ancorado no código de objeto `90 1C` seguido do marcador `50 40` 16 bytes depois.
+ * Offsets aqui contam a partir de `90 1C`; docs/enc-format.md §7 conta a partir do tick (+2).
+ *
+ *   +0  `90 1C`   tipo do objeto (nota)
+ *   +2  uint8     reservado (0 nas amostras)
+ *   +3  uint8     figura (1=semibreve … 5=semicolcheia)
+ *   +8  uint16    x — posição horizontal dentro do compasso
+ *   +10 int8      y — posição na pauta (0 = 1ª linha suplementar inferior; C4 na clave de sol)
+ *   +12 uint8     campo desconhecido (0 em 439/450 registros)
+ *   +13 uint8     altura MIDI
+ *   +14 uint16    duração na unidade do arquivo (pontos incluídos)
+ *   +16 `50 40`   marcador do registro
+ *
+ * Validado contra o MusicXML exportado pelo Encore nas três amostras reais: 450/450 notas
+ * conferem em altura e figura. Ver docs/enc-format.md §7.
  */
-function hypothesisNotes(bytes, chunks) {
+function noteRecords(bytes, chunks) {
   const measures = [];
   const measuresChunks = chunks.filter((chunk) => chunk.tag === 'MEAS');
   measuresChunks.forEach((chunk, index) => {
     const body = bytes.subarray(chunk.payload, chunk.end);
     const notes = [];
-    for (let position = 8; position + 1 < body.length; position += 1) {
-      if (body[position] !== 0x50 || body[position + 1] !== 0x40) continue;
-      const pitch = body[position - 3];
+    for (let position = 0; position + 18 < body.length; position += 1) {
+      if (body[position] !== 0x90 || body[position + 1] !== 0x1c) continue;
+      if (body[position + 16] !== 0x50 || body[position + 17] !== 0x40) continue;
+      const pitch = body[position + 13];
       notes.push({
         offset: chunk.payload + position,
-        x: body.readUInt16LE(position - 8),
-        y: body.readUInt16LE(position - 6),
-        byte4: body[position - 4],
+        figure: FIGURES[body[position + 3]] ?? `?${body[position + 3]}`,
+        x: body.readUInt16LE(position + 8),
+        y: body.readInt8(position + 10),
+        byte12: body[position + 12],
         pitch,
         name: midiName(pitch),
-        duration: body.readUInt16LE(position - 2),
+        duration: body.readUInt16LE(position + 14),
       });
     }
     measures.push({ index, chunkOffset: chunk.offset, payloadLength: chunk.length, notes });
@@ -205,7 +222,7 @@ const result = {
   strings: stringsOf(slice),
   tags: tagsMode ? tagsOf(slice) : [],
   chunks: chunksMode || notesMode ? chunkChain(data).chunks : [],
-  notes: notesMode ? hypothesisNotes(data, chunkChain(data).chunks) : [],
+  notes: notesMode ? noteRecords(data, chunkChain(data).chunks) : [],
 };
 
 if (asJson) {
@@ -251,19 +268,19 @@ if (asJson) {
   }
   if (result.notes.length > 0) {
     const total = result.notes.reduce((sum, measure) => sum + measure.notes.length, 0);
-    console.log('\nnotas (HIPÓTESE — docs/enc-format.md §6; não usar no parser):');
-    console.log(`  ${result.notes.length} compassos, ${total} candidatos a nota`);
+    console.log('\nnotas (registro `90 1C` + marcador `50 40`; ver docs/enc-format.md §7):');
+    console.log(`  ${result.notes.length} compassos, ${total} notas`);
     for (const measure of result.notes) {
       const label = `#${String(measure.index).padStart(2, '0')}`;
       if (measure.notes.length === 0) {
-        console.log(`  ${label}  (nenhum candidato)`);
+        console.log(`  ${label}  (nenhuma nota)`);
         continue;
       }
       const notes = measure.notes
         .map(
           (note) =>
-            `${note.name}(${note.pitch}) x${note.x} y${note.y} dur${note.duration}${
-              note.byte4 !== 0 ? ` ?${note.byte4}` : ''
+            `${note.name} x${note.x} y${note.y} ${note.figure} dur${note.duration}${
+              note.byte12 !== 0 ? ` ?${note.byte12}` : ''
             }`,
         )
         .join('  ');

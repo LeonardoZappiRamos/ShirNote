@@ -1,4 +1,6 @@
-import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { basename } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { locateChunkChain, readChunkChain } from './container';
 
@@ -70,6 +72,17 @@ describe.each(SAMPLES)('contêiner .enc — $file', ({ file, size, chunks, measu
     expect(byTag('DRUM')?.payloadLength).toBe(0);
     expect(byTag('WINI')?.payloadLength).toBe(42);
   });
+
+  it('repete a contagem de sistemas em PAGE +2 e +12', () => {
+    const found = readChunkChain(sample, 0x930);
+    const page = found.find((chunk) => chunk.tag === 'PAGE');
+    const view = new DataView(sample.buffer, sample.byteOffset, sample.byteLength);
+
+    expect(page).toBeDefined();
+    const payload = (page?.offset ?? 0) + 8;
+    expect(view.getUint32(payload + 2, true)).toBe(lines);
+    expect(view.getUint32(payload + 12, true)).toBe(lines);
+  });
 });
 
 describe('anomalia conhecida: MEAS mínimo', () => {
@@ -81,6 +94,52 @@ describe('anomalia conhecida: MEAS mínimo', () => {
     expect(measures[33]?.offset).toBe(0x261e);
     expect(measures[33]?.payloadLength).toBe(2);
     expect(measures[33]?.endOffset).toBe(0x265e);
+  });
+});
+
+const CONTROLLED_DIR = 'tests/fixtures/controlled';
+const CONTROLLED = readdirSync(CONTROLLED_DIR).filter((file) => file.endsWith('.enc'));
+
+describe.each(CONTROLLED)('amostra controlada — %s', (file) => {
+  const sample = new Uint8Array(readFileSync(`${CONTROLLED_DIR}/${file}`));
+
+  it('fecha a cadeia no fim do arquivo, depois de um TK00 por parte', () => {
+    const located = locateChunkChain(sample);
+
+    expect(located.startOffset).toBe(0xc2 + (sample[0x32] ?? 0) * 0x86e);
+    expect(located.endsAtFileEnd).toBe(true);
+  });
+});
+
+describe('múltiplas partes', () => {
+  it('desloca o primeiro bloco em um TK00 por parte', () => {
+    const sample = new Uint8Array(readFileSync(`${CONTROLLED_DIR}/controle-11-duas-partes.enc`));
+
+    expect(sample[0x32]).toBe(2);
+    expect(locateChunkChain(sample).startOffset).toBe(0x119e);
+  });
+});
+
+// Evidência do portão G1: o spike confere cada evento com o MusicXML exportado pelo Encore. Toda
+// amostra controlada que tiver referência com o mesmo nome-base entra sozinha.
+const CHECKED = [
+  ...SAMPLES.map(({ file }) => `tests/fixtures/samples/${file}`),
+  ...CONTROLLED.map((file) => `${CONTROLLED_DIR}/${file}`),
+].filter((path) => existsSync(referenceOf(path)));
+
+function referenceOf(path: string): string {
+  return `tests/fixtures/reference/${basename(path, '.enc')}.xml`;
+}
+
+describe.each(CHECKED)('spike contra a referência — %s', (path) => {
+  it('confere compassos, notas, pausas, clave, armadura, barras, vozes e quiálteras', () => {
+    const output = execFileSync(
+      process.execPath,
+      ['scripts/enc-spike.mjs', path, '--check', referenceOf(path)],
+      { encoding: 'utf8' },
+    );
+
+    expect(output).toContain('referência: confere');
   });
 });
 

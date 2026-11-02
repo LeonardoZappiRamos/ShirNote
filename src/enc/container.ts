@@ -10,8 +10,9 @@ const TAG_PATTERN = /^[A-Z][A-Z0-9]{3}$/;
 
 /**
  * Bytes que pertencem ao bloco mas ficam fora do tamanho declarado.
- * Medido em 117 transições `MEAS` das três amostras (todas terminam em `FF FF`);
- * ainda não é compreendido, por isso o valor fica isolado aqui.
+ * Em `MEAS`, são os 54 bytes do cabeçalho do compasso: o tamanho declarado conta só a lista de
+ * eventos. Fisicamente vêm antes dela, não depois; o cálculo do fim do bloco é o mesmo.
+ * Ver `docs/enc-format.md` seção 6.
  */
 export const DEFAULT_TRAILERS: Readonly<Record<string, number>> = { MEAS: 54 };
 
@@ -81,7 +82,8 @@ export interface LocatedChain {
 /**
  * Encontra a cadeia de blocos mais longa nos primeiros 8 KiB.
  *
- * Provisório: existe até o cabeçalho `SCOW` revelar o offset real do primeiro bloco.
+ * Provisório: o offset real é `0xC2 + partes × 0x86E` (`docs/enc-format.md` seção 4); o parser
+ * da Fase 2 deve calculá-lo em vez de procurar.
  */
 export function locateChunkChain(data: Uint8Array): LocatedChain {
   let best: LocatedChain = { startOffset: 0, chunks: [], endsAtFileEnd: false };

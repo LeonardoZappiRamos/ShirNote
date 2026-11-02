@@ -1,10 +1,11 @@
-# Formato `.enc` do Encore — v0.2
+# Formato `.enc` do Encore — v0.8
 
-**Versão:** 0.2 (descoberta em andamento) · **Data:** 01/11/2026
-**Base:** 3 amostras reais, 117 compassos · **Portão G1:** não atingido (ver seção 11)
+**Versão:** 0.8 (descoberta em andamento) · **Data:** 02/11/2026
+**Base:** 3 partituras reais (117 compassos, 450 notas) e 24 amostras controladas, todas com
+**MusicXML de referência** exportado pelo próprio Encore · **Portão G1:** aguarda decisão (seção 11)
 
-Este documento registra o que foi **provado** por comparação binária e o que continua **hipótese**.
-Nada aqui deve ser tratado como especificação até ter ao menos uma amostra que comprove o campo.
+Este documento separa o que está **comprovado** por amostra do que continua **hipótese**. Hipótese
+não entra no parser de produto.
 
 ## 1. Amostras e método
 
@@ -12,356 +13,386 @@ Nada aqui deve ser tratado como especificação até ter ao menos uma amostra qu
 | --- | --- | --- | --- |
 | Arquivo original | `docs/amostra/A JUSTIÇA - Flauta 2.enc` | `docs/amostra/A TORÁ DE ADONAI - Sax tenor.enc` | `docs/amostra/ALEGREI-ME QUANDO ME DISSERAM (SALMO 122) - Sax Alto.enc` |
 | Cópia de teste | `tests/fixtures/samples/justica-flauta2.enc` | `tora-sax-tenor.enc` | `alegrei-sax-alto.enc` |
-| Tamanho | 39.094 B (`0x98B6`) | 37.112 B (`0x90F8`) | 42.198 B (`0xA4D6`) |
-| Compassos (`MEAS`) | 38 | 36 | 43 |
-| Sistemas (`LINE`) | 10 | 9 | 11 |
-| Parte (texto em `TITL`) | `Flauta C 02` | `Sax tenor Bb` | `Sax alto Eb` |
-| Título (texto em `TITL`) | `A2 - A JUSTIÇA (BASE BÍBLICA DE 2007)` | `A TORÁ DE ADONAI` | `ALEGREI-ME QUANDO ME D. (SALMO 122)` |
+| MusicXML de referência | `tests/fixtures/reference/justica-flauta2.xml` | `tora-sax-tenor.xml` | `alegrei-sax-alto.xml` |
+| Tamanho | 39.094 B | 37.112 B | 42.198 B |
+| Compassos / sistemas | 38 / 10 | 36 / 9 | 43 / 11 |
+| Notas / pausas no MusicXML | 105 / 71 | 112 / 24 | 233 / 43 |
+| Armadura / fórmula / clave | 1♯ / 4/4 / sol | 3♯ / 4/4 / sol | 2♯ / 4/4 / sol |
 
-Ferramenta: `scripts/enc-dump.mjs` (hexadecimal, strings, tags candidatas, reconstrução de blocos e
-candidatos a nota da hipótese da seção 6).
-As três amostras são de obras distintas; nenhuma foi produzida em ambiente controlado.
+As amostras controladas estão catalogadas em
+[`tests/fixtures/controlled/README.md`](../tests/fixtures/controlled/README.md).
 
-```bash
-node scripts/enc-dump.mjs "tests/fixtures/samples/justica-flauta2.enc" --chunks
-node scripts/enc-dump.mjs "tests/fixtures/samples/tora-sax-tenor.enc" --tags --length 37112
-node scripts/enc-dump.mjs "tests/fixtures/samples/alegrei-sax-alto.enc" --offset 0 --length 320
-```
+O MusicXML de referência é a evidência central: `scripts/enc-spike.mjs --check` lê o `.enc` e compara
+cada compasso e evento com ele. O teste `src/enc/container.test.ts` roda essa comparação no CI para
+toda amostra com referência de mesmo nome-base.
 
-## 2. Resultado em uma frase
+As exportações de 02/11/2026 vieram em **UTF-16LE** (declarado no cabeçalho XML); as anteriores, em
+UTF-8. O spike aceita as duas. O Encore também passa para a segunda pauta sem `<backup>`, então a
+posição de cada evento na referência é contada por pauta.
 
-O arquivo é um **contêiner de blocos com tag ASCII de 4 letras e tamanho `uint32` little-endian**,
-precedido por um cabeçalho `SCOW`; não há compressão nem criptografia, e os textos são UTF-16LE.
+## 2. Resultado
 
-Nas três amostras a cadeia de blocos começa **sempre em `0x930`**, com `PAGE`, e fecha **exatamente
-no fim do arquivo**. É a evidência mais forte de que o enquadramento está correto.
+O arquivo é um cabeçalho `SCOW`, um registro `TK00` por parte e uma cadeia de blocos
+`tag + uint32 + payload`. Não há compressão nem criptografia. Cada compasso é um cabeçalho fixo mais
+uma lista de eventos de tamanho próprio, terminada em `FF FF`.
 
-O conteúdo musical ainda **não está decodificado**. A seção 6 registra a primeira hipótese
-consistente para o registro de nota (`50 40`), com evidências e com o que falta para confirmá-la.
+**Comprovado contra o MusicXML do Encore, sem nenhuma divergência:** 117/117 compassos, 450/450 notas
+(tick, nome, oitava, alteração, figura, ponto, acorde e ligadura), 138/138 pausas (tick, figura e
+ponto), armadura, fórmula, clave, título, barras de repetição, barra final e casas de repetição nas
+partituras reais. Nas 24 controladas, mais 88 compassos e 141 notas, que acrescentam todas as
+armaduras de 7♭ a 7♯, troca de armadura e de fórmula no meio do sistema, claves de dó na 3ª e na 4ª
+linha e sol oitavada, troca de clave no meio da partitura, segunda pauta, segunda parte, voz 2,
+quiálteras 3:2, barra dupla e autor.
 
-## 3. Enquadramento dos blocos
+**Ainda sem amostra ou sem referência:** vozes 3 a 8, quiálteras além de 3:2, mais de duas partes e a
+versão do formato (seção 8).
 
-```
-tag      : 4 bytes ASCII maiúsculos (ex.: "MEAS")
-tamanho  : uint32 little-endian, bytes do payload
-payload  : `tamanho` bytes
-```
-
-Exceção medida: **cada `MEAS` é seguido por um bloco fixo de 54 bytes**, fora do `tamanho`
-declarado. A regra foi verificada nas **117 ocorrências das 3 amostras**: todas têm exatamente 54
-bytes entre o fim do payload e a próxima tag, e os últimos dois bytes desse bloco são sempre
-`FF FF`. Sem essa regra a cadeia não fecha no EOF em nenhum dos três arquivos.
-
-Com essa regra, a cadeia de `justica-flauta2.enc` é:
-
-| # | Tag | Offset | Tamanho | Fim | Observação |
-| --- | --- | --- | --- | --- | --- |
-| 1 | `PAGE` | `0x930` | 26 | `0x952` | |
-| 2–11 | `LINE` ×10 | `0x952` … | 56 cada | `0xBD2` | um por sistema |
-| 12–49 | `MEAS` ×38 | `0xBD2` … | 2–554 | `0x2C02` | +54 bytes de bloco fixo cada |
-| 50 | `PREC` | `0x2C02` | 5.420 | `0x4136` | configuração de impressão |
-| 51 | `TITL` | `0x4136` | 21.242 | `0x9438` | metadados de texto |
-| 52 | `TEXT` | `0x9438` | 8 | `0x9448` | payload todo zero |
-| 53 | `FONT` | `0x9448` | 918 | `0x97E6` | fonte “Arial” |
-| 54 | `COLR` | `0x97E6` | 142 | `0x987C` | paleta + “Times New Roman” |
-| 55 | `DRUM` | `0x987C` | 0 | `0x9884` | bloco vazio |
-| 56 | `WINI` | `0x9884` | 42 | `0x98B6` | estado de janela (hipótese) |
-
-Contagem por arquivo:
-
-| Arquivo | Blocos | `LINE` | `MEAS` | Primeiro `MEAS` | Primeiro bloco | EOF |
-| --- | --- | --- | --- | --- | --- | --- |
-| justica | 56 | 10 | 38 | `0xBD2` | `0x930` | `0x98B6` |
-| tora | 53 | 9 | 36 | `0xB92` | `0x930` | `0x90F8` |
-| alegrei | 62 | 11 | 43 | `0xC12` | `0x930` | `0xA4D6` |
-
-O primeiro bloco reconhecido começa em `0x930` nos três arquivos; os 2.352 bytes anteriores são o
-cabeçalho e uma área reservada (seção 4).
-
-### 3.1 Anomalia: `MEAS` de 2 bytes em justica
-
-O compasso 34 (índice 33, offset `0x261E`) declara **2 bytes** de payload; todos os outros 116
-compassos das três amostras declaram entre 20 e 554 bytes. Mesmo assim a cadeia fecha: com o bloco
-fixo de 54 bytes, o próximo `MEAS` cai exatamente em `0x265E`.
-
-O conteúdo de `payload + bloco fixo` (56 bytes) é igual ao de um compasso vazio normal, exceto pelo
-tamanho declarado:
+## 3. Layout
 
 ```
-0x2626  6B 00 00 00 F0 00 C0 03 04 04 00 00 00 00 00 00 99 00 00 00 C5 00 00 00 C8 ...
+0x00    SCOW   cabeçalho (seção 4)
+0xC2    TK00   0x86E bytes × número de partes
+0xC2 + partes × 0x86E
+        PAGE
+        LINE   × sistemas
+        MEAS   × compassos
+        PREC  TITL  TEXT  FONT  COLR  DRUM  WINI
+EOF     a cadeia fecha exatamente no fim do arquivo
 ```
 
-Ou seja: o prefixo de 11 bytes que aparece em **todos** os compassos está intacto, mas o campo de
-tamanho diz 2. Não é possível decidir, com as amostras atuais, se é (a) um defeito de gravação do
-Encore, (b) um registro especial (compasso de “sistema”/“quebra”) ou (c) um campo de tamanho com
-outro significado nesse caso. O leitor do contêiner **não deve rejeitar** o arquivo; deve apenas
-sinalizar o compasso anômalo para a camada de validação.
-
-## 4. Cabeçalho `SCOW`
+Cada bloco:
 
 ```
-00000000  53 43 4F 57 C4 00 00 00 00 00 00 00 00 00 00 00 |SCOW............|
-00000010  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |................|
-00000020  00 00 00 00 00 00 00 00 20 04 21 00 F0 00 0A 00 |........ .!.....|
-00000030  01 00 01 01 26 00 00 00 00 00 00 01 00 01 04 EE |....&...........|
-00000040  98 0B A9 00 20 00 00 00 00 00 28 00 00 00 00 00 |.... .....(.....|
-00000050  00 00 04 00 00 00 01 00 00 00 00 00 00 00 00 00 |................|
-00000060  A8 E9 AA 00 00 00 00 00 0C 00 00 00 00 00 00 00 |................|
+tag      4 bytes ASCII maiúsculos
+tamanho  uint32 little-endian
+payload  `tamanho` bytes (em MEAS: 54 + `tamanho`)
 ```
 
-| Campo | Offset | Bytes | Situação |
-| --- | --- | --- | --- |
-| Magic | `0x00` | `53 43 4F 57` = “SCOW” | **comprovado** (constante nas 3 amostras) |
-| `uint32` após o magic | `0x04` | `C4 00 00 00` = 196 nas 3 amostras | **não interpretado**; não é o tamanho do cabeçalho (a área vai até `0x930`) |
-| Área estruturada | `0x28`–`0x6B` | contadores/valores | **não interpretado** |
-| `uint16` | `0x8C` | `C0 03` = 960 nas 3 amostras | **hipótese**: resolução temporal (divisões por compasso/semínima) |
-| Área zerada | `0x6C`–`0x907` | zeros | reservada |
-| Valores tipo paleta | `0x908`–`0x91D` | `20 20 20 … 40 40 40 40 40 40 40 40` | **hipótese**: cinzas da interface |
-| `TK00` | `0xC2` | `54 4B 30 30` + `6E 08 00 00` | **não interpretado**; o valor `0x086E` (2.158) não casa com nenhum limite de bloco |
+Inteiros são little-endian, e textos são UTF-16LE terminados em zero.
 
-Os cabeçalhos das três amostras são **idênticos exceto por ~40 bytes** (offsets `0x2A`, `0x2E`,
-`0x34`, `0x40`–`0x42`, `0x60`–`0x68`, `0x80`–`0x86`, `0x91`–`0x9A`, `0xA6`, `0xAC`–`0xC0`), o que
-reforça que o layout é fixo e que esses campos carregam dados da sessão/arquivo (não música).
+## 4. Cabeçalho `SCOW` e registros `TK00`
 
-Nenhum campo do cabeçalho tem, por enquanto, significado comprovado além do magic. Não usar estes
-bytes no parser.
-
-## 5. Blocos conhecidos
-
-### 5.1 `PAGE` e `LINE` — paginação
-
-`PAGE` tem **26 bytes nas três amostras**. Os valores observados são `0A 00 00 00` repetidos,
-compatíveis com contagens (hipótese).
-
-`LINE` tem **56 bytes nas três amostras** e sua quantidade é exatamente o número de sistemas
-(10/9/11). O payload contém:
-
-- posições verticais crescentes de ~64 em ~64 (`0x28`, `0x62`, `0xA2`, `0xE2`, …), compatíveis com
-  a posição de cada sistema na página (hipótese);
-- um índice sequencial em `+10` (`04`, `08`, `0C`, … = 4 × sistema);
-- quatro valores `uint16` de coordenadas em `+40`–`+47`;
-- a cauda fixa `FC F8 F4 F0 EC E8 E4 E0`, oito valores que decrescem de 4 em 4 — compatíveis com
-  deslocamentos de linhas de pauta (hipótese).
-
-A estrutura de `LINE` ainda não foi decodificada campo a campo; só o tamanho é comprovado.
-
-### 5.2 `MEAS` — compasso
-
-- Um bloco por compasso, na ordem do arquivo.
-- `tamanho` varia de **20 a 554 bytes** (exceto a anomalia de 2 bytes da seção 3.1): cresce com a
-  quantidade de eventos do compasso.
-- Os compassos de 20 bytes têm **zero** ocorrências do marcador de nota da seção 6 e são os
-  candidatos naturais a compasso vazio (hipótese forte, ainda sem amostra controlada).
-- O payload começa com um **prefixo de 11 bytes** idêntico em **117/117 compassos**:
-
-```
-+0   uint32  constante por arquivo (justica 107 = 0x6B, tora 116 = 0x74, alegrei 100 = 0x64)
-+4   F0 00   uint16 240
-+6   C0 03   uint16 960  (mesmo valor do cabeçalho em 0x8C)
-+8   04 04   hipótese: fórmula de compasso 4/4
-+10  00
-```
-
-- O byte em `+11` é **não nulo exatamente no primeiro compasso de cada sistema** nas três amostras
-  (30 inícios de sistema, valores `0x42`, `0x2A`, `0x45`, `0x3F`, `0x36`, `0x30`). Há duas exceções
-  com valor `0x06` que **não** iniciam sistema (tora #29, alegrei #5), provavelmente outro
-  significado (marcação/texto). A correlação é forte, mas a regra ainda não está confirmada.
-- O bloco fixo de 54 bytes termina sempre em `FF FF` e **não é preenchimento**: o conteúdo varia
-  entre compassos e frequentemente continua o registro iniciado no payload (por exemplo, um
-  `99 00 00 00` cortado pelo fim do payload). O significado é desconhecido.
-- A codificação de notas é tratada como hipótese na seção 6.
-
-### 5.3 `PREC` — configuração de impressão
-
-**5.420 bytes nas três amostras**, sem relação com música. Contém, em UTF-16LE:
-
-- `Microsoft Print to PDF`
-- GUID `{084F01FA-E634-4D77-83EE-074817C03581}`
-- `DocumentUserPassword`, `DocumentOwnerPassword`, `DocumentCryptSecurity`
-- `PaperSize`, `Orientation`, `PORTRAIT`, `Resolution`, `ResOption1`, `ColorMode`, `Color`, `V4DM`
-
-É compatível com um blob **DEVMODE** do Windows (impressora, papel, resolução, cor) e pode ser
-ignorado pelo parser.
-
-### 5.4 `TITL` — metadados de texto
-
-**21.242 bytes nas três amostras**, quase todo zero, com textos em UTF-16LE. É onde estão o título
-e o nome da parte — não em `MEAS`:
-
-| Amostra | Texto | Offset |
-| --- | --- | --- |
-| justica | `A2 - A JUSTIÇA (BASE BÍBLICA DE 2007)` | `0x415E` |
-| justica | `Flauta C 02` | `0x4DBE` |
-| tora | `A TORÁ DE ADONAI` | `0x3A7C` |
-| tora | `Sax tenor Bb` | `0x3E9C` |
-| alegrei | `ALEGREI-ME QUANDO ME D. (SALMO 122)` | `0x4E6C` |
-| alegrei | `Sax alto Eb` | `0x528C` |
-
-O tamanho fixo e a distribuição esparsa sugerem uma **área de tamanho fixo para textos e estilos**,
-não uma lista compacta (hipótese).
-
-### 5.5 `TEXT`, `FONT`, `COLR`, `DRUM`, `WINI`
-
-| Bloco | justica | tora | alegrei | Conteúdo observado |
+| Offset | Tipo | Campo | Situação | Evidência |
 | --- | --- | --- | --- | --- |
-| `TEXT` | 8 | 66 | 48 | varia; `TEXT` da justica é todo zero |
-| `FONT` | 918 | 640 | 640 | fonte `Arial` em UTF-16LE em justica |
-| `COLR` | 142 | 142 | 142 | paleta (`FF FF FF`, `C0 C0 C0`, `7F 7F 7F`, `FF 00 FF`, `00 FF FF`, …) + `Times New Roman` |
-| `DRUM` | 0 | 0 | 0 | bloco vazio |
-| `WINI` | 42 | 42 | 42 | valores como `05 00 00 00` e coordenadas — compatível com estado de janela/zoom (hipótese) |
+| `0x00` | 4 B | magic `SCOW` | comprovado | todas as amostras |
+| `0x04` | uint32 | sempre 196 (`0xC4`) | hipótese: versão do formato | um único valor observado; o Enc2MusicXML trata `0xC4` como Encore 5.0.2 e lê também `0xC2` e `0xA6` (seção 8) |
+| `0x28` | uint16 | sempre `0x0420` | desconhecido | um único valor observado |
+| `0x2C` | uint16 | ticks por semínima, 240 | comprovado | `<divisions>` nas 3 referências |
+| `0x2E` | uint16 | sistemas | comprovado | igual ao número de `LINE` em todas as amostras |
+| `0x32` | uint8 | partes | comprovado | 1 em todas; 2 em `controle-11`, com 2 `TK00` |
+| `0x33` | uint8 | pautas por sistema | comprovado | igual às entradas de pauta em `LINE` |
+| `0x34` | uint16 | compassos | comprovado | igual ao número de `MEAS` em todas as amostras |
 
-`TEXT` e `FONT` têm tamanho variável; `COLR`, `DRUM` e `WINI` têm tamanho fixo nas três amostras.
+`TK00` tem `0x86E` bytes contando a própria tag e guarda o índice da parte em `+6` (uint16). Isso
+explica por que a cadeia começa em `0x930` com uma parte (`0xC2 + 0x86E`) e em `0x119E` com duas. O
+conteúdo restante de `TK00` não foi interpretado.
 
-## 6. Hipótese do registro de nota (`50 40`)
+Parte dos bytes que variam entre arquivos parece ponteiro de memória, sem relação com música
+(hipótese; ex.: `0x40`, `0x80` e `LINE +22`). Não os use.
 
-**Status: hipótese. Não usar no parser até uma amostra controlada confirmar.**
+## 5. Blocos
 
-Dentro de `MEAS` (payload + bloco fixo) o par de bytes `50 40` aparece 110 vezes em justica, 112 em
-tora e 233 em alegrei. Os compassos de 20 bytes têm **zero** ocorrências; todos os outros têm uma
-ou mais. Isso é consistente com `50 40` marcando uma nota.
+### 5.1 `PAGE`
 
-Os **8 bytes imediatamente antes** de cada `50 40` têm uma forma estável:
+26 bytes. Contém a contagem de sistemas da página em `+2` e `+12` (uint32), confirmada em 3/3
+partituras reais. A semântica com várias páginas não tem amostra.
+
+### 5.2 `LINE` — sistema
+
+`26 + 30 × pautas` bytes: 56 com uma pauta e 86 com duas.
+
+| Offset | Tipo | Campo | Situação |
+| --- | --- | --- | --- |
+| `+12` | uint32 | compassos no sistema | comprovado: a soma dá o total em todas as amostras |
+| `+26` | 30 B | uma entrada por pauta | comprovado |
+
+Entrada de pauta:
+
+| Offset | Campo | Valores comprovados |
+| --- | --- | --- |
+| `+0` | sempre `02` | desconhecido |
+| `+1` | clave | `00` = sol, `01` = fá, `02` = dó na 3ª linha, `03` = dó na 4ª linha, `04` = sol oitavada acima |
+| `+2` | armadura | `00` = sem acidentes, `01`–`05` e `07` = 1–5♭ e 7♭, `08`–`0B`, `0D`, `0E` = 1–4♯, 6♯ e 7♯ |
+| `+3` | contador de pautas na partitura | sequencial |
+
+- **Clave:** sol e fá conferem com `controle-08`, `controle-15` e as referências reais; dó na 3ª linha
+  e sol oitavada, com `controle-15` e `controle-20`; dó na 4ª linha, com `controle-22` (troca `0x10`
+  para `03` e nota C5 com `y = 15`). `+1` é a clave em vigor no início do sistema; a troca dentro do
+  sistema vem do evento `0x10` (seção 7).
+- **Armadura:** a regra `01`–`07` = 1–7♭ e `08`–`0E` = 1–7♯ confere com 4♭ (`controle-13`), 6♯
+  (`controle-14`), 2♯ (`controle-09`), 1♭, 2♭, 3♭, 5♭, 7♭, 4♯ e 7♯ (`controle-23`, um sistema por
+  armadura) e 6♭ e 5♯ (`controle-24`). Todos os códigos têm amostra. A troca dentro do sistema vem do
+  evento `0x20` (seção 7).
+- **Identificador da pauta (`+8`):** repete-se no `+4` de cada evento da pauta (seção 7). Valores
+  medidos: `00` na primeira pauta, `40` na segunda pauta da mesma parte (`controle-16`) e `01` na
+  primeira pauta da segunda parte (`controle-17`, `controle-24`). Hipótese: pauta na parte nos bits
+  6–7 e parte nos bits 0–5; o Enc2MusicXML usa `+4 & 0x3F` como parte.
+
+### 5.3 `TITL` — textos
+
+21.242 bytes em todas as amostras.
+
+| Offset | Campo | Situação |
+| --- | --- | --- |
+| `+32` | título | comprovado: igual a `<work-title>` em 3/3 e em `controle-21` |
+| `+1088` | primeiro texto livre | observado: nome do instrumento em 3/3 |
+| `+6368` | autor | comprovado: igual a `<creator type="composer">` em `controle-21` |
+
+Os textos caem em `+32 + 1056 × n`: `n = 0` título, `1` texto livre, `6` autor. Os outros campos não
+têm amostra.
+
+### 5.4 Demais blocos
+
+| Bloco | Conteúdo observado | Uso |
+| --- | --- | --- |
+| `PREC` | configuração de impressão do Windows (`Microsoft Print to PDF`, DEVMODE) | ignorar |
+| `TEXT` | tamanho variável; hipótese: textos dos eventos `0x50` de 86 bytes | ignorar no MVP |
+| `FONT`, `COLR` | fontes e paleta | ignorar |
+| `DRUM` | vazio | ignorar |
+| `WINI` | hipótese: estado da janela | ignorar |
+
+## 6. `MEAS` — compasso
 
 ```
--8   uint16  x        posição horizontal (cresce dentro do compasso)
--6   uint16  y        posição diatônica na pauta (ex.: 1 = D4, 3 = F4, 4 = G4, 8 = D5)
--4   uint8   0        (zero em 109/110, 111/112 e 223/233 ocorrências)
--3   uint8   pitch    altura cromática compatível com MIDI (62–83 nas três amostras)
--2   uint16  duração  valores múltiplos de uma unidade por arquivo (ver abaixo)
++0   cabeçalho, 54 bytes fixos
++54  eventos, `tamanho` bytes, incluindo o terminador FF FF
 ```
 
-Evidências a favor:
+O tamanho declarado conta só a lista de eventos. Por isso um compasso vazio declara 2 bytes: somente
+o terminador. Percorrer os eventos pelo tamanho de cada um cai exatamente no terminador e no fim do
+bloco em **141/141** compassos.
 
-1. `y` e `pitch` são coerentes entre si e com a armadura: o mesmo `y` aparece com `pitch` vizinho
-   (acidente), e a diferença de `y` acompanha a diferença de altura.
-2. As sequências extraídas formam melodias plausíveis. Exemplos:
-   - justica #12: `F#4 D4 G4 A4 B4 D5 E5 D5`
-   - tora #5: `D5 C#5 B4 C#5 D5 F#5`
-   - alegrei #2: `C#5 B4 A#4 B4 B4 B4 C#5 D5`
-3. A faixa de alturas (D4–B5) é compatível com partes escritas de flauta e sax.
-4. O campo de duração só assume valores com proporções exatas de figuras musicais:
-
-| Amostra | unidade | valores observados | proporções |
+| Offset | Tipo | Campo | Situação |
 | --- | --- | --- | --- |
-| justica | 48 | 48, 96, 192, 288, 384, 768 | 1, 2, 4, 6, 8, 16 |
-| tora | 108 | 108, 216, 432, 648, 864 | 1, 2, 4, 6, 8 |
-| alegrei | 54 | 54, 108, 216, 324, 432, 648, 864 | 1, 2, 3, 4, 6, 8, 12, 16 |
+| `+0` | uint32 | constante por arquivo (107, 116, 100) | hipótese: andamento |
+| `+4` | uint16 | ticks por semínima, 240 | comprovado |
+| `+6` | uint16 | duração do compasso em ticks | comprovado: 960 em 4/4, 720 em 3/4 |
+| `+8` | uint8 | numerador da fórmula, em todo compasso | comprovado: `controle-07`, referências e troca para 3/4 no meio do sistema em `controle-19`, sem evento próprio |
+| `+9` | uint8 | denominador da fórmula | comprovado |
+| `+12` | uint8 | barra inicial: `02` = início de repetição | comprovado |
+| `+13` | uint8 | barra final: `04` = fim de repetição, `05` = barra final, `06` = barra dupla | comprovado (`06`: `controle-14`) |
+| `+14` | uint8 | `C0` quando há casa de repetição | comprovado (2 ocorrências) |
+| `+15` | uint8 | número da casa | comprovado (2 ocorrências) |
+| `+38` | 16 B | lixo de memória | ver abaixo |
 
-As proporções 1, 2, 3, 4, 6, 8, 12 e 16 são exatamente as relações entre semicolcheia, colcheia,
-colcheia pontuada, semínima, semínima pontuada, mínima, mínima pontuada e semibreve (ou entre
-colcheia, semínima, … semibreve, conforme a unidade). A **unidade absoluta** (48/108/54) muda de
-arquivo para arquivo e ainda não foi explicada.
+**Lixo de memória:** `+38` a `+53` costuma trazer resíduos, como os textos UTF-16 `ata\Loca`,
+`in\Encor` e `ograma`. Esses bytes geram ruído no `enc-diff`, não têm significado musical e podem
+carregar **fragmentos de caminhos locais** de quem salvou o arquivo. Não os exiba nem os interprete.
 
-O que **não** fecha e impede tratar isso como decodificado:
+## 7. Eventos
 
-- Em alegrei há pares de notas com **o mesmo `x`** (ex.: compasso 7, 16 notas em 8 pares). Pode ser
-  duas vozes no mesmo pentagrama, acordes, ou um erro de alinhamento do nosso recorte.
-- Em 11 ocorrências o byte em `-4` não é zero (25 ou 29), o que sugere que o registro muda de forma
-  em acordes/vozes múltiplas.
-- A soma das durações por compasso **não fecha em 4/4** em vários compassos (ex.: justica #0 soma
-  672 com unidade 48). Pode haver pausas não registradas, múltiplas vozes, ou o campo não ser
-  duração.
-- `50 40` pode ser um bitfield comum que coincide com notas; só uma amostra controlada elimina a
-  dúvida.
+```
++0  uint16  tick no compasso (FFFF = fim da lista)
++2  uint8   tipo
++3  uint8   tamanho total do evento, contando o tick
+```
 
-Experimento decisivo: uma amostra com **uma única nota** de altura e figura conhecidas; depois uma
-com duas notas de figuras diferentes; depois duas vozes explícitas. Comparar os 8 bytes antes de
-`50 40` em cada caso.
+Offsets abaixo contam a partir do tick. O `+0` das versões anteriores deste documento equivale ao
+`+2` atual.
 
-## 7. Inventário de tags
-
-Contagem e primeiras ocorrências (`--tags`):
-
-| Tag | justica | tora | alegrei |
+| Tipo | Tamanho | Significado | Situação |
 | --- | --- | --- | --- |
-| `MEAS` | 38 | 36 | 43 |
-| `LINE` | 10 | 9 | 11 |
-| `PAGE` | 1 | 1 | 1 |
-| `PREC` | 1 | 1 | 1 |
-| `TITL` | 1 | 1 | 1 |
-| `TEXT` | 1 | 1 | 1 |
-| `FONT` | 1 | 1 | 1 |
-| `COLR` | 1 | 1 | 1 |
-| `DRUM` | 1 | 1 | 1 |
-| `WINI` | 1 | 1 | 1 |
+| `0x90`–`0x97` | 28 | nota; nibble baixo = voz − 1 | comprovado para voz 1 e 2 (`controle-18`) |
+| `0x80` | 18 | pausa | comprovado |
+| `0x10` | 16 | troca de clave, código de `LINE +1` em `+5` | comprovado (`controle-15`, `controle-20`) |
+| `0x30` | 18 | curva de ligadura | hipótese forte: 28/1/19 eventos e o mesmo número de ligaduras iniciadas |
+| `0x40`, `0x41` | 14 + 16n | grupo de feixe, `n` em `+5`; nibble baixo = voz − 1 | hipótese |
+| `0x50` | 16 | símbolo, código em `+5` | hipótese forte: 13 em justica (segno/coda), 1 em alegrei (dinâmica) |
+| `0x50` | 86 | texto | hipótese forte: 2 em tora, 1 em alegrei, como as `<words>` |
+| `0x20` | 14 | troca de armadura, código de `LINE +2` em `+5` e o anterior em `+10` | comprovado (`controle-09`, `controle-10`, `controle-23`) |
 
-`TK00` aparece uma vez em cada arquivo (`0xC2`), dentro do cabeçalho, e ainda não é compreendido.
+**Troca de clave:** vale a partir do seu tick, inclusive para eventos do mesmo tick gravados antes dela
+na lista (`controle-20`, compasso 3: C4 só sai certo com a clave nova). O MusicXML do Encore, nesse
+caso, exporta a clave depois da nota.
+
+**Voz:** em `controle-18`, a voz 2 vem como `0x91` e o feixe dela como `0x41`. A voz 2 traz `+6 = 10`.
+Pausa em voz 2 não tem amostra; o spike aplica a mesma regra.
+
+**Pauta:** o `+4` do evento é igual ao `+8` da entrada de `LINE` da pauta onde ele está (seção 5).
+Em `controle-16` (piano), as notas da pauta inferior vêm como `0x94` com `+4 = 40` e são lidas com a
+clave de fá da segunda entrada; `0x94` é a voz 5, como o Encore exporta a pauta 2. Confere com o
+MusicXML: 15 compassos, 30 notas.
+
+**Partes:** cada parte ocupa as pautas seguintes do mesmo sistema. Em `controle-17` e `controle-24`, as
+notas da parte 2 trazem `+4 = 01`, voz 1, e conferem com a parte `P2` do MusicXML. A troca de armadura
+`0x20` vem uma vez por pauta, cada uma com o seu `+4`.
+
+### 7.1 Nota (`0x90`)
+
+| Offset | Tipo | Campo |
+| --- | --- | --- |
+| `+0` | uint16 | tick |
+| `+2` | 2 B | `9v 1C`, `v` = voz − 1 |
+| `+4` | uint8 | pauta: igual a `LINE +8` da pauta (seção 5) |
+| `+5` | uint8 | figura (7.3) |
+| `+6` | uint8 | flags |
+| `+10` | uint16 | posição horizontal (layout) |
+| `+12` | int8 | `y`, posição na pauta |
+| `+13` | uint8 | quiáltera: nibble alto = notas tocadas, baixo = normais; `00` = nenhuma |
+| `+15` | uint8 | altura MIDI |
+| `+16` | uint16 | duração tocada |
+| `+18` | 2 B | `50 40` |
+
+Flags:
+
+| Bit | Significado | Evidência |
+| --- | --- | --- |
+| `0x01` | início de ligadura | 450/450 |
+| `0x02` | fim de ligadura | 450/450; os dois juntos também ocorrem |
+| `0x40` | nota de acorde: soa com a nota anterior | 450/450 |
+| `0x10` | hipótese: nota em grupo de feixe | toda nota com `<beam>` tem o bit, mas o inverso não vale |
+| `0x80` | desconhecido | |
+
+**Altura.** `y` dá a nota escrita, e a altura MIDI dá a alteração:
+
+```
+base       = 28 (C4) sol; 16 (E2) fá; 22 (D3) dó na 3ª linha; 20 (B2) dó na 4ª linha;
+             35 (C5) sol oitavada acima
+diatonico  = base + y
+grau       = diatonico mod 7      (C D E F G A B)
+oitava     = floor(diatonico / 7)
+natural    = [0 2 4 5 7 9 11][grau] + (oitava + 1) × 12
+alteracao  = altura − natural
+```
+
+`y` tem sinal: em `controle-12`, B3 traz `FF` (−1). O campo depende da clave: `y = 0` fica seis graus
+abaixo da linha central da pauta, então a base é a nota da linha central menos 6.
+
+**Quiáltera:** `+13 = 32` é tercina (3:2) em 13/13 notas de `controle-20`, tanto de semínima quanto de
+colcheia. A duração tocada é a nominal × 2/3 × fator. Pausa em quiáltera não tem amostra.
+
+**Armadilhas de leitura:**
+
+- Percorra os eventos pelo tamanho. Procurar `50 40` no compasso gera falsos positivos.
+- `+14` e `+21` variam e não foram decodificados. `controle-05` (C♯4) traz `+21 = 01`, compatível com
+  acidente visível, mas isso não é necessário: a alteração vem de `altura`.
+
+### 7.2 Pausa (`0x80`)
+
+| Offset | Tipo | Campo |
+| --- | --- | --- |
+| `+0` | uint16 | tick |
+| `+2` | 2 B | `80 12` |
+| `+5` | uint8 | figura (7.3) |
+| `+10` | uint16 | posição horizontal |
+| `+16` | uint16 | duração nominal |
+
+Um compasso **sem nenhum evento** é pausa de compasso inteiro implícita (justica, compasso 34). Em
+alegrei, os compassos 26 e 34 trazem pausa com figura `0x20` e 1.920 ticks em 4/4. O MusicXML do Encore
+os exporta como `breve`, o que excede o compasso; o modelo musical não tem esse valor ainda (Fase 2).
+
+### 7.3 Figura e duração
+
+| Figura | Nominal (ticks) | Comprovada |
+| --- | --- | --- |
+| `0x20` breve | 1.920 | só em pausa |
+| `1` semibreve | 960 | sim |
+| `2` mínima | 480 | sim |
+| `3` semínima | 240 | sim |
+| `4` colcheia | 120 | sim |
+| `5` semicolcheia | 60 | sim |
+| `6`, `7` (fusa, semifusa) | 30, 15 | extrapolação |
+
+**A duração da nota é a tocada, não a escrita.** Ela é a nominal multiplicada por um fator de execução:
+0,8 em justica e 0,9 em tora, alegrei e nas controladas. Isso explica por que a semínima parecia valer
+192 ou 216. A duração da pausa é a nominal.
+
+O ponto não tem bit: é deduzido de `duração / nominal / fator` (1 = sem ponto, 1,5 = um ponto,
+1,75 = dois pontos). O fator é a razão mais frequente do arquivo. O ponto duplo não tem amostra. Onde o
+fator fica gravado é desconhecido.
+
+**Não use a duração para posicionar eventos.** A posição vem do tick.
 
 ## 8. O que continua desconhecido
 
-1. Significado dos campos do cabeçalho `SCOW` (inclusive o `uint32` 196, o `uint16` 960 em `0x8C` e
-   o `TK00`).
-2. Semântica do bloco fixo de 54 bytes de cada compasso.
-3. Confirmação da codificação de **notas**: altura, oitava, acidente, duração, ligadura, voz.
-4. Codificação de **clave, tonalidade e fórmula de compasso** dentro de `MEAS` (ou em `LINE`).
-5. Onde ficam **pausas**, articulações, dinâmica e letras.
-6. Se múltiplas partes geram múltiplos fluxos de `MEAS`, ou um bloco por parte.
-7. Por que a unidade de duração muda por arquivo (48, 108, 54).
-8. Se existe campo de **versão do Encore** e onde.
-9. Como `LINE` relaciona sistemas a compassos (o índice em `+10` sugere 4 compassos por sistema,
-   mas tora tem um sistema de 3 compassos).
+Afeta o MVP (RF-05, RF-06, RF-07):
 
-## 9. Próximos experimentos (amostras controladas)
+1. Vozes 3, 4, 6 a 8, e voz em pausa.
+2. Claves além de sol, fá, dó na 3ª e 4ª linha e sol oitavada acima (o Enc2MusicXML lista sol e fá
+   oitavadas abaixo, percussão e tablatura).
+3. Quiálteras além de 3:2.
+4. Terceira parte em diante e segunda pauta de uma segunda parte (regra de `+4` extrapolada).
 
-A ordem abaixo isola um campo por vez. Cada arquivo deve ser gerado no Encore com o mínimo de
-diferença em relação ao anterior, e comparado com `--chunks` mais um diff hexadecimal par a par.
-Nomear os arquivos como `controle-*.enc` e registrar no catálogo de `tests/fixtures/`.
+Não afeta o MVP: significado dos eventos `0x30`, `0x40`, `0x50`; bytes `+14`, `+21` da nota;
+restante de `TK00` e do cabeçalho; `0x04`; versão do Encore.
 
-| # | Experimento | O que deve mudar | Campo isolado |
-| --- | --- | --- | --- |
-| 1 | Partitura vazia (1 compasso, sem notas) | `MEAS` mínimo | cabeçalho de compasso |
-| 2 | 1 nota C4 semínima, 4/4 | `MEAS` com 1 evento | registro de nota |
-| 3 | 1 nota D4 semínima | idem ao 2 | altura |
-| 4 | 1 nota C4 mínima | idem ao 2 | duração |
-| 5 | 1 nota C#4 semínima | idem ao 2 | acidente |
-| 6 | 1 nota C4 colcheia | idem ao 2 | unidade de duração |
-| 7 | 1 compasso 3/4 | `LINE`/`MEAS` | fórmula de compasso |
-| 8 | Clave de fá | `LINE`/`MEAS` | clave |
-| 9 | Tonalidade com 2 sustenidos | `LINE`/`MEAS` | armadura |
-| 10 | Duas vozes no mesmo compasso | `MEAS` maior | voz |
-| 11 | Duas partes (piano) | novo fluxo de `MEAS` ou novo bloco | partes |
+**Versão:** não há como comprovar o campo com uma versão só (seção 4). Falta uma amostra salva em outra
+versão, ou em versão conhecida. O [Enc2MusicXML](https://github.com/lvinken/Enc2MusicXML) (GPL-3.0)
+lê `0x04` como versão: `0xC4` (Encore 5.0.2), `0xC2` e `0xA6`, este com outro espaçamento de eventos.
+Também aceita o magic `SCO5`, em big-endian. É pista, não evidência: vale como hipótese até termos
+amostra.
 
-**Atalho de alto valor:** se o Encore instalado conseguir exportar **MusicXML** de uma das três
-amostras reais, esse arquivo vira a “verdade de referência” para casar cada nota (altura, figura,
-posição) com o registro binário correspondente. Vale mais que várias amostras controladas, porque
-traz centenas de notas rotuladas de uma vez.
+## 9. Próximos experimentos
 
-Sem os itens 1–6, o parser do MVP (RF-05, RF-06) não pode começar: são eles que revelam o registro
-de nota, que é o coração do formato.
+Salvar cada um no Encore em `tests/fixtures/controlled/` e exportar também o MusicXML para
+`tests/fixtures/reference/` com o mesmo nome-base. O MusicXML é o que torna o resultado comprovável.
+
+Os experimentos 13 a 24 e os MusicXML de 09, 10, 11 e 16 foram gerados em 02/11/2026; o resultado
+está nas seções 5 a 7. Todos conferem com a referência.
+
+Os `controle-19-mudancas.xml` e `controle-22-clave-tenor.xml` foram gravados sobre XML anterior sem
+truncar: depois do primeiro `</part>` vem o resto do arquivo antigo. O spike lê só até ali; para
+limpar, apague o `.xml` antes de reexportar.
+
+Nenhum experimento pendente decide o MVP. Os próximos, se forem úteis, cobrem a seção 8: vozes 3 e 4,
+pausa em voz 2, quiáltera 5:4, sol oitavada abaixo, três partes e uma segunda parte com duas pautas.
 
 ## 10. Como reproduzir
 
 ```bash
-# cadeia de blocos completa
-node scripts/enc-dump.mjs "tests/fixtures/samples/justica-flauta2.enc" --chunks
+# compara o .enc com o MusicXML do Encore, compasso a compasso
+node scripts/enc-spike.mjs tests/fixtures/samples/alegrei-sax-alto.enc \
+  --check tests/fixtures/reference/alegrei-sax-alto.xml
 
-# inventário de tags
-node scripts/enc-dump.mjs "tests/fixtures/samples/tora-sax-tenor.enc" --tags --length 37112
+# resumo de uma amostra sem referência
+node scripts/enc-spike.mjs tests/fixtures/controlled/controle-10-clave-fa-notas-simultaneas.enc
 
-# cabeçalho
-node scripts/enc-dump.mjs "tests/fixtures/samples/alegrei-sax-alto.enc" --offset 0 --length 320
+# cadeia de blocos e notas
+node scripts/enc-dump.mjs tests/fixtures/samples/justica-flauta2.enc --chunks
+node scripts/enc-dump.mjs tests/fixtures/samples/justica-flauta2.enc --notes
 
-# anomalia do compasso de 2 bytes
-node scripts/enc-dump.mjs "tests/fixtures/samples/justica-flauta2.enc" --offset 0x261E --length 64
+# comparação bloco a bloco entre duas amostras controladas
+node scripts/enc-diff.mjs tests/fixtures/controlled/controle-02-c4-seminima.enc \
+  tests/fixtures/controlled/controle-04-c4-minima.enc --tag MEAS
 
-# candidatos a nota da hipótese da seção 6 (rótulos x, y, altura e duração)
-node scripts/enc-dump.mjs "tests/fixtures/samples/alegrei-sax-alto.enc" --notes
-
-# testes do contêiner
+# testes, incluindo a comparação com as referências
 npx vitest run src/enc/container.test.ts
 ```
 
 ## 11. Status do portão G1
 
-| Critério do G1 | Situação |
+| Critério | Situação |
 | --- | --- |
-| `docs/enc-format.md` cobre cabeçalho, versão, partes, compassos, notas, durações, claves, armaduras, metadados | **não** — contêiner, metadados e uma hipótese de nota; claves e armaduras não |
-| Cada campo documentado tem ao menos uma amostra que o comprova | parcial — 3 amostras; campos marcados como hipótese |
-| Spike de parser abre ≥ 3 amostras simples sem erro | **não** — só o leitor de contêiner abre as 3 amostras |
-| Magic bytes e versão identificados | magic sim (`SCOW`); versão não |
-| Decisão go/no-go registrada e datas recalculadas | pendente |
+| Documento cobre cabeçalho, versão, partes, compassos, notas, durações, claves, armaduras e metadados | **sim, com lacunas declaradas** (seção 8) |
+| Cada campo documentado tem amostra que o comprova | **sim** para os marcados como comprovados; o resto está marcado como hipótese |
+| Spike abre ≥ 3 amostras simples sem erro | **sim**: 3 partituras reais e as 24 controladas conferem com a referência |
+| Magic bytes e versão identificados, ou motivo da ausência | **sim**: magic `SCOW`; versão só tem candidato (`0x04` = `0xC4`), porque só há um valor observado |
+| Decisão go/no-go registrada e datas recalculadas | **pendente**: decisão do responsável pelo projeto |
 
-**Conclusão:** o contêiner está resolvido o suficiente para escrever um leitor de blocos e já foi
-validado em três arquivos reais, inclusive com uma anomalia de tamanho. O conteúdo musical continua
-bloqueado. O próximo passo é coletar as amostras controladas da seção 9 (ou uma exportação MusicXML
-de referência) antes de escrever o parser de notas.
+Fora do portão, mas na Fase 1:
+
+- **Tarefa 1.1 incompleta:** há 3 partituras reais, contra a meta de 10 a 30. O cronograma trata menos
+  de 10 como bloqueante. Versão do Encore e direitos de uso também seguem a confirmar.
+- **Tarefa 1.2 parcial:** experimentos 13 a 24 gerados, todos com MusicXML e conferidos.
+- **Tarefa 1.6 não acionada:** a análise do executável não foi necessária, e a questão legal segue
+  aberta.
+
+**Recomendação: GO para a Fase 2, com várias partes e pautas.** Melodias de uma voz, o
+caso de prioridade Alta, têm todos os campos comprovados, agora também com bemóis, claves de dó e
+oitavada, troca de clave e de armadura, quiálteras 3:2, voz 2 e autor. Segunda pauta e segunda parte
+(RF-07) também estão comprovadas; mais de duas ficam em modo tolerante, com aviso. O risco é
+a amostragem: 3 partituras de um único acervo podem não representar outras versões do Encore.
+
+**Proposta de datas, se a Fase 2 começar em 03/11/2026** (mesmo esforço do cronograma, em dias úteis,
+sem reduzir o que já foi adiantado):
+
+| Portão | Cronograma v1.0 | Proposta |
+| --- | --- | --- |
+| G1 | 27/11/2026 | na decisão |
+| G2 | 18/12/2026 | 24/11/2026 |
+| G3 | 07/01/2027 | 10/12/2026 |
+| G4 | 21/01/2027 | 24/12/2026 |
+| G5 | 29/01/2027 | 05/01/2027 |
+
+As datas do cronograma não foram alteradas: vale a regra da seção 9 dele, com a versão 2.0 emitida
+depois da decisão.
