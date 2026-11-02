@@ -2,6 +2,7 @@ export type {
   Barline,
   Clef,
   ClefSign,
+  Direction,
   Dots,
   KeySignature,
   Measure,

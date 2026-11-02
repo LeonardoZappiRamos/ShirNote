@@ -10,4 +10,7 @@ export interface ReferenceScore {
   readonly author: string;
 }
 
-export function readReferenceXml(xml: string, options?: { beams?: boolean }): ReferenceScore;
+export function readReferenceXml(
+  xml: string,
+  options?: { beams?: boolean; directions?: boolean },
+): ReferenceScore;

@@ -96,10 +96,18 @@ export interface Barline {
   readonly ending?: number;
 }
 
+/** Sinal de navegação sobre a pauta. */
+export interface Direction {
+  readonly symbol: 'segno' | 'coda';
+  /** Posição desde o início do compasso, em semínimas. */
+  readonly offset: number;
+}
+
 export interface Measure {
   /** Número do compasso como aparece na partitura (começa em 1). */
   readonly number: number;
   readonly barline?: Barline;
+  readonly directions?: readonly Direction[];
   /** Presente só quando algo muda em relação ao compasso anterior. */
   readonly attributes?: MeasureAttributes;
   readonly voices: readonly Voice[];

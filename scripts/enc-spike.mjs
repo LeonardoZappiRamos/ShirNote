@@ -344,9 +344,10 @@ function readReference(path) {
 
 /**
  * Lê um MusicXML (do Encore ou do ShirNote) na forma que `compare` usa. Com `beams`, cada nota traz
- * também a barra de colcheia principal (`<beam number="1">`), que o spike não lê.
+ * também a barra de colcheia principal (`<beam number="1">`); com `directions`, cada compasso traz
+ * os segnos e codas, na ordem. O spike não lê nenhum dos dois.
  */
-export function readReferenceXml(xml, { beams = false } = {}) {
+export function readReferenceXml(xml, { beams = false, directions = false } = {}) {
   const value = (text, pattern) => text.match(pattern)?.[1];
   const divisions = Number(value(xml, /<divisions>(\d+)/) ?? 0);
   // Armadura, fórmula e clave da pauta 1 em vigor ao fim de cada compasso.
@@ -434,6 +435,9 @@ export function readReferenceXml(xml, { beams = false } = {}) {
       finalBar: right.includes('light-heavy') && !right.includes('direction="backward"'),
       doubleBar: right.includes('light-light'),
       ending: Number(value(body, /<ending[^>]*number="(\d+)"/) ?? 0),
+      ...(directions
+        ? { directions: [...body.matchAll(/<direction-type>\s*<(segno|coda)\b/g)].map((m) => m[1]) }
+        : {}),
     };
   };
   // O `.enc` grava cada parte como pautas seguintes do mesmo sistema (`controle-11`); no MusicXML,

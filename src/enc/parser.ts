@@ -8,6 +8,7 @@
 import type {
   Barline,
   Clef,
+  Direction,
   Dots,
   Measure,
   MusicEvent,
@@ -295,11 +296,20 @@ function decodeMeasures(
         start: event.tick,
         end: uint16(event.body, 20),
       }));
+    const directions: Direction[] = [];
     for (const event of ordered) {
       const kind = event.type & 0xf0;
       if (kind !== 0x90 && kind !== 0x80) {
         // 0x30 é a curva de uma ligadura de valor, que já sai das flags da nota (`+6`).
-        if (event.type !== 0x10 && event.type !== 0x20 && event.type !== 0x30 && kind !== 0x40) {
+        if (event.type === 0x50) {
+          const direction = directionOf(event, ticksPerQuarter, warnings);
+          if (direction) directions.push(direction);
+        } else if (
+          event.type !== 0x10 &&
+          event.type !== 0x20 &&
+          event.type !== 0x30 &&
+          kind !== 0x40
+        ) {
           warnings.add(`event-${event.type}`, ignoredMessage(event.type));
         }
         continue;
@@ -377,6 +387,7 @@ function decodeMeasures(
       return {
         number,
         ...(measure.barline ? { barline: measure.barline } : {}),
+        ...(part === 0 && directions.length > 0 ? { directions } : {}),
         attributes: {
           key: { fifths: fifthsOf(keys[firstStaff] ?? 0, warnings) },
           time: { beats: measure.beats, beatType: measure.beatType },
@@ -387,6 +398,26 @@ function decodeMeasures(
     });
   });
 }
+
+/**
+ * Símbolo (0x50 de 16 bytes, código em `+5`): A2 = segno, A6 = coda, CC = dinâmica. O de 86 bytes é
+ * texto, guardado no bloco `TEXT` (docs/enc-format.md seção 7).
+ */
+function directionOf(
+  event: RawEvent,
+  ticksPerQuarter: number,
+  warnings: Warnings,
+): Direction | undefined {
+  const code = byte(event.body, 5);
+  const symbol = event.body.length === 16 ? SYMBOLS[code] : undefined;
+  if (symbol) return { symbol, offset: event.tick / ticksPerQuarter };
+  if (event.body.length !== 16) warnings.add('text', 'Ainda não exibidos: textos.');
+  else if (code === 0xcc) warnings.add('dynamics', 'Ainda não exibidas: dinâmicas.');
+  else warnings.add('symbol', 'Ainda não exibidos: alguns símbolos.');
+  return undefined;
+}
+
+const SYMBOLS: Readonly<Record<number, Direction['symbol']>> = { 0xa2: 'segno', 0xa6: 'coda' };
 
 /** Cabeçalho de `MEAS`: `+12` = 2 início de repetição; `+13` = 4 fim de repetição, 5 final, 6 dupla;
  * `+14` = C0 casa, com o número em `+15` (docs/enc-format.md seção 6). */
@@ -556,9 +587,7 @@ function readEvents(
   return events;
 }
 
-const IGNORED: Readonly<Record<number, string>> = {
-  0x50: 'símbolos e textos',
-};
+const IGNORED: Readonly<Record<number, string>> = {};
 
 function ignoredMessage(type: number): string {
   const name = IGNORED[type];

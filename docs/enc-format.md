@@ -1,6 +1,6 @@
-# Formato `.enc` do Encore — v0.11
+# Formato `.enc` do Encore — v0.12
 
-**Versão:** 0.11 · **Data:** 02/11/2026
+**Versão:** 0.12 · **Data:** 02/11/2026
 **Base:** 14 partituras reais (1.024 compassos, 2.945 notas) e 24 amostras controladas, todas com
 **MusicXML de referência** exportado pelo próprio Encore · **Portão G1:** aprovado (seção 11)
 
@@ -148,7 +148,7 @@ têm amostra.
 | Bloco | Conteúdo observado | Uso |
 | --- | --- | --- |
 | `PREC` | configuração de impressão do Windows (`Microsoft Print to PDF`, DEVMODE) | ignorar |
-| `TEXT` | tamanho variável; hipótese: textos dos eventos `0x50` de 86 bytes | ignorar no MVP |
+| `TEXT` | tamanho variável; textos dos eventos `0x50` de 86 bytes: em tora, 2 eventos e 2 textos ("sax", "nipe") em UTF-16LE | layout das entradas: hipótese; ignorar no MVP |
 | `FONT`, `COLR` | fontes e paleta | ignorar |
 | `DRUM` | vazio | ignorar |
 | `WINI` | hipótese: estado da janela | ignorar |
@@ -199,8 +199,8 @@ Offsets abaixo contam a partir do tick. O `+0` das versões anteriores deste doc
 | `0x10` | 16 | troca de clave, código de `LINE +1` em `+5` | comprovado (`controle-15`, `controle-20`) |
 | `0x30` | 18 | desenho da curva de uma ligadura de valor; a ligadura em si vem das flags da nota | comprovado: 289 eventos e 289 `<tie type="start">` nas 14 partituras reais, uma a uma por arquivo. O acervo não tem ligadura de expressão (`<slur>`), que segue sem amostra |
 | `0x40`, `0x41` | 14 + 16n | barra de colcheia; nibble baixo = voz − 1; vai do tick do evento ao tick em `+20`; `n` em `+5` conta as entradas de 16 B a partir de `+14`, e as seguintes à primeira são barras secundárias, por posição `x` | comprovado (grupo principal): confere com `<beam number="1">` nas 38 amostras; só na nota principal do acorde. Barras secundárias: hipótese |
-| `0x50` | 16 | símbolo, código em `+5` | hipótese forte: 13 em justica (segno/coda), 1 em alegrei (dinâmica) |
-| `0x50` | 86 | texto | hipótese forte: 2 em tora, 1 em alegrei, como as `<words>` |
+| `0x50` | 16 | símbolo, código em `+5`: `A2` = segno, `A6` = coda, `CC` = dinâmica | comprovado para segno e coda: um evento por `<segno/>` e `<coda/>` nas 38 amostras, inclusive os pares no mesmo compasso. Dinâmica: o próprio Encore exporta `<dynamics>` vazio, então qual dinâmica é segue sem evidência |
+| `0x50` | 86 | texto, conteúdo no bloco `TEXT` | hipótese forte: 46 eventos e 46 `<words>` nas referências; em "A seu tempo", são letras |
 | `0x20` | 14 | troca de armadura, código de `LINE +2` em `+5` e o anterior em `+10` | comprovado (`controle-09`, `controle-10`, `controle-23`) |
 
 **Troca de clave:** vale a partir do seu tick, inclusive para eventos do mesmo tick gravados antes dela
@@ -326,7 +326,7 @@ Afeta o MVP (RF-05, RF-06, RF-07):
 3. Quiálteras além de 3:2.
 4. Terceira parte em diante e segunda pauta de uma segunda parte (regra de `+4` extrapolada).
 
-Não afeta o MVP: significado do evento `0x50`; codificação da ligadura de expressão (sem amostra); barras secundárias de `0x40`; bytes `+14`, `+21` da nota;
+Não afeta o MVP: qual dinâmica o código `CC` de `0x50` representa; layout do bloco `TEXT`; codificação da ligadura de expressão (sem amostra); barras secundárias de `0x40`; bytes `+14`, `+21` da nota;
 restante de `TK00` e do cabeçalho; `0x04`; versão do Encore.
 
 **Versão:** não há como comprovar o campo com uma versão só (seção 4). Falta uma amostra salva em outra

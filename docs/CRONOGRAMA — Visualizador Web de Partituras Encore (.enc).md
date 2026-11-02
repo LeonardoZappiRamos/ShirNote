@@ -1,6 +1,6 @@
 # Cronograma — Visualizador Web de Partituras Encore (.enc)
 
-**Versão:** 2.0 · **Data:** 02/11/2026 · **Base:** `docs/PRD — Visualizador Web de Partituras Encore (.enc).md`
+**Versão:** 2.1 · **Data:** 02/11/2026 · **Base:** `docs/PRD — Visualizador Web de Partituras Encore (.enc).md`
 **Horizonte:** 03/11/2026 → 06/01/2027 (release do MVP) + reserva até 13/01/2027
 **Decisão de origem:** portão G1 aprovado em 02/11/2026 ([ADR 0002](decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md))
 
@@ -22,6 +22,24 @@ como manda a seção 9 da v1.0.
 | Versão do Encore | "1 versão de referência" | **`0xC4`** (Encore 5.0.2) | único valor em todas as amostras |
 | G4 | 21/01/2027 | 28/12/2026 | sai de 24/12, meio período |
 | Release (G5) | 29/01/2027 | 06/01/2027 | — |
+
+## 0.1 Andamento em 02/11/2026
+
+A Fase 2 foi executada em 02/11/2026, antes do início previsto (03/11). Falta um item do G2: abrir
+o MusicXML gerado num segundo visualizador. Parte da Fase 3 também já foi adiantada.
+
+| Item | Situação |
+| --- | --- |
+| 2.1 a 2.6 | feitas; detalhe na seção 4 |
+| G2 | 4 de 5 critérios; falta o segundo visualizador (MuseScore Studio ou Verovio) |
+| 3.3, 3.5 | feitas: o OSMD renderiza o `.enc`, e os avisos do parser aparecem no status |
+| 3.4 | parcial: pipeline no navegador, sem Web Worker (o parse leva milissegundos nas amostras) |
+| Além do plano | barras de repetição e casas, barras de colcheia, segno e coda |
+| Avisos que restam nas partituras reais | dinâmicas (o próprio Encore exporta `<dynamics>` vazio) e textos (bloco `TEXT`) |
+
+**As datas da seção 2 não mudaram.** A Fase 2 terminou com 15 du de folga, mas antecipar G3 a G5 é
+decisão de replanejamento (seção 9). Recomendação: fechar o G2 assim que o MusicXML abrir no segundo
+visualizador e decidir, nessa revisão, entre antecipar as datas ou somar a folga à reserva.
 
 ---
 
@@ -114,18 +132,18 @@ várias partes, pautas e vozes.
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
 | 2.1 | Scaffold do projeto | feito | Repositório pronto |
-| 2.2 | Ajustar o modelo musical para partes, pautas e vozes | 1 du | `src/music` |
-| 2.3 | Parser Encore: magic, versão `0xC4`, metadados, compassos, claves, armaduras, notas, pausas, partes, pautas e vozes (RF-07); avisos do modo tolerante | 8 du | `src/enc` |
-| 2.4 | Gerador MusicXML com várias partes e pautas + validação contra XSD | 3 du | `src/musicxml` |
-| 2.5 | Harness de fixtures: o teste do spike passa a rodar contra o parser de produto | 1 du | `tests/` |
-| 2.6 | Conferir o parser com as 14 partituras reais, incluindo as diferenças do exportador do Encore (`enc-format.md`, seção 7) | 2 du | Catálogo e `docs/enc-format.md` |
+| 2.2 | Ajustar o modelo musical para partes, pautas e vozes | feito | `src/music`: breve, quiáltera, acorde, pautas, barras, barra de colcheia, segno e coda |
+| 2.3 | Parser Encore: magic, versão `0xC4`, metadados, compassos, claves, armaduras, notas, pausas, partes, pautas e vozes (RF-07); avisos do modo tolerante | feito | `src/enc/parser.ts` |
+| 2.4 | Gerador MusicXML com várias partes e pautas + validação contra XSD | feito | `src/musicxml`; XSD oficial do MusicXML 4.0 em `tests/schema` |
+| 2.5 | Harness de fixtures: o teste do spike passa a rodar contra o parser de produto | feito | `src/enc/parser.test.ts` |
+| 2.6 | Conferir o parser com as 14 partituras reais, incluindo as diferenças do exportador do Encore (`enc-format.md`, seção 7) | feito | 38 amostras conferem com o MusicXML do Encore |
 
 **Portão G2 — Pipeline completo (24/11/2026)**
-- [ ] `.enc` → MusicXML válido via teste, sem tocar na UI.
-- [ ] MusicXML abre no OSMD e em um segundo visualizador (MuseScore ou Verovio).
-- [ ] Comparação elementar passando nas 24 controladas e nas **14 partituras reais** (condição do ADR 0002; o spike já confere).
-- [ ] Arquivo de outra versão do Encore gera `EncoreFormatError` com mensagem clara.
-- [ ] Módulos sem acoplamento (RNF-05): parser não importa MusicXML e vice-versa.
+- [x] `.enc` → MusicXML válido via teste, sem tocar na UI (`src/musicxml/schema.test.ts`).
+- [ ] MusicXML abre no OSMD e em um segundo visualizador (MuseScore ou Verovio). **OSMD: sim**; segundo visualizador pendente.
+- [x] Comparação elementar passando nas 24 controladas e nas **14 partituras reais** (condição do ADR 0002), inclusive barras e barras de colcheia.
+- [x] Arquivo de outra versão do Encore gera `EncoreFormatError` com mensagem clara.
+- [x] Módulos sem acoplamento (RNF-05): `src/enc` e `src/musicxml` só dependem de `src/music`.
 
 ---
 
@@ -137,15 +155,15 @@ Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 | --- | --- | --- | --- |
 | 3.1 | `FileUploader`: seleção, arrastar e soltar, filtro de extensão | 2 du | RF-01 |
 | 3.2 | `StatusBar`: vazio, lendo, validando, convertendo, renderizando | 2 du | Estados de UX |
-| 3.3 | `ScoreViewer` com OSMD, zoom e rolagem horizontal/vertical | 3 du | RF-09, RF-10 |
-| 3.4 | Integração do pipeline no navegador (`ArrayBuffer`, Web Worker para não travar a UI) | 2 du | RF-02, RNF-01, RNF-03 |
-| 3.5 | Modo tolerante: avisos do parser chegam à UI sem derrubar a renderização | 2 du | RF-11 |
+| 3.3 | `ScoreViewer` com OSMD, zoom e rolagem horizontal/vertical | feito, a revisar no G3 | RF-09, RF-10 |
+| 3.4 | Integração do pipeline no navegador (`ArrayBuffer`, Web Worker para não travar a UI) | parcial: falta o Web Worker | RF-02, RNF-01, RNF-03 |
+| 3.5 | Modo tolerante: avisos do parser chegam à UI sem derrubar a renderização | feito | RF-11 |
 | 3.6 | Textos em pt-BR e mensagens de erro acionáveis | 1 du | RNF-08 |
 
 3.1 e 3.2 já têm rascunho desde o scaffold; o esforço cobre a versão final.
 
 **Portão G3 — MVP navegável (10/12/2026)**
-- [ ] Melodia de uma voz renderizada no navegador a partir de um `.enc` real.
+- [x] Melodia de uma voz renderizada no navegador a partir de um `.enc` real (verificado em 02/11/2026 com 3 partituras).
 - [ ] Zoom e rolagem funcionando.
 - [ ] Arquivo inválido gera mensagem clara, sem recarregar a página.
 - [ ] Nenhum arquivo sai do navegador (verificado na aba Network).

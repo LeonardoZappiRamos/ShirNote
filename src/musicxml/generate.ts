@@ -2,6 +2,7 @@ import { divisionsFor, durationInDivisions } from '../music/duration';
 import type {
   Barline,
   Clef,
+  Direction,
   Measure,
   MeasureAttributes,
   MusicEvent,
@@ -115,6 +116,9 @@ function measureXml(
 
   const attributes = attributesXml(measure.attributes, divisions, state, isFirstMeasure, staves);
   if (attributes) children.push(attributes);
+  for (const direction of measure.directions ?? []) {
+    children.push(directionXml(direction, divisions));
+  }
 
   let previousVoiceDuration = 0;
 
@@ -169,6 +173,16 @@ function rightBarlineXml(barline: Barline | undefined): XmlElement | null {
   if (barline.end === 'repeat')
     children.push({ tag: 'repeat', attributes: { direction: 'backward' } });
   return { tag: 'barline', attributes: { location: 'right' }, children };
+}
+
+/** Segno ou coda, posicionado por `<offset>` a partir do início do compasso. */
+function directionXml(direction: Direction, divisions: number): XmlElement {
+  // ponytail: arredonda o offset; `divisionsFor` só considera durações. Símbolos do Encore caem em
+  // múltiplos de colcheia nas amostras.
+  const offset = Math.round(direction.offset * divisions);
+  const children: XmlElement[] = [{ tag: 'direction-type', children: [{ tag: direction.symbol }] }];
+  if (offset > 0) children.push({ tag: 'offset', text: String(offset) });
+  return { tag: 'direction', attributes: { placement: 'above' }, children };
 }
 
 function endingXml(number: number, type: 'start' | 'stop'): XmlElement {

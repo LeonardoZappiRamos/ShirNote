@@ -22,7 +22,7 @@ function readXml(path: string): string {
   return bytes.toString(bytes[1] === 0 ? 'utf16le' : 'utf8').replace(/^\uFEFF/, '');
 }
 
-const BEAMS = { beams: true };
+const OPTIONS = { beams: true, directions: true };
 
 /** O Encore exporta a pausa de compasso vazio sem `<voice>`. */
 const isMeasureRest = (event: Record<string, unknown>) =>
@@ -46,8 +46,8 @@ describe.each(CHECKED)('parser contra a referência — %s', (path) => {
   it('gera MusicXML com os mesmos compassos, notas, pausas, claves e armaduras', () => {
     const { score } = parseEncore(readBytes(path));
     // 240 por semínima, como o Encore, para comparar os ticks.
-    const generated = readReferenceXml(generateMusicXml(score, { divisions: 240 }), BEAMS);
-    const expected = readReferenceXml(readXml(referenceOf(path)), BEAMS);
+    const generated = readReferenceXml(generateMusicXml(score, { divisions: 240 }), OPTIONS);
+    const expected = readReferenceXml(readXml(referenceOf(path)), OPTIONS);
 
     expect(comparable(generated)).toEqual(comparable(expected));
   });
@@ -76,7 +76,7 @@ describe('parseEncore', () => {
   it('avisa, sem falhar, o que ainda não exibe', () => {
     const { warnings } = parseEncore(readBytes('tests/fixtures/samples/justica-flauta2.enc'));
 
-    // 0x50 (80): símbolos, como segno e coda.
-    expect(warnings.map((warning) => warning.code)).toEqual(['event-80']);
+    // Segno e coda já saem; a dinâmica (0x50, código CC) ainda não.
+    expect(warnings.map((warning) => warning.code)).toEqual(['dynamics']);
   });
 });
