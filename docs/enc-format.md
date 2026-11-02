@@ -1,8 +1,8 @@
-# Formato `.enc` do Encore — v0.8
+# Formato `.enc` do Encore — v0.9
 
-**Versão:** 0.8 (descoberta em andamento) · **Data:** 02/11/2026
-**Base:** 3 partituras reais (117 compassos, 450 notas) e 24 amostras controladas, todas com
-**MusicXML de referência** exportado pelo próprio Encore · **Portão G1:** aguarda decisão (seção 11)
+**Versão:** 0.9 · **Data:** 02/11/2026
+**Base:** 14 partituras reais (1.024 compassos, 2.945 notas) e 24 amostras controladas, todas com
+**MusicXML de referência** exportado pelo próprio Encore · **Portão G1:** aprovado (seção 11)
 
 Este documento separa o que está **comprovado** por amostra do que continua **hipótese**. Hipótese
 não entra no parser de produto.
@@ -19,7 +19,8 @@ não entra no parser de produto.
 | Notas / pausas no MusicXML | 105 / 71 | 112 / 24 | 233 / 43 |
 | Armadura / fórmula / clave | 1♯ / 4/4 / sol | 3♯ / 4/4 / sol | 2♯ / 4/4 / sol |
 
-As amostras controladas estão catalogadas em
+As outras 11 partituras reais, recebidas em 02/11/2026 do mesmo acervo, estão catalogadas em
+[`tests/fixtures/README.md`](../tests/fixtures/README.md). Todas são `0xC4`. As amostras controladas estão catalogadas em
 [`tests/fixtures/controlled/README.md`](../tests/fixtures/controlled/README.md).
 
 O MusicXML de referência é a evidência central: `scripts/enc-spike.mjs --check` lê o `.enc` e compara
@@ -36,10 +37,11 @@ O arquivo é um cabeçalho `SCOW`, um registro `TK00` por parte e uma cadeia de 
 `tag + uint32 + payload`. Não há compressão nem criptografia. Cada compasso é um cabeçalho fixo mais
 uma lista de eventos de tamanho próprio, terminada em `FF FF`.
 
-**Comprovado contra o MusicXML do Encore, sem nenhuma divergência:** 117/117 compassos, 450/450 notas
-(tick, nome, oitava, alteração, figura, ponto, acorde e ligadura), 138/138 pausas (tick, figura e
-ponto), armadura, fórmula, clave, título, barras de repetição, barra final e casas de repetição nas
-partituras reais. Nas 24 controladas, mais 88 compassos e 141 notas, que acrescentam todas as
+**Comprovado contra o MusicXML do Encore, sem nenhuma divergência:** 1.024/1.024 compassos,
+2.945/2.945 notas (tick, nome, oitava, alteração, figura, ponto, acorde e ligadura), 460/460 pausas
+(tick, figura e ponto), armadura, fórmula (inclusive 6/8), clave, título, barras de repetição, barra
+final e casas de repetição nas 14 partituras reais. Duas diferenças são do exportador do Encore, não
+da leitura (seção 7). Nas 24 controladas, mais 88 compassos e 141 notas, que acrescentam todas as
 armaduras de 7♭ a 7♯, troca de armadura e de fórmula no meio do sistema, claves de dó na 3ª e na 4ª
 linha e sol oitavada, troca de clave no meio da partitura, segunda pauta, segunda parte, voz 2,
 quiálteras 3:2, barra dupla e autor.
@@ -298,8 +300,19 @@ os exporta como `breve`, o que excede o compasso; o modelo musical não tem esse
 192 ou 216. A duração da pausa é a nominal.
 
 O ponto não tem bit: é deduzido de `duração / nominal / fator` (1 = sem ponto, 1,5 = um ponto,
-1,75 = dois pontos). O fator é a razão mais frequente do arquivo. O ponto duplo não tem amostra. Onde o
-fator fica gravado é desconhecido.
+1,75 = dois pontos). O fator é a razão mais frequente do arquivo; na pausa, o fator é 1. O ponto duplo
+não tem amostra. Onde o fator fica gravado é desconhecido.
+
+**Diferenças do exportador MusicXML do Encore.** O spike segue o `.enc`; o leitor de referência
+corrige estes dois casos antes de comparar:
+
+- **Pausa pontuada sem `<dot/>`:** em 54 pausas (ANA BEKOACH, 6/8, e A VONTADE DO PAI), o `.enc` grava
+  duração de 1,5 × a figura, e o MusicXML mantém essa duração (`360` com `quarter`), mas omite o
+  `<dot/>`. Musicalmente é pausa pontuada. A pausa de compasso inteiro vem sem `<type>` e fica de fora.
+- **Grafia da nota que termina uma ligadura:** em ANA BEKOACH - Trombone (compassos 61 e 69), um C♯4
+  ligado por cima da barra sai como D♭4 na continuação. No `.enc`, as duas notas têm o mesmo `y` e a
+  mesma altura; só a primeira tem acidente visível (`+21`). O exportador grafa a continuação pela
+  armadura (1♭), o que produz uma ligadura C♯–D♭.
 
 **Não use a duração para posicionar eventos.** A posição vem do tick.
 
@@ -365,34 +378,19 @@ npx vitest run src/enc/container.test.ts
 | --- | --- |
 | Documento cobre cabeçalho, versão, partes, compassos, notas, durações, claves, armaduras e metadados | **sim, com lacunas declaradas** (seção 8) |
 | Cada campo documentado tem amostra que o comprova | **sim** para os marcados como comprovados; o resto está marcado como hipótese |
-| Spike abre ≥ 3 amostras simples sem erro | **sim**: 3 partituras reais e as 24 controladas conferem com a referência |
+| Spike abre ≥ 3 amostras simples sem erro | **sim**: 14 partituras reais e as 24 controladas conferem com a referência |
 | Magic bytes e versão identificados, ou motivo da ausência | **sim**: magic `SCOW`; versão só tem candidato (`0x04` = `0xC4`), porque só há um valor observado |
-| Decisão go/no-go registrada e datas recalculadas | **pendente**: decisão do responsável pelo projeto |
+| Decisão go/no-go registrada e datas recalculadas | **sim**: GO em 02/11/2026 ([ADR 0002](decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md)); cronograma v2.0 |
 
 Fora do portão, mas na Fase 1:
 
-- **Tarefa 1.1 incompleta:** há 3 partituras reais, contra a meta de 10 a 30. O cronograma trata menos
-  de 10 como bloqueante. Versão do Encore e direitos de uso também seguem a confirmar.
+- **Tarefa 1.1 concluída:** 14 partituras reais do mesmo acervo, todas `0xC4`, com MusicXML e direito
+  de uso aprovado (o acervo é liberado para o projeto, que será open source). A condição do ADR 0002
+  está cumprida pelo spike; no G2, o parser de produto precisa repetir o resultado.
 - **Tarefa 1.2 parcial:** experimentos 13 a 24 gerados, todos com MusicXML e conferidos.
 - **Tarefa 1.6 não acionada:** a análise do executável não foi necessária, e a questão legal segue
   aberta.
 
-**Recomendação: GO para a Fase 2, com várias partes e pautas.** Melodias de uma voz, o
-caso de prioridade Alta, têm todos os campos comprovados, agora também com bemóis, claves de dó e
-oitavada, troca de clave e de armadura, quiálteras 3:2, voz 2 e autor. Segunda pauta e segunda parte
-(RF-07) também estão comprovadas; mais de duas ficam em modo tolerante, com aviso. O risco é
-a amostragem: 3 partituras de um único acervo podem não representar outras versões do Encore.
-
-**Proposta de datas, se a Fase 2 começar em 03/11/2026** (mesmo esforço do cronograma, em dias úteis,
-sem reduzir o que já foi adiantado):
-
-| Portão | Cronograma v1.0 | Proposta |
-| --- | --- | --- |
-| G1 | 27/11/2026 | na decisão |
-| G2 | 18/12/2026 | 24/11/2026 |
-| G3 | 07/01/2027 | 10/12/2026 |
-| G4 | 21/01/2027 | 24/12/2026 |
-| G5 | 29/01/2027 | 05/01/2027 |
-
-As datas do cronograma não foram alteradas: vale a regra da seção 9 dele, com a versão 2.0 emitida
-depois da decisão.
+**Decisão: GO**, com as condições do ADR 0002: Encore `0xC4` como versão de referência, RF-07 na
+Fase 2 e pelo menos 10 partituras reais até o G2. As datas estão no cronograma v2.0: G2 24/11/2026,
+G3 10/12/2026, G4 28/12/2026, G5 06/01/2027.

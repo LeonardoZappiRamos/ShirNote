@@ -1,7 +1,27 @@
 # Cronograma — Visualizador Web de Partituras Encore (.enc)
 
-**Versão:** 1.0 · **Data:** 01/11/2026 · **Base:** `docs/PRD — Visualizador Web de Partituras Encore (.enc).md`
-**Horizonte:** 03/11/2026 → 29/01/2027 (release do MVP) + reserva até 05/02/2027
+**Versão:** 2.0 · **Data:** 02/11/2026 · **Base:** `docs/PRD — Visualizador Web de Partituras Encore (.enc).md`
+**Horizonte:** 03/11/2026 → 06/01/2027 (release do MVP) + reserva até 13/01/2027
+**Decisão de origem:** portão G1 aprovado em 02/11/2026 ([ADR 0002](decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md))
+
+---
+
+## 0. Mudanças em relação à v1.0
+
+A v1.0 (01/11/2026) previa 18 du para a Fase 1. A descoberta do formato terminou em 02/11/2026,
+antes do início planejado, e o portão G1 foi aprovado com uma condição. Esta versão recalcula G2 a G5
+como manda a seção 9 da v1.0.
+
+| Item | v1.0 | v2.0 | Motivo |
+| --- | --- | --- | --- |
+| Fase 1 | 03/11 → 27/11 (18 du) | **concluída** em 02/11 | `docs/enc-format.md` v0.8; spike confere 27 de 27 amostras |
+| Início da Fase 2 | 30/11/2026 | 03/11/2026 | G1 aprovado |
+| RF-07 (partes e vozes) | Fase 4, tarefa 4.6 | Fase 2, tarefa 2.3 | segunda pauta e segunda parte já comprovadas |
+| Folga da trilha paralela | — | absorvida pelo RF-07 | 2.1, 2.2 e 2.4 já existem desde o scaffold |
+| Partituras reais | meta de 10–30 na Fase 1 | **≥ 10 até o G2** (24/11) | G1 aprovado com 3; condição do ADR 0002, cumprida em 02/11 com 14 |
+| Versão do Encore | "1 versão de referência" | **`0xC4`** (Encore 5.0.2) | único valor em todas as amostras |
+| G4 | 21/01/2027 | 28/12/2026 | sai de 24/12, meio período |
+| Release (G5) | 29/01/2027 | 06/01/2027 | — |
 
 ---
 
@@ -11,15 +31,18 @@ O cronograma é dimensionado em **dias úteis (du)** e assume:
 
 | Premissa | Valor adotado | Efeito se mudar |
 | --- | --- | --- |
-| Equipe de desenvolvimento | 1 pessoa full-time (TypeScript/front-end) | 2 devs comprimem F2–F4 em ~30%, mas não F1 |
-| Apoio de domínio | 0,5 pessoa (música/Encore) para gerar amostras e validar | Sem esse apoio, F1 não fecha |
-| Início | terça, 03/11/2026 (02/11 é feriado) | — |
-| Feriados considerados | 02/11, 20/11, 25/12/2026 e 01/01/2027 | 24 e 31/12 tratados como meio período, absorvidos pela reserva |
-| Acesso ao Encore | sim, para gerar amostras controladas | Sem acesso, F1 vira dependência externa bloqueante |
-| Restrição legal à análise do executável | não confirmada — **questão em aberto do PRD** | Se houver, remover a tarefa 1.6 e aceitar +2 a +3 semanas em F2 |
+| Equipe de desenvolvimento | 1 pessoa full-time (TypeScript/front-end) | 2 devs comprimem F2–F4 em ~30% |
+| Apoio de domínio | 0,5 pessoa (música/Encore) para gerar amostras e validar | Sem esse apoio, a condição do G2 não fecha |
+| Início da Fase 2 | terça, 03/11/2026 (02/11 é feriado) | — |
+| Feriados considerados | 20/11, 25/12/2026 e 01/01/2027 | 24/12 fora da contagem; 31/12 contado como dia cheio |
+| Versão do Encore | só `0xC4`; outras versões geram erro claro | Outra versão exige amostras e entra no backlog |
+| Partituras reais | 14 do mesmo acervo, recebidas em 02/11/2026, direito de uso aprovado | Novas partituras só ampliam a cobertura |
+| Restrição legal | análise do executável não foi necessária; Enc2MusicXML (GPL-3.0) só como pista | Parecer negativo não muda datas: o formato já está documentado |
 | Escopo | exatamente o MVP do PRD (12 RF, 8 RNF) | Qualquer RF extra entra no backlog pós-MVP |
 
-**Regra de ouro:** a Fase 1 governa todo o resto. As datas de G2 a G5 são **provisórias** até o portão G1, quando são recalculadas com o esforço real de engenharia reversa.
+**Regra de ouro:** o formato está comprovado para o MVP, e as 14 partituras reais conferem com o
+spike. O risco passou a ser a **fidelidade do parser de produto** ao spike; o modo tolerante (RF-11)
+continua sendo a defesa para casos sem amostra.
 
 ---
 
@@ -27,90 +50,86 @@ O cronograma é dimensionado em **dias úteis (du)** e assume:
 
 | Fase | Foco | Esforço | Início | Fim | Portão |
 | --- | --- | --- | --- | --- | --- |
-| **1. Descoberta do formato** | Engenharia reversa e `docs/enc-format.md` | 18 du | 03/11/2026 | 27/11/2026 | **G1** |
-| **2. Núcleo de conversão** | Parser → modelo → MusicXML | 15 du | 30/11/2026 | 18/12/2026 | **G2** |
-| **3. Interface e renderização** | Upload, status, OSMD, zoom | 12 du | 21/12/2026 | 07/01/2027 | **G3** |
-| **4. Robustez e testes** | Fixtures, erros, desempenho, a11y | 10 du | 08/01/2027 | 21/01/2027 | **G4** |
-| **5. Homologação e release** | Aceite, docs, demo | 6 du | 22/01/2027 | 29/01/2027 | **G5** |
-| **Reserva** | Contingência de cronograma | 5 du | 01/02/2027 | 05/02/2027 | — |
+| **1. Descoberta do formato** | Engenharia reversa e `docs/enc-format.md` | concluída | 01/11/2026 | 02/11/2026 | **G1** ✓ |
+| **2. Núcleo de conversão** | Parser → modelo → MusicXML, com RF-07 | 15 du | 03/11/2026 | 24/11/2026 | **G2** |
+| **3. Interface e renderização** | Upload, status, OSMD, zoom | 12 du | 25/11/2026 | 10/12/2026 | **G3** |
+| **4. Robustez e testes** | Fixtures, erros, desempenho, a11y | 10 du | 11/12/2026 | 28/12/2026 | **G4** |
+| **5. Homologação e release** | Aceite, docs, demo | 6 du | 29/12/2026 | 06/01/2027 | **G5** |
+| **Reserva** | Contingência de cronograma | 5 du | 07/01/2027 | 13/01/2027 | — |
 
-**Total:** 61 du de execução + 5 du de reserva = 66 du (~13,2 semanas corridas).
+**Total:** 43 du de execução + 5 du de reserva = 48 du (~9,6 semanas corridas).
 
 ---
 
 ## 3. Linha do tempo
 
-| Fase / trilha | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | W9 | W10 | W11 | W12 | W13 | W14 |
-| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| **1. Descoberta do formato** | ██ | ██ | ██ | ██ | · | · | · | · | · | · | · | · | · | · |
-| **2. Núcleo (parser → MusicXML)** | · | · | · | · | ██ | ██ | ██ | · | · | · | · | · | · | · |
-| **3. Interface e renderização** | · | · | · | · | · | · | · | ██ | ██ | ██ | · | · | · | · |
-| **4. Robustez e testes** | · | · | · | · | · | · | · | · | · | ██ | ██ | ██ | · | · |
-| **5. Homologação e release** | · | · | · | · | · | · | · | · | · | · | · | · | ██ | · |
-| **Reserva** | · | · | · | · | · | · | · | · | · | · | · | · | · | ██ |
-| **Trilha paralela (scaffold/XML)** | · | ██ | ██ | ██ | · | · | · | · | · | · | · | · | · | · |
+| Fase / trilha | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | W9 | W10 | W11 |
+| --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| **2. Núcleo (parser → MusicXML)** | ██ | ██ | ██ | ▌ | · | · | · | · | · | · | · |
+| **3. Interface e renderização** | · | · | · | ▐ | ██ | ▌ | · | · | · | · | · |
+| **4. Robustez e testes** | · | · | · | · | · | ▐ | ██ | ██ | ▌ | · | · |
+| **5. Homologação e release** | · | · | · | · | · | · | · | · | ▐ | ▌ | · |
+| **Reserva** | · | · | · | · | · | · | · | · | · | ▐ | ██ |
 
 | Semana | Período | Semana | Período |
 | --- | --- | --- | --- |
-| W1 | 03–06/11 | W8 | 21–24/12 |
-| W2 | 09–13/11 | W9 | 28–31/12 |
-| W3 | 16–20/11 | W10 | 04–08/01 |
-| W4 | 23–27/11 | W11 | 11–15/01 |
-| W5 | 30/11–04/12 | W12 | 18–22/01 |
-| W6 | 07–11/12 | W13 | 25–29/01 |
-| W7 | 14–18/12 | W14 | 01–05/02 |
+| W1 | 03–06/11 | W7 | 14–18/12 |
+| W2 | 09–13/11 | W8 | 21–24/12 |
+| W3 | 16–20/11 | W9 | 28–31/12 |
+| W4 | 23–27/11 | W10 | 04–08/01 |
+| W5 | 30/11–04/12 | W11 | 11–15/01 |
+| W6 | 07–11/12 | | |
 
-**Marcos:** G1 27/11 · G2 18/12 · G3 07/01 · G4 21/01 · G5 29/01 · Reserva 05/02.
+**Marcos:** G1 02/11 ✓ · G2 24/11 · G3 10/12 · G4 28/12 · G5 06/01 · Reserva 13/01.
 
 ---
 
 ## 4. Detalhamento por fase
 
-### Fase 1 — Descoberta do formato `.enc` (18 du · 03/11 → 27/11)
+### Fase 1 — Descoberta do formato `.enc` (concluída em 02/11/2026)
 
-Objetivo: sair de "formato desconhecido" para "formato documentado e comprovado por amostras".
+| # | Tarefa | Resultado |
+| --- | --- | --- |
+| 1.1 | Coletar 10–30 amostras reais | **3**; a meta passou a ser condição do G2 |
+| 1.2 | Gerar amostras controladas | 24, todas com MusicXML de referência |
+| 1.3 | Diff hexadecimal | `scripts/enc-diff.mjs` e `scripts/enc-dump.mjs` |
+| 1.4 | Spike de parser | `scripts/enc-spike.mjs` confere 27 de 27 amostras com o MusicXML do Encore |
+| 1.5 | `docs/enc-format.md` | v0.8, com comprovado e hipótese separados |
+| 1.6 | Análise do executável | não foi necessária |
 
-| # | Tarefa | Esforço | Saída |
-| --- | --- | --- | --- |
-| 1.1 | Coletar 10–30 amostras reais, de complexidade crescente, e catalogar versão do Encore, SO e opções de salvamento | 3 du | `tests/fixtures/` + catálogo de amostras |
-| 1.2 | Gerar amostras controladas com mudanças mínimas (1 nota, 1 compasso, outra tonalidade, outra clave, 2 vozes, piano) | 4 du | Matriz de amostras isoladas |
-| 1.3 | Diff hexadecimal par a par: magic bytes, cabeçalho, contadores, offsets, campos | 6 du | Tabela offset/tamanho/tipo/significado/evidência |
-| 1.4 | Spike de parser de prova (script descartável) lendo cabeçalho + notas de amostras simples | 3 du | Prova de que o formato é legível |
-| 1.5 | Escrever `docs/enc-format.md` v0.1 com diagramas binários | 2 du | Documento do formato |
-| 1.6 | *(Condicional)* Análise do executável com Ghidra/IDA Free/Radare2 em VM | até 5 du | Mapa de rotinas de leitura |
-
-**Portão G1 — Formato comprovado (27/11/2026)**
-- [ ] `docs/enc-format.md` v0.1 cobre cabeçalho, versão, partes, compassos, notas, durações, claves, armaduras, metadados.
-- [ ] Cada campo documentado tem ao menos uma amostra que o comprova.
-- [ ] O spike de parser abre ≥ 3 amostras simples sem erro.
-- [ ] Magic bytes e versão identificados (ou motivo documentado da ausência).
-- [ ] Decisão go/no-go registrada e **datas de G2–G5 recalculadas**.
-
-> Este é o único portão que pode alterar o cronograma inteiro. Se G1 atrasar, tudo atrasa na mesma proporção.
+**Portão G1 — aprovado em 02/11/2026** (ADR 0002)
+- [x] `docs/enc-format.md` cobre cabeçalho, versão, partes, compassos, notas, durações, claves, armaduras, metadados.
+- [x] Cada campo documentado tem ao menos uma amostra que o comprova.
+- [x] O spike de parser abre ≥ 3 amostras simples sem erro.
+- [x] Magic bytes e versão identificados (`SCOW`; versão `0xC4` como candidata).
+- [x] Decisão go/no-go registrada e datas de G2–G5 recalculadas.
 
 ---
 
-### Fase 2 — Núcleo de conversão (15 du · 30/11 → 18/12)
+### Fase 2 — Núcleo de conversão (15 du · 03/11 → 24/11)
 
-Objetivo: pipeline completo fora do navegador — `.enc` → modelo neutro → MusicXML válido.
+Objetivo: pipeline completo fora do navegador — `.enc` → modelo neutro → MusicXML válido, já com
+várias partes, pautas e vozes.
 
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
-| 2.1 | Scaffold do projeto (Vite + TS + Vitest + ESLint/Prettier + CI) e estrutura `src/enc`, `src/music`, `src/musicxml` | 2 du | Repositório pronto |
-| 2.2 | Modelo musical neutro (partes, compassos, notas, pausas, claves, tonalidade, vozes) + testes | 3 du | `src/music` |
-| 2.3 | Parser Encore: magic bytes, versão, metadados, compassos, claves, tonalidade, notas/pausas | 6 du | `src/enc` |
-| 2.4 | Gerador MusicXML `score-partwise` + validação contra XSD/parser XML | 3 du | `src/musicxml` |
-| 2.5 | Harness de fixtures e comparação elementar (compassos, notas, alturas, durações) | 1 du | `tests/` |
+| 2.1 | Scaffold do projeto | feito | Repositório pronto |
+| 2.2 | Ajustar o modelo musical para partes, pautas e vozes | 1 du | `src/music` |
+| 2.3 | Parser Encore: magic, versão `0xC4`, metadados, compassos, claves, armaduras, notas, pausas, partes, pautas e vozes (RF-07); avisos do modo tolerante | 8 du | `src/enc` |
+| 2.4 | Gerador MusicXML com várias partes e pautas + validação contra XSD | 3 du | `src/musicxml` |
+| 2.5 | Harness de fixtures: o teste do spike passa a rodar contra o parser de produto | 1 du | `tests/` |
+| 2.6 | Conferir o parser com as 14 partituras reais, incluindo as diferenças do exportador do Encore (`enc-format.md`, seção 7) | 2 du | Catálogo e `docs/enc-format.md` |
 
-**Portão G2 — Pipeline completo (18/12/2026)**
-- [ ] `.enc` → MusicXML válido via CLI/teste, sem tocar na UI.
+**Portão G2 — Pipeline completo (24/11/2026)**
+- [ ] `.enc` → MusicXML válido via teste, sem tocar na UI.
 - [ ] MusicXML abre no OSMD e em um segundo visualizador (MuseScore ou Verovio).
-- [ ] Comparação elementar passando em ≥ 3 amostras simples.
+- [ ] Comparação elementar passando nas 24 controladas e nas **14 partituras reais** (condição do ADR 0002; o spike já confere).
+- [ ] Arquivo de outra versão do Encore gera `EncoreFormatError` com mensagem clara.
 - [ ] Módulos sem acoplamento (RNF-05): parser não importa MusicXML e vice-versa.
 
 ---
 
-### Fase 3 — Interface e renderização (12 du · 21/12 → 07/01)
+### Fase 3 — Interface e renderização (12 du · 25/11 → 10/12)
 
 Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 
@@ -123,7 +142,9 @@ Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 | 3.5 | Modo tolerante: avisos do parser chegam à UI sem derrubar a renderização | 2 du | RF-11 |
 | 3.6 | Textos em pt-BR e mensagens de erro acionáveis | 1 du | RNF-08 |
 
-**Portão G3 — MVP navegável (07/01/2027)**
+3.1 e 3.2 já têm rascunho desde o scaffold; o esforço cobre a versão final.
+
+**Portão G3 — MVP navegável (10/12/2026)**
 - [ ] Melodia de uma voz renderizada no navegador a partir de um `.enc` real.
 - [ ] Zoom e rolagem funcionando.
 - [ ] Arquivo inválido gera mensagem clara, sem recarregar a página.
@@ -131,21 +152,21 @@ Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 
 ---
 
-### Fase 4 — Robustez e testes (10 du · 08/01 → 21/01)
+### Fase 4 — Robustez e testes (10 du · 11/12 → 28/12)
 
 Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às métricas.
 
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
 | 4.1 | Cobertura de fixtures por recurso (todo RF suportado tem `.enc` de teste) | 2 du | RNF-06 |
-| 4.2 | Robustez: arquivos truncados, corrompidos, `.enc` criptografado e de outros formatos | 2 du | RNF-02, RF-03 |
+| 4.2 | Robustez: arquivos truncados, corrompidos, outras versões e outros formatos | 2 du | RNF-02, RF-03 |
 | 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | 1 du | RNF-03 |
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | 1 du | RNF-04 |
 | 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | 1 du | RNF-07 |
-| 4.6 | Múltiplas partes/vozes (RF-07) e metadados título/autor (RF-04) | 2 du | RF-04, RF-07 |
+| 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | 2 du | RF-04, RF-07 |
 | 4.7 | Arquivos de exemplo para demonstração (RF-12) | 1 du | RF-12 |
 
-**Portão G4 — Robustez comprovada (21/01/2027)**
+**Portão G4 — Robustez comprovada (28/12/2026)**
 - [ ] 90% das amostras simples abrem sem erro; 100% de fidelidade nas suportadas.
 - [ ] Zero travamentos com arquivos inválidos (teste com lote de arquivos ruins).
 - [ ] Renderização de 50 compassos ≤ 3 s no notebook de referência.
@@ -153,7 +174,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 
 ---
 
-### Fase 5 — Homologação e release (6 du · 22/01 → 29/01)
+### Fase 5 — Homologação e release (6 du · 29/12 → 06/01)
 
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
@@ -163,7 +184,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | 5.4 | Deploy estático da demo | 1 du | URL da demo |
 | 5.5 | Retrospectiva e backlog pós-MVP | 1 du | Backlog priorizado |
 
-**Portão G5 — Release do MVP (29/01/2027)**
+**Portão G5 — Release do MVP (06/01/2027)**
 - [ ] Os 7 critérios de aceite do PRD marcados.
 - [ ] Demo no ar e acessível.
 - [ ] `docs/enc-format.md` publicado e suficiente para outra pessoa dar manutenção.
@@ -176,54 +197,43 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | Requisito | Fase | Verificação |
 | --- | --- | --- |
 | RF-01, RF-02 | 3 | Teste manual + Network |
-| RF-03 | 1 (magic bytes) e 4 (robustez) | Amostras inválidas |
-| RF-04 | 2 (extração) e 4 (UI) | Fixture com título/autor |
-| RF-05, RF-06 | 1 (formato), 2 (parser), 3 (render) | Comparação elementar |
-| RF-07 | 4 | Amostra de piano e duas vozes |
+| RF-03 | 2 (magic e versão) e 4 (robustez) | Amostras inválidas e de outra versão |
+| RF-04 | 2 (extração) e 4 (UI) | Fixture com título/autor (`controle-21`) |
+| RF-05, RF-06 | 2 (parser) e 3 (render) | Comparação elementar |
+| RF-07 | 2 (parser) e 4 (render) | `controle-16`, `17`, `18` e `24` |
 | RF-08 | 2 | Validação XSD + 2º visualizador |
 | RF-09, RF-10 | 3 | Render no navegador |
-| RF-11 | 3 (UI) e 4 (cobertura) | Lote de arquivos ruins |
+| RF-11 | 2 (avisos), 3 (UI) e 4 (cobertura) | Lote de arquivos ruins |
 | RF-12 | 4 | Exemplos publicados |
 | RNF-01, RNF-02 | 3 e 4 | Network + lote de corrompidos |
 | RNF-03 | 4 | Cronometragem de 50 compassos |
 | RNF-04 | 4 | Matriz de navegadores |
 | RNF-05 | 2 | Revisão de imports entre módulos |
-| RNF-06 | 1 e 4 | Fixture por recurso |
+| RNF-06 | 2 e 4 | Fixture por recurso |
 | RNF-07, RNF-08 | 3 e 4 | Checklist a11y + revisão de textos |
 
 ---
 
 ## 6. Cenários de prazo
 
-As três hipóteses variam sobretudo no esforço da Fase 1 e no efeito dela sobre o parser.
+Com a Fase 1 concluída e as 14 partituras reais conferindo com o spike, a incerteza está no parser de
+produto e em partituras fora do acervo.
 
-| Cenário | Gatilho | F1 | F2 | F3 | F4 | F5 | Total | Release |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **Otimista** | Formato simples, magic bytes na 1ª semana, sem análise de executável | 12 | 12 | 10 | 8 | 5 | 47 du | **11/01/2027** |
-| **Base** | Formato legível com esforço moderado, 1 versão do Encore | 18 | 15 | 12 | 10 | 6 | 61 du | **29/01/2027** |
-| **Pessimista** | Formato compactado/indireto, exige análise de executável e 2ª versão | 30 | 22 | 14 | 12 | 6 | 84 du | **03/03/2027** |
-
-A reserva de 5 du (01–05/02) cobre apenas o cenário base. No pessimista, a reserva é consumida e o release escorrega para março.
+| Cenário | Gatilho | Efeito | Release |
+| --- | --- | --- | --- |
+| **Otimista** | O parser repete o spike nas 38 amostras | Reserva intacta | **06/01/2027** |
+| **Base** | Partituras fora do acervo trazem casos sem amostra (vozes 3–8, quiálteras 5:4, outras claves) | Novas amostras controladas; consome até 3 du da reserva | **06/01/2027** |
+| **Pessimista** | Parser exige retrabalho estrutural ou surge estrutura desconhecida | G2 escorrega; reserva consumida | **13/01/2027** ou depois |
 
 ---
 
-## 7. Caminho crítico, paralelismo e dependências
+## 7. Caminho crítico e dependências
 
-**Caminho crítico:** 1.1 → 1.2 → 1.3 → 1.4 → G1 → 2.3 → 2.4 → 3.3 → 4.2 → 5.2 → G5.
-
-| Trilha paralela | Janela | Por quê |
-| --- | --- | --- |
-| Scaffold + tooling + CI (2.1) | W2–W3 | Não depende do formato |
-| Modelo musical neutro (2.2) | W3–W4 | Pode ser desenhado a partir do MusicXML, não do `.enc` |
-| Gerador MusicXML com dados sintéticos (2.4) | W2–W4 | Permite testar OSMD antes de o parser existir |
-| Rascunho dos componentes de UI (3.1, 3.2) | W4 | Independentes do parser |
-
-> Essas frentes usam o tempo em que a Fase 1 está bloqueada esperando amostras. Elas **não encurtam o calendário de F2** — o ganho é consumido por integração, retrabalho do modelo e pela incerteza do parser. O benefício real é reduzir a chance de G2 escorregar e evitar que a Fase 2 vire a primeira vez que alguém vê o MusicXML gerado.
+**Caminho crítico:** 2.3 → 2.6 → G2 → 3.3 → 3.4 → 4.2 → 5.2 → G5.
 
 **Dependências externas**
-- Amostras reais em mãos até o fim da W1 (1.1) — sem isso, F1 para.
-- Acesso ao Encore para amostras controladas (1.2) — premissa do PRD.
-- Parecer sobre análise de executável antes da W3 (1.6).
+- ~~≥ 10 partituras reais do mesmo acervo até 24/11/2026~~ — cumprida em 02/11/2026, com 14.
+- Acesso ao Encore para novas amostras controladas, se as partituras reais revelarem casos novos.
 - Notebook de referência definido antes de 4.3.
 
 ---
@@ -232,11 +242,11 @@ A reserva de 5 du (01–05/02) cobre apenas o cenário base. No pessimista, a re
 
 | Risco | Sinal de alerta | Ação imediata | Impacto |
 | --- | --- | --- | --- |
-| Magic bytes não identificados | Fim da W2 sem hipótese de cabeçalho | Acionar 1.6 (Ghidra em VM) na W3 | +5 a +10 du |
-| Formato varia por versão do Encore | Diferenças estruturais entre amostras do mesmo tipo | Congelar suporte em 1 versão e documentar as demais | +5 du |
-| Menos de 10 amostras reais | Fim da W1 com acervo incompleto | Bloquear F1 e escalar; não iniciar F2 "no escuro" | Bloqueante |
+| Parser diverge do spike numa partitura real | Falha no teste de referência na tarefa 2.6 | Comparar com o spike e com `enc-format.md`; corrigir o parser | +1 a +2 du |
+| Partitura real com caso sem amostra | Divergência na tarefa 2.6 | Amostra controlada isolando o caso; enquanto isso, aviso do modo tolerante | +1 a +3 du |
+| Acervo usa outra versão do Encore | `0x04` diferente de `0xC4` | Erro claro; versão nova vai para o backlog, salvo decisão em novo ADR | +5 du se entrar no MVP |
 | OSMD não renderiza o MusicXML gerado | G2 falha na abertura | Spike de 3 du com Verovio como renderizador alternativo | +5 du |
-| Análise de executável proibida juridicamente | Parecer negativo | Remover 1.6 e aceitar parser mais lento por tentativa e erro | +10 a +15 du |
+| Contaminação de licença GPL | Código derivado do Enc2MusicXML | Usar só como pista; toda regra comprovada por amostra nossa | — |
 | Atraso > 3 du em qualquer fase | Review de sexta | Cortar escopo na ordem: RF-12 → RF-10 → RF-07 → RF-04 | Protege G5 |
 
 **Escopo de corte (nunca cortar):** RF-01, RF-02, RF-03, RF-05, RF-06, RF-08, RF-09, RF-11. São o núcleo do MVP.
@@ -248,9 +258,8 @@ A reserva de 5 du (01–05/02) cobre apenas o cenário base. No pessimista, a re
 | Quando | O quê | Saída |
 | --- | --- | --- |
 | Segunda, 30 min | Planejamento da semana e revisão do caminho crítico | Lista de tarefas da semana |
-| Sexta, 30 min | Review: o que fechou, o que travou, desvio em du | Atualização do cronograma |
+| Sexta, 30 min | Review: o que fechou, o que travou, desvio em du, partituras recebidas | Atualização do cronograma |
 | Fim de cada fase | Demo de 15 min + checklist do portão | Portão assinado ou replanejamento |
-| G1 | Recalcular G2–G5 com o esforço real medido | Cronograma v2.0 |
 
 **Regra de replanejamento:** desvio acumulado > 3 du em uma fase dispara corte de escopo (ordem da seção 8) ou consumo da reserva — nunca as duas coisas ao mesmo tempo.
 
@@ -266,5 +275,5 @@ Itens do PRD declarados como não-objetivo, mantidos aqui para não virarem pres
 - Edição de partitura e conversão em lote.
 - Layout fiel ao Encore.
 - Percussão avançada, tablatura, letras, cifras e articulações sofisticadas.
-- Suporte a múltiplas versões do Encore além da versão de referência.
+- Suporte a versões do Encore além de `0xC4` (`0xC2`, `0xA6`, magic `SCO5`).
 - Internacionalização além de pt-BR.

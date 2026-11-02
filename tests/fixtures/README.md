@@ -1,7 +1,7 @@
-# Amostras `.enc` — Fase 1
+# Amostras `.enc`
 
-Aqui ficam os arquivos usados para a engenharia reversa (tarefa 1.1 do cronograma). O parser de
-produto não existe ainda; por enquanto esta pasta é o acervo de evidências.
+Aqui ficam os arquivos usados na engenharia reversa (Fase 1) e na conferência do parser de produto
+(Fase 2, tarefa 2.6).
 
 ```
 tests/fixtures/
@@ -15,17 +15,31 @@ tests/fixtures/
 Preencha uma linha por arquivo. A coluna "recurso comprovado" é o que o portão G1 exige: cada campo
 documentado em `docs/enc-format.md` precisa de ao menos uma amostra que o comprove.
 
-| Arquivo                        | Versão do Encore | SO          | Complexidade                       | Recurso comprovado                                                                          | Origem / direitos                                                                              |
-| ------------------------------ | ---------------- | ----------- | ---------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `samples/justica-flauta2.enc`  | a confirmar      | a confirmar | 1 parte, 38 compassos, 10 sistemas | contêiner `SCOW` + cadeia `PAGE`/`LINE`/`MEAS`/`TITL` fechando no EOF; bloco fixo de 54 B   | `docs/amostra/A JUSTIÇA - Flauta 2.enc` (direitos a confirmar)                                 |
-| `samples/tora-sax-tenor.enc`   | a confirmar      | a confirmar | 1 parte, 36 compassos, 9 sistemas  | mesma cadeia fechando no EOF; `TEXT`/`FONT` de tamanho variável entre arquivos              | `docs/amostra/A TORÁ DE ADONAI - Sax tenor.enc` (direitos a confirmar)                         |
-| `samples/alegrei-sax-alto.enc` | a confirmar      | a confirmar | 1 parte, 43 compassos, 11 sistemas | mesma cadeia fechando no EOF; `LINE` com 11 sistemas; possíveis pares de notas no mesmo `x` | `docs/amostra/ALEGREI-ME QUANDO ME DISSERAM (SALMO 122) - Sax Alto.enc` (direitos a confirmar) |
+| Arquivo                                 | Versão do Encore | SO          | Complexidade                        | Recurso comprovado                                                                          | Origem / direitos                                                                         |
+| --------------------------------------- | ---------------- | ----------- | ----------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `samples/justica-flauta2.enc`           | `0xC4`           | a confirmar | 1 parte, 38 compassos, 10 sistemas  | contêiner `SCOW` + cadeia `PAGE`/`LINE`/`MEAS`/`TITL` fechando no EOF; bloco fixo de 54 B   | `docs/amostra/A JUSTIÇA - Flauta 2.enc` (acervo liberado)                                 |
+| `samples/tora-sax-tenor.enc`            | `0xC4`           | a confirmar | 1 parte, 36 compassos, 9 sistemas   | mesma cadeia fechando no EOF; `TEXT`/`FONT` de tamanho variável entre arquivos              | `docs/amostra/A TORÁ DE ADONAI - Sax tenor.enc` (acervo liberado)                         |
+| `samples/alegrei-sax-alto.enc`          | `0xC4`           | a confirmar | 1 parte, 43 compassos, 11 sistemas  | mesma cadeia fechando no EOF; `LINE` com 11 sistemas; possíveis pares de notas no mesmo `x` | `docs/amostra/ALEGREI-ME QUANDO ME DISSERAM (SALMO 122) - Sax Alto.enc` (acervo liberado) |
+| `samples/meu-clamor-trompete.enc`       | `0xC4`           | a confirmar | 1 parte, 99 compassos, 24 sistemas  | confere com o MusicXML                                                                      | `docs/amostra/A MEU CLAMOR (SALMO 4) - Trompete Bb.enc` (acervo liberado)                 |
+| `samples/seu-tempo-melodia.enc`         | `0xC4`           | a confirmar | 1 parte, 48 compassos, 12 sistemas  | confere com o MusicXML                                                                      | `docs/amostra/A SEU TEMPO - MELODIA.enc` (acervo liberado)                                |
+| `samples/vontade-do-pai-trompete.enc`   | `0xC4`           | a confirmar | 1 parte, 31 compassos, 8 sistemas   | pausa pontuada sem `<dot/>` no MusicXML                                                     | `docs/amostra/A VONTADE DO PAI (O DIA E A HORA) - TROMPETE Bb.enc` (acervo liberado)      |
+| `samples/adonai-adoneinu-melodia.enc`   | `0xC4`           | a confirmar | 1 parte, 56 compassos, 14 sistemas  | confere com o MusicXML                                                                      | `docs/amostra/ADONAI ADONEINU - MELODIA Bb.enc` (acervo liberado)                         |
+| `samples/adonai-adoneinu-sax-tenor.enc` | `0xC4`           | a confirmar | 1 parte, 59 compassos, 12 sistemas  | confere com o MusicXML                                                                      | `docs/amostra/ADONAI ADONEINU - SAX TENOR.enc` (acervo liberado)                          |
+| `samples/al-ze-flauta.enc`              | `0xC4`           | a confirmar | 1 parte, 127 compassos, 24 sistemas | confere com o MusicXML                                                                      | `docs/amostra/AL ZE- Flauta.enc` (acervo liberado)                                        |
+| `samples/alegrei-flauta.enc`            | `0xC4`           | a confirmar | 1 parte, 43 compassos, 11 sistemas  | confere com o MusicXML                                                                      | `docs/amostra/ALEGREI-ME QUANDO ME DISSERAM (SALMO 122) - Flauta.enc` (acervo liberado)   |
+| `samples/ana-bekoach-clarinete.enc`     | `0xC4`           | a confirmar | 1 parte, 120 compassos, 24 sistemas | 6/8; pausas pontuadas sem `<dot/>` no MusicXML                                              | `docs/amostra/ANA BEKOACH - Clarinete.enc` (acervo liberado)                              |
+| `samples/ana-bekoach-flauta.enc`        | `0xC4`           | a confirmar | 1 parte, 120 compassos, 24 sistemas | 6/8; pausas pontuadas sem `<dot/>` no MusicXML                                              | `docs/amostra/ANA BEKOACH - Flauta.enc` (acervo liberado)                                 |
+| `samples/ana-bekoach-trombone.enc`      | `0xC4`           | a confirmar | 1 parte, 120 compassos, 24 sistemas | 6/8; pausas pontuadas; grafia de ligadura C♯–D♭ no MusicXML                                 | `docs/amostra/ANA BEKOACH - Trombone.enc` (acervo liberado)                               |
+| `samples/atravessem-sax-tenor.enc`      | `0xC4`           | a confirmar | 1 parte, 84 compassos, 21 sistemas  | confere com o MusicXML                                                                      | `docs/amostra/ATRAVESSEM AS PORTAS (Ivru Basharim) - Sax Tenor.enc` (acervo liberado)     |
 
-Análise consolidada em [`docs/enc-format.md`](../../docs/enc-format.md) (v0.5).
+Direito de uso: o acervo é liberado para o ShirNote, que será publicado como open source
+(aprovado em 02/11/2026). Todas conferem com o MusicXML em `reference/`.
+
+Análise consolidada em [`docs/enc-format.md`](../../docs/enc-format.md) (v0.9).
 
 ## Catálogo — `controlled/`
 
-O catálogo dos 21 arquivos `controle-*.enc`, com o conteúdo de cada um, está em
+O catálogo dos 24 arquivos `controle-*.enc`, com o conteúdo de cada um, está em
 [`controlled/README.md`](controlled/README.md).
 
 ## Catálogo — `reference/`

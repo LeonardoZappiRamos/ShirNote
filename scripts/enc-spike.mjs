@@ -319,16 +319,33 @@ function byPosition(a, b) {
   );
 }
 
+/** Figura do MusicXML em semínimas. */
+const REST_QUARTERS = {
+  breve: 8,
+  whole: 4,
+  half: 2,
+  quarter: 1,
+  eighth: 0.5,
+  '16th': 0.25,
+  '32nd': 0.125,
+};
+
+const SEMITONES = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+const midiOf = (note) => (note.octave + 1) * 12 + SEMITONES[note.step] + note.alter;
+
 function readReference(path) {
   // O Encore exporta em UTF-16LE (declarado no cabeçalho XML); exportações antigas vieram em UTF-8.
   const bytes = readFileSync(path);
   const xml = bytes.toString(bytes[1] === 0 ? 'utf16le' : 'utf8').replace(/^﻿/, '');
   const value = (text, pattern) => text.match(pattern)?.[1];
+  const divisions = Number(value(xml, /<divisions>(\d+)/) ?? 0);
   // Armadura, fórmula e clave da pauta 1 em vigor ao fim de cada compasso.
   let fifths;
   let beats;
   let beatType;
   let clef;
+  // Nota que começou ligadura, por pauta, voz e altura MIDI.
+  const tied = new Map();
   const readMeasure = (body, staffOffset) => {
     fifths = Number(value(body, /<fifths>(-?\d+)/) ?? fifths);
     beats = Number(value(body, /<beats>(\d+)/) ?? beats);
@@ -366,9 +383,15 @@ function readReference(path) {
         tuplet: actual ? `${actual}:${value(item, /<normal-notes>(\d+)/)}` : '',
       };
       if (item.includes('<rest')) {
+        // O Encore omite `<dot/>` em pausa pontuada, mas mantém a duração de 1,5 × a figura (54 pausas
+        // em ANA BEKOACH e A VONTADE DO PAI). O ponto vem da duração. Pausa de compasso inteiro vem
+        // sem `<type>` e fica de fora.
+        const nominal = divisions * (REST_QUARTERS[common.type] ?? 0);
+        const typed = item.includes('<type>');
+        if (typed && common.dots === 0 && !actual && duration === nominal * 1.5) common.dots = 1;
         events.push({ kind: 'rest', ...common });
       } else {
-        events.push({
+        const note = {
           kind: 'note',
           ...common,
           step: value(item, /<step>(.)/),
@@ -377,7 +400,14 @@ function readReference(path) {
           chord,
           tieStart: ties.includes('start'),
           tieStop: ties.includes('stop'),
-        });
+        };
+        // O Encore grafa pela armadura a nota que termina uma ligadura (C♯ ligado vira D♭ em ANA
+        // BEKOACH - Trombone). No `.enc` ela tem o mesmo `y` da que começa; a grafia vem desta.
+        const key = `${note.staff}/${note.voice}/${midiOf(note)}`;
+        const start = tied.get(key);
+        if (note.tieStop && start) Object.assign(note, { step: start.step, alter: start.alter });
+        if (note.tieStart) tied.set(key, note);
+        events.push(note);
       }
       if (!chord) clocks[current] += duration;
     }

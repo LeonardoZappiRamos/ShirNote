@@ -120,10 +120,13 @@ describe('múltiplas partes', () => {
   });
 });
 
-// Evidência do portão G1: o spike confere cada evento com o MusicXML exportado pelo Encore. Toda
-// amostra controlada que tiver referência com o mesmo nome-base entra sozinha.
+// Evidência dos portões G1 e G2: o spike confere cada evento com o MusicXML exportado pelo Encore.
+// Toda amostra real ou controlada que tiver referência com o mesmo nome-base entra sozinha.
+const SAMPLES_DIR = 'tests/fixtures/samples';
 const CHECKED = [
-  ...SAMPLES.map(({ file }) => `tests/fixtures/samples/${file}`),
+  ...readdirSync(SAMPLES_DIR)
+    .filter((file) => file.endsWith('.enc'))
+    .map((file) => `${SAMPLES_DIR}/${file}`),
   ...CONTROLLED.map((file) => `${CONTROLLED_DIR}/${file}`),
 ].filter((path) => existsSync(referenceOf(path)));
 

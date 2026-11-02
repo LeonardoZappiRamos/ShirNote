@@ -18,8 +18,8 @@ O produto e o planejamento estão em [`docs/`](docs/):
 
 ## Estado atual
 
-Fase 1 do cronograma (descoberta do formato) aguardando a decisão do portão G1, com a trilha paralela
-concluída:
+Fase 1 concluída e portão G1 aprovado em 02/11/2026 ([ADR 0002](docs/decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md)).
+A Fase 2 (parser de produto) começa em 03/11/2026; o release do MVP está previsto para 06/01/2027:
 
 | Item                                                                   | Estado                                                            |
 | ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
@@ -31,9 +31,9 @@ concluída:
 | Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                |
 | Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                            |
 | Formato documentado (`docs/enc-format.md` v0.8)                        | pronto para até duas partes e duas pautas, com lacunas declaradas |
-| Parser de produto (Fase 2)                                             | **pendente** — depende do portão G1                               |
+| Parser de produto (Fase 2)                                             | **em andamento** — G2 em 24/11/2026                               |
 
-O que se sabe sobre o formato, com base em 3 partituras reais (117 compassos), 24 amostras controladas
+O que se sabe sobre o formato, com base em 14 partituras reais (1.024 compassos), 24 amostras controladas
 e MusicXML exportado pelo Encore para todas:
 
 - **Comprovado, sem divergência contra o MusicXML:** cadeia de blocos, título, autor, 536 notas
@@ -119,4 +119,4 @@ partituras reais ainda estão a confirmar.
 - A interface só verifica a extensão do arquivo; o magic `SCOW` ainda não é validado (RF-03).
 - O formato só está comprovado para até duas partes e duas pautas, com até duas vozes por pauta. O
   restante está na seção 8 de `docs/enc-format.md`.
-- Há 3 partituras reais, contra a meta de 10 a 30 do cronograma.
+- Só o Encore `0xC4` é suportado; outras versões geram erro (ADR 0002).

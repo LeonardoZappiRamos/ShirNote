@@ -3,9 +3,10 @@
 Instruções para agentes de código neste repositório. Visão geral e estado do projeto: `README.md`.
 
 ShirNote abre partituras do Encore (`.enc`) no navegador. O formato não tem especificação pública e
-o projeto está na Fase 1 (engenharia reversa). **Não existe parser de produto:** `App.tsx` lê o
-arquivo, mostra o cabeçalho em hexadecimal e renderiza a partitura sintética `simpleMelody`. O spike
-`scripts/enc-spike.mjs` já lê as amostras e é descartável.
+o projeto está na Fase 2 (parser de produto, G2 em 24/11/2026; ver ADR 0002). **O parser de produto
+ainda não existe:** `App.tsx` lê o arquivo, mostra o cabeçalho em hexadecimal e renderiza a partitura
+sintética `simpleMelody`. O spike `scripts/enc-spike.mjs` lê as amostras, serve de referência para o
+parser e é descartável.
 
 ## Antes de concluir uma alteração
 
@@ -42,7 +43,9 @@ O parser deve implementar o contrato `EncoreParser` de `src/enc/types.ts`.
 Mantenha essa separação:
 
 - Um campo só vira comprovado com amostra que o demonstre. Registre offset, bytes e evidência.
-- Só use no parser de produto campos comprovados. Do cabeçalho `SCOW`, apenas o magic.
+- Só use no parser de produto campos comprovados. Do cabeçalho `SCOW`, só os marcados como
+  comprovados na seção 4; `0x04` serve apenas para recusar versão diferente de `0xC4` (ADR 0002).
+- O Enc2MusicXML (GPL-3.0) é só pista para hipóteses: não copie nem traduza código dele.
 - Prefira `tests/fixtures/reference/*.xml` como gabarito e amostras controladas para isolar um
   campo. Comprove com `node scripts/enc-spike.mjs <arquivo> --check <referencia>`.
 
