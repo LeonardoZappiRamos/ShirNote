@@ -15,6 +15,7 @@ export type {
   Score,
   Step,
   TimeSignature,
+  Tuplet,
   Voice,
 } from './model';
 

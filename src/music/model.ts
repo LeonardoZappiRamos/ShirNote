@@ -7,7 +7,8 @@
 
 export type Step = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 
-export type NoteValue = 'whole' | 'half' | 'quarter' | 'eighth' | '16th' | '32nd' | '64th';
+export type NoteValue =
+  'breve' | 'whole' | 'half' | 'quarter' | 'eighth' | '16th' | '32nd' | '64th';
 
 /** Pontos de aumento. Ausente equivale a 0. */
 export type Dots = 0 | 1 | 2;
@@ -20,9 +21,16 @@ export interface Pitch {
   readonly alter?: -2 | -1 | 0 | 1 | 2;
 }
 
+/** Quiáltera: `actual` figuras no tempo de `normal` (3:2 = tercina). */
+export interface Tuplet {
+  readonly actual: number;
+  readonly normal: number;
+}
+
 export interface NoteDuration {
   readonly value: NoteValue;
   readonly dots?: Dots;
+  readonly tuplet?: Tuplet;
 }
 
 export interface Note {
@@ -32,6 +40,8 @@ export interface Note {
   /** Pauta (1 = superior). Ausente equivale a 1. */
   readonly staff?: number;
   readonly tie?: 'start' | 'stop' | 'continue';
+  /** Soa junto com a nota anterior da mesma voz e não avança o tempo. */
+  readonly chord?: boolean;
 }
 
 export interface Rest {
@@ -85,6 +95,8 @@ export interface Measure {
 export interface Part {
   readonly id: string;
   readonly name: string;
+  /** Pautas da parte (piano = 2). Ausente equivale a 1. */
+  readonly staves?: number;
   readonly measures: readonly Measure[];
 }
 

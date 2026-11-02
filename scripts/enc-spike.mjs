@@ -9,6 +9,7 @@
  *   node scripts/enc-spike.mjs arquivo.enc --check referencia.xml
  */
 import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 
 const TRACK_START = 0xc2;
 const TRACK_SIZE = 0x86e;
@@ -336,7 +337,13 @@ const midiOf = (note) => (note.octave + 1) * 12 + SEMITONES[note.step] + note.al
 function readReference(path) {
   // O Encore exporta em UTF-16LE (declarado no cabeçalho XML); exportações antigas vieram em UTF-8.
   const bytes = readFileSync(path);
-  const xml = bytes.toString(bytes[1] === 0 ? 'utf16le' : 'utf8').replace(/^﻿/, '');
+  return readReferenceXml(
+    bytes.toString(bytes[1] === 0 ? 'utf16le' : 'utf8').replace(/^\uFEFF/, ''),
+  );
+}
+
+/** Lê um MusicXML (do Encore ou do ShirNote) na forma que `compare` usa. */
+export function readReferenceXml(xml) {
   const value = (text, pattern) => text.match(pattern)?.[1];
   const divisions = Number(value(xml, /<divisions>(\d+)/) ?? 0);
   // Armadura, fórmula e clave da pauta 1 em vigor ao fim de cada compasso.
@@ -481,45 +488,50 @@ function compare(score, reference) {
   return problems;
 }
 
-const [file, flag, referencePath] = process.argv.slice(2);
-if (!file || (flag !== undefined && (flag !== '--check' || !referencePath))) {
-  console.error('Uso: node scripts/enc-spike.mjs <arquivo.enc> [--check <referencia.xml>]');
-  process.exit(2);
-}
+function main() {
+  const [file, flag, referencePath] = process.argv.slice(2);
+  if (!file || (flag !== undefined && (flag !== '--check' || !referencePath))) {
+    console.error('Uso: node scripts/enc-spike.mjs <arquivo.enc> [--check <referencia.xml>]');
+    process.exit(2);
+  }
 
-let score;
-try {
-  score = parse(readFileSync(file));
-} catch (error) {
-  console.error(`${file}: ${error.message}`);
-  process.exit(1);
-}
+  let score;
+  try {
+    score = parse(readFileSync(file));
+  } catch (error) {
+    console.error(`${file}: ${error.message}`);
+    process.exit(1);
+  }
 
-const events = score.measures.flatMap((measure) => measure.events);
-const notes = events.filter((event) => event.kind === 'note').length;
-console.log(file);
-console.log(`  título: ${score.title}`);
-console.log(`  texto: ${score.subtitle}`);
-console.log(`  autor: ${score.author}`);
-console.log(
-  `  partes: ${score.partCount}  pautas: ${score.staffCount}  sistemas: ${score.systems.length}`,
-);
-const first = score.measures[0];
-console.log(
-  `  clave: ${CLEF_NAMES[first.clef]}  armadura: ${first.fifths}  fórmula: ${first.beats}/${first.beatType}`,
-);
-console.log(
-  `  compassos: ${score.measures.length}  notas: ${notes}  pausas: ${events.length - notes}`,
-);
-for (const warning of score.warnings) console.log(`  aviso: ${warning}`);
-
-if (flag === '--check') {
-  const problems = compare(score, readReference(referencePath));
-  for (const problem of problems) console.log(`  DIVERGE ${problem}`);
+  const events = score.measures.flatMap((measure) => measure.events);
+  const notes = events.filter((event) => event.kind === 'note').length;
+  console.log(file);
+  console.log(`  título: ${score.title}`);
+  console.log(`  texto: ${score.subtitle}`);
+  console.log(`  autor: ${score.author}`);
   console.log(
-    problems.length === 0
-      ? '  referência: confere'
-      : `  referência: ${problems.length} divergência(s)`,
+    `  partes: ${score.partCount}  pautas: ${score.staffCount}  sistemas: ${score.systems.length}`,
   );
-  process.exit(problems.length === 0 ? 0 : 1);
+  const first = score.measures[0];
+  console.log(
+    `  clave: ${CLEF_NAMES[first.clef]}  armadura: ${first.fifths}  fórmula: ${first.beats}/${first.beatType}`,
+  );
+  console.log(
+    `  compassos: ${score.measures.length}  notas: ${notes}  pausas: ${events.length - notes}`,
+  );
+  for (const warning of score.warnings) console.log(`  aviso: ${warning}`);
+
+  if (flag === '--check') {
+    const problems = compare(score, readReference(referencePath));
+    for (const problem of problems) console.log(`  DIVERGE ${problem}`);
+    console.log(
+      problems.length === 0
+        ? '  referência: confere'
+        : `  referência: ${problems.length} divergência(s)`,
+    );
+    process.exit(problems.length === 0 ? 0 : 1);
+  }
 }
+
+// Importado pelos testes, o módulo só exporta `readReferenceXml`.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

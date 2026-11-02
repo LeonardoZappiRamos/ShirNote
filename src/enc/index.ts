@@ -6,6 +6,7 @@ export {
   type ParseWarning,
 } from './types';
 export { inspectBinary, type BinarySnapshot } from './inspect';
+export { encoreParser, parseEncore } from './parser';
 export {
   ChunkFormatError,
   DEFAULT_TRAILERS,

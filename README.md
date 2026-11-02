@@ -30,8 +30,8 @@ A Fase 2 (parser de produto) começa em 03/11/2026; o release do MVP está previ
 | Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                            |
 | Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                |
 | Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                            |
-| Formato documentado (`docs/enc-format.md` v0.8)                        | pronto para até duas partes e duas pautas, com lacunas declaradas |
-| Parser de produto (Fase 2)                                             | **em andamento** — G2 em 24/11/2026                               |
+| Formato documentado (`docs/enc-format.md` v0.9)                        | pronto para até duas partes e duas pautas, com lacunas declaradas |
+| Parser de produto (Fase 2)                                             | **em andamento** — confere nas 38 amostras, falta ligar à UI      |
 
 O que se sabe sobre o formato, com base em 14 partituras reais (1.024 compassos), 24 amostras controladas
 e MusicXML exportado pelo Encore para todas:

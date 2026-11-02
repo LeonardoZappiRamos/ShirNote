@@ -8,6 +8,7 @@ export interface Fraction {
 
 /** Duração de cada figura em semínimas (quarter notes). */
 export const NOTE_VALUE_QUARTERS: Readonly<Record<NoteValue, Fraction>> = {
+  breve: { numerator: 8, denominator: 1 },
   whole: { numerator: 4, denominator: 1 },
   half: { numerator: 2, denominator: 1 },
   quarter: { numerator: 1, denominator: 1 },
@@ -61,7 +62,9 @@ export function durationToQuarters(duration: NoteDuration): Fraction {
   const base = NOTE_VALUE_QUARTERS[duration.value];
   const factor = DOTS_FACTORS[duration.dots ?? 0];
   if (!factor) throw new Error(`Quantidade de pontos não suportada: ${duration.dots}`);
-  return multiplyFractions(base, factor);
+  const { tuplet } = duration;
+  const dotted = multiplyFractions(base, factor);
+  return tuplet ? multiplyFractions(dotted, fraction(tuplet.normal, tuplet.actual)) : dotted;
 }
 
 /** Menor `divisions` (por semínima) que representa todas as durações da partitura. */
@@ -97,6 +100,7 @@ export function voiceDurationInQuarters(measure: Measure, voiceIndex: number): F
   if (!voice) throw new Error(`Voz ${voiceIndex} inexistente no compasso ${measure.number}.`);
   let total = fraction(0);
   for (const event of voice.events) {
+    if (event.type === 'note' && event.chord) continue;
     const quarters = durationToQuarters(event.duration);
     total = fraction(
       total.numerator * quarters.denominator + quarters.numerator * total.denominator,

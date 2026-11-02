@@ -20,6 +20,7 @@ const XML_HEADER =
   '<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">';
 
 const TYPE_BY_VALUE: Readonly<Record<NoteValue, string>> = {
+  breve: 'breve',
   whole: 'whole',
   half: 'half',
   quarter: 'quarter',
@@ -92,7 +93,7 @@ function partXml(part: Part, divisions: number): XmlElement {
   let isFirstMeasure = true;
 
   const measures = part.measures.map((measure) => {
-    const element = measureXml(measure, divisions, state, isFirstMeasure);
+    const element = measureXml(measure, divisions, state, isFirstMeasure, part.staves);
     isFirstMeasure = false;
     return element;
   });
@@ -105,10 +106,11 @@ function measureXml(
   divisions: number,
   state: AttributeState,
   isFirstMeasure: boolean,
+  staves: number | undefined,
 ): XmlElement {
   const children: XmlElement[] = [];
 
-  const attributes = attributesXml(measure.attributes, divisions, state, isFirstMeasure);
+  const attributes = attributesXml(measure.attributes, divisions, state, isFirstMeasure, staves);
   if (attributes) children.push(attributes);
 
   let previousVoiceDuration = 0;
@@ -126,7 +128,10 @@ function measureXml(
     }
 
     previousVoiceDuration = voice.events.reduce(
-      (total, event) => total + durationInDivisions(event.duration, divisions),
+      (total, event) =>
+        event.type === 'note' && event.chord
+          ? total
+          : total + durationInDivisions(event.duration, divisions),
       0,
     );
   });
@@ -139,6 +144,7 @@ function attributesXml(
   divisions: number,
   state: AttributeState,
   isFirstMeasure: boolean,
+  staves: number | undefined,
 ): XmlElement | null {
   const children: XmlElement[] = [];
 
@@ -168,6 +174,10 @@ function attributesXml(
     state.time = timeSignature;
   }
 
+  if (isFirstMeasure && staves !== undefined && staves > 1) {
+    children.push({ tag: 'staves', text: String(staves) });
+  }
+
   const clefs = attributes?.clefs;
   const clefSignature = clefs ? JSON.stringify(clefs) : undefined;
   if (clefs && clefs.length > 0 && clefSignature !== state.clefs) {
@@ -193,6 +203,15 @@ function clefXml(clef: Clef, staffNumber: number): XmlElement {
 
 function eventXml(event: MusicEvent, divisions: number, voiceId: string): XmlElement {
   const children: XmlElement[] = [];
+  // `continue` não existe em `<tie>`: a nota termina uma ligadura e começa outra.
+  const ties =
+    event.type === 'note' && event.tie
+      ? event.tie === 'continue'
+        ? ['stop', 'start']
+        : [event.tie]
+      : [];
+
+  if (event.type === 'note' && event.chord) children.push({ tag: 'chord' });
 
   if (event.type === 'note') {
     const pitchChildren: XmlElement[] = [{ tag: 'step', text: event.pitch.step }];
@@ -206,9 +225,7 @@ function eventXml(event: MusicEvent, divisions: number, voiceId: string): XmlEle
 
   children.push({ tag: 'duration', text: String(durationInDivisions(event.duration, divisions)) });
 
-  if (event.type === 'note' && event.tie) {
-    children.push({ tag: 'tie', attributes: { type: event.tie } });
-  }
+  for (const type of ties) children.push({ tag: 'tie', attributes: { type } });
 
   children.push({ tag: 'voice', text: voiceId });
   children.push({ tag: 'type', text: TYPE_BY_VALUE[event.duration.value] });
@@ -217,14 +234,25 @@ function eventXml(event: MusicEvent, divisions: number, voiceId: string): XmlEle
     children.push({ tag: 'dot' });
   }
 
+  const { tuplet } = event.duration;
+  if (tuplet) {
+    children.push({
+      tag: 'time-modification',
+      children: [
+        { tag: 'actual-notes', text: String(tuplet.actual) },
+        { tag: 'normal-notes', text: String(tuplet.normal) },
+      ],
+    });
+  }
+
   if (event.staff !== undefined && event.staff > 1) {
     children.push({ tag: 'staff', text: String(event.staff) });
   }
 
-  if (event.type === 'note' && event.tie) {
+  if (ties.length > 0) {
     children.push({
       tag: 'notations',
-      children: [{ tag: 'tied', attributes: { type: event.tie } }],
+      children: ties.map((type) => ({ tag: 'tied', attributes: { type } })),
     });
   }
 

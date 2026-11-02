@@ -24,10 +24,7 @@ export interface EncoreParseResult {
   readonly warnings: readonly ParseWarning[];
 }
 
-/**
- * Contrato do parser `.enc`. A implementação entra na Fase 2, depois de
- * `docs/enc-format.md` provar o layout do arquivo (portão G1).
- */
+/** Contrato do parser `.enc`. Implementação: `encoreParser`, em `./parser`. */
 export interface EncoreParser {
   parse(data: ArrayBuffer): EncoreParseResult;
 }
