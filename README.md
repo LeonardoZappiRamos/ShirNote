@@ -13,15 +13,15 @@ O produto e o planejamento estão em [`docs/`](docs/):
 
 Trilha paralela do cronograma (seção 7), executada antes do parser `.enc` existir:
 
-| Item                                                                 | Estado                                             |
-| -------------------------------------------------------------------- | -------------------------------------------------- |
-| Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI   | pronto                                             |
-| Modelo musical neutro (`src/music`) com testes                       | pronto                                             |
-| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes    | pronto                                             |
-| Partitura sintética renderizada no OSMD (`src/components`)           | pronto                                             |
-| Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`) | pronto                                             |
-| Parser do formato Encore                                             | **pendente** — depende do portão G1                |
-| Contêiner `.enc` documentado (`docs/enc-format.md` v0.1)             | parcial — 1 amostra, notas ainda não decodificadas |
+| Item                                                                 | Estado                                                       |
+| -------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI   | pronto                                                       |
+| Modelo musical neutro (`src/music`) com testes                       | pronto                                                       |
+| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes    | pronto                                                       |
+| Partitura sintética renderizada no OSMD (`src/components`)           | pronto                                                       |
+| Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`) | pronto                                                       |
+| Parser do formato Encore                                             | **pendente** — depende do portão G1                          |
+| Contêiner `.enc` documentado (`docs/enc-format.md` v0.2)             | parcial — 3 amostras, 117 compassos, notas ainda em hipótese |
 
 O que já funciona no navegador: upload/arrastar de um `.enc` é lido localmente e tem o cabeçalho
 exibido em hexadecimal; a partitura exibida é o exemplo sintético. Nenhum byte é enviado a servidor.
@@ -79,5 +79,6 @@ versão do Encore, sistema operacional e recurso comprovado por arquivo.
 - O bundle inclui o OSMD e passa de 500 kB (aviso do Vite); avaliar code splitting quando a UI
   estabilizar.
 - Sem cursor/playback: o OSMD é usado só para desenhar a partitura.
-- Portão G1 não atingido: o contêiner `.enc` está documentado, mas notas, claves e armaduras ainda
-  não foram decodificadas — faltam amostras controladas (ver seção 8 de `docs/enc-format.md`).
+- Portão G1 não atingido: o contêiner `.enc` está documentado e validado em 3 amostras reais, mas
+  notas, claves e armaduras ainda não foram decodificadas — faltam amostras controladas (ver seção 9
+  de `docs/enc-format.md`).

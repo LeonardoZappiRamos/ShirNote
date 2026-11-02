@@ -8,11 +8,13 @@ não existe ainda; por enquanto esta pasta é o acervo de evidências.
 Preencha uma linha por arquivo. A coluna "recurso comprovado" é o que o portão G1 exige: cada campo
 documentado em `docs/enc-format.md` precisa de ao menos uma amostra que o comprove.
 
-| Arquivo                       | Versão do Encore | SO          | Complexidade                       | Recurso comprovado                                                    | Origem / direitos                                              |
-| ----------------------------- | ---------------- | ----------- | ---------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `samples/justica-flauta2.enc` | a confirmar      | a confirmar | 1 parte, 38 compassos, 10 sistemas | contêiner `SCOW` + cadeia `PAGE`/`LINE`/`MEAS`/`TITL` fechando no EOF | `docs/amostra/A JUSTIÇA - Flauta 2.enc` (direitos a confirmar) |
+| Arquivo                        | Versão do Encore | SO          | Complexidade                       | Recurso comprovado                                                                          | Origem / direitos                                                                              |
+| ------------------------------ | ---------------- | ----------- | ---------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `samples/justica-flauta2.enc`  | a confirmar      | a confirmar | 1 parte, 38 compassos, 10 sistemas | contêiner `SCOW` + cadeia `PAGE`/`LINE`/`MEAS`/`TITL` fechando no EOF; bloco fixo de 54 B   | `docs/amostra/A JUSTIÇA - Flauta 2.enc` (direitos a confirmar)                                 |
+| `samples/tora-sax-tenor.enc`   | a confirmar      | a confirmar | 1 parte, 36 compassos, 9 sistemas  | mesma cadeia fechando no EOF; `TEXT`/`FONT` de tamanho variável entre arquivos              | `docs/amostra/A TORÁ DE ADONAI - Sax tenor.enc` (direitos a confirmar)                         |
+| `samples/alegrei-sax-alto.enc` | a confirmar      | a confirmar | 1 parte, 43 compassos, 11 sistemas | mesma cadeia fechando no EOF; `LINE` com 11 sistemas; possíveis pares de notas no mesmo `x` | `docs/amostra/ALEGREI-ME QUANDO ME DISSERAM (SALMO 122) - Sax Alto.enc` (direitos a confirmar) |
 
-Análise consolidada em [`docs/enc-format.md`](../../docs/enc-format.md).
+Análise consolidada em [`docs/enc-format.md`](../../docs/enc-format.md) (v0.2).
 
 ## Regras
 

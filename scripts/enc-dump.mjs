@@ -10,6 +10,9 @@
  */
 import { readFile } from 'node:fs/promises';
 
+/** Bytes extras medidos fora do tamanho declarado (ver docs/enc-format.md). */
+const TRAILERS = { MEAS: 54 };
+
 const args = process.argv.slice(2);
 
 function flagValue(name, fallback) {
@@ -122,9 +125,17 @@ function chunkChain(bytes) {
     while (isTag(position) && position + 8 <= bytes.length) {
       const tag = bytes.toString('latin1', position, position + 4);
       const length = bytes.readUInt32LE(position + 4);
-      if (length > bytes.length - position - 8) break;
-      chunks.push({ offset: position, tag, length, payload: position + 8 });
-      position += 8 + length;
+      const trailer = TRAILERS[tag] ?? 0;
+      if (length + trailer > bytes.length - position - 8) break;
+      chunks.push({
+        offset: position,
+        tag,
+        length,
+        trailer,
+        payload: position + 8,
+        end: position + 8 + length + trailer,
+      });
+      position += 8 + length + trailer;
     }
     return { chunks, end: position };
   };
@@ -192,7 +203,7 @@ if (asJson) {
         `  ${offsetHex}  ${chunk.tag}  ${String(chunk.length).padStart(6)} bytes  payload@${chunk.payload
           .toString(16)
           .toUpperCase()
-          .padStart(8, '0')}`,
+          .padStart(8, '0')}${chunk.trailer > 0 ? `  +trailer ${chunk.trailer}` : ''}`,
       );
     }
   }

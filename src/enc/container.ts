@@ -1,17 +1,17 @@
 /**
  * Leitura do contêiner `.enc` (Fase 1).
  *
- * Comprovado na amostra `tests/fixtures/samples/justica-flauta2.enc`: o arquivo é uma
- * cadeia de blocos `tag[4 ASCII] + uint32LE(tamanho) + payload`, e a cadeia fecha
- * exatamente no fim do arquivo. Ver `docs/enc-format.md` seção 3.
+ * Comprovado nas três amostras de `tests/fixtures/samples/`: o arquivo é uma cadeia de
+ * blocos `tag[4 ASCII] + uint32LE(tamanho) + payload`, e a cadeia fecha exatamente no fim
+ * do arquivo. Ver `docs/enc-format.md` seção 3.
  */
 
 const TAG_PATTERN = /^[A-Z][A-Z0-9]{3}$/;
 
 /**
  * Bytes que pertencem ao bloco mas ficam fora do tamanho declarado.
- * Medido em 37 transições `MEAS` da única amostra disponível; ainda não é
- * compreendido, por isso o valor fica isolado aqui.
+ * Medido em 117 transições `MEAS` das três amostras (todas terminam em `FF FF`);
+ * ainda não é compreendido, por isso o valor fica isolado aqui.
  */
 export const DEFAULT_TRAILERS: Readonly<Record<string, number>> = { MEAS: 54 };
 
