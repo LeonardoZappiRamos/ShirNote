@@ -1,0 +1,4 @@
+# MusicXML exportado pelo Encore: UTF-16LE sem BOM, com CRLF. O Git guarda em UTF-8 para mostrar o
+# diff e devolve os bytes originais no checkout.
+tests/fixtures/reference/controle-*.xml working-tree-encoding=UTF-16LE eol=crlf
+docs/amostra/*.xml working-tree-encoding=UTF-16LE eol=crlf
