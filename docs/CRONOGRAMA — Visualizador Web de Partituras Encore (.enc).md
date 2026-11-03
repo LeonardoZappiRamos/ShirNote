@@ -34,7 +34,7 @@ Fase 3 também já foi adiantada.
 | G2 | **5 de 5** — MusicXML abre no OSMD e no Verovio (38 de 38 amostras, 02/11) |
 | G3 | **3 de 3** — zoom/rolagem, arquivo inválido e Network verificados no navegador em 02/11 |
 | 3.3, 3.5 | feitas: o OSMD renderiza o `.enc`, e os avisos do parser aparecem no status |
-| 3.4 | parcial: pipeline no navegador, sem Web Worker (o parse leva milissegundos nas amostras) |
+| 3.4 | parcial por decisão: pipeline no navegador sem Web Worker; a maior amostra leva 2,3 ms de mediana ([ADR 0003](decisions/0003-adiar-o-web-worker-do-parse.md)) |
 | Além do plano | barras de repetição e casas, barras de colcheia, segno e coda |
 | Avisos que restam nas partituras reais | dinâmicas (o próprio Encore exporta `<dynamics>` vazio) e textos (bloco `TEXT`) |
 
@@ -160,7 +160,7 @@ Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 | 3.1 | `FileUploader`: seleção, arrastar e soltar, filtro de extensão | 2 du | RF-01 |
 | 3.2 | `StatusBar`: vazio, lendo, validando, convertendo, renderizando | 2 du | Estados de UX |
 | 3.3 | `ScoreViewer` com OSMD, zoom e rolagem horizontal/vertical | feito, verificado no G3 | RF-09, RF-10 |
-| 3.4 | Integração do pipeline no navegador (`ArrayBuffer`, Web Worker para não travar a UI) | parcial: falta o Web Worker | RF-02, RNF-01, RNF-03 |
+| 3.4 | Integração do pipeline no navegador (`ArrayBuffer`, Web Worker para não travar a UI) | parcial por decisão: sem Web Worker ([ADR 0003](../decisions/0003-adiar-o-web-worker-do-parse.md)) | RF-02, RNF-01, RNF-03 |
 | 3.5 | Modo tolerante: avisos do parser chegam à UI sem derrubar a renderização | feito | RF-11 |
 | 3.6 | Textos em pt-BR e mensagens de erro acionáveis | 1 du | RNF-08 |
 

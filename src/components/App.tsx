@@ -41,8 +41,8 @@ export function App() {
     try {
       const buffer = await file.arrayBuffer();
       setLoadedFile({ fileName: file.name, snapshot: inspectBinary(buffer) });
-      // ponytail: parse na thread principal; leva milissegundos nas amostras. Web Worker (tarefa 3.4)
-      // se partituras grandes travarem a interface.
+      // ADR 0003: parse na thread principal. A maior amostra (63 KB, 417 notas) leva 2,3 ms de mediana
+      // com a geração do MusicXML; se passar de 100 ms, o worker entra.
       const { score, warnings } = parseEncore(new Uint8Array(buffer));
       setMusicXml(generateMusicXml(score));
       setStatus({
