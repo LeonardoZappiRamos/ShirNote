@@ -207,7 +207,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
 | 4.1 | Cobertura de fixtures por recurso (todo RF suportado tem `.enc` de teste) | 2 du | RNF-06 |
-| 4.2 | Robustez: arquivos truncados, corrompidos, outras versões e outros formatos | 2 du | RNF-02, RF-03 |
+| 4.2 | Robustez: arquivos truncados, corrompidos, outras versões e outros formatos | feito: fuzz determinístico em `src/enc/robustness.test.ts` | RNF-02, RF-03 |
 | 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | 1 du | RNF-03 |
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | 1 du | RNF-04 |
 | 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | 1 du | RNF-07 |
@@ -216,7 +216,10 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 
 **Portão G4 — Robustez comprovada (28/12/2026)**
 - [ ] 90% das amostras simples abrem sem erro; 100% de fidelidade nas suportadas.
-- [ ] Zero travamentos com arquivos inválidos (teste com lote de arquivos ruins).
+- [x] Zero travamentos com arquivos inválidos (teste com lote de arquivos ruins). Verificado em
+  02/11/2026 por `src/enc/robustness.test.ts`: corte em 21 offsets por amostra, bytes aleatórios,
+  magia/versão erradas, texto e PDF disfarçados, cabeçalho fora de faixa e **500 mutações de 1 a 3
+  bytes por amostra**, todas terminando em `EncoreFormatError` ou partitura íntegra.
 - [ ] Renderização de 50 compassos ≤ 3 s na régua provisória: esta máquina com CPU a 4×
   ([ADR 0004](../decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md)).
 - [ ] Checklist de acessibilidade e matriz dos 4 navegadores preenchidos. **Safari fica pendente** por

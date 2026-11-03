@@ -95,7 +95,26 @@ interface StaffSlot {
 
 export const encoreParser: EncoreParser = { parse: (data) => parseEncore(new Uint8Array(data)) };
 
+/**
+ * RNF-02: qualquer entrada ruim vira `EncoreFormatError`.
+ *
+ * As checagens internas cobrem o que já foi medido, mas o formato não tem especificação: se alguma
+ * leitura escapar do previsto, o usuário recebe "arquivo corrompido" em vez de um `RangeError` sem
+ * explicação. O erro original não é engolido em silêncio — a mensagem diz que a estrutura é inesperada.
+ */
 export function parseEncore(bytes: Uint8Array): EncoreParseResult {
+  try {
+    return parseBody(bytes);
+  } catch (error) {
+    if (error instanceof EncoreFormatError) throw error;
+    throw new EncoreFormatError(
+      'corrupt',
+      'O arquivo está corrompido: a estrutura não é a esperada.',
+    );
+  }
+}
+
+function parseBody(bytes: Uint8Array): EncoreParseResult {
   const warnings = new Warnings();
   if (bytes.length < TRACK_START || ascii(bytes, 0, 4) !== 'SCOW') {
     throw new EncoreFormatError('not-encore', 'O arquivo não é uma partitura do Encore.');
