@@ -1,8 +1,8 @@
 # Cronograma — Visualizador Web de Partituras Encore (.enc)
 
-**Versão:** 2.1 · **Data:** 02/11/2026 · **Base:** `docs/PRD — Visualizador Web de Partituras Encore (.enc).md`
-**Horizonte:** 03/11/2026 → 06/01/2027 (release do MVP) + reserva até 13/01/2027
-**Decisão de origem:** portão G1 aprovado em 02/11/2026 ([ADR 0002](decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md))
+**Versão:** 2.2 · **Data:** 02/11/2026 · **Base:** `docs/PRD — Visualizador Web de Partituras Encore (.enc).md`
+**Horizonte:** 03/11/2026 → 11/12/2026 (release do MVP), com limite em 06/01/2027 e reserva até 13/01/2027
+**Decisões de origem:** G1 aprovado em 02/11/2026 ([ADR 0002](decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md)); régua de desempenho e compatibilidade ([ADR 0004](decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md))
 
 ---
 
@@ -25,8 +25,8 @@ como manda a seção 9 da v1.0.
 
 ## 0.1 Andamento em 02/11/2026
 
-A Fase 2 foi executada em 02/11/2026, antes do início previsto (03/11), e o G2 está fechado. Parte da
-Fase 3 também já foi adiantada.
+A Fase 2 foi executada em 02/11/2026, antes do início previsto (03/11), e o G2 está fechado. A Fase 3
+também fechou no mesmo dia, com os três critérios do G3 verificados no navegador.
 
 | Item | Situação |
 | --- | --- |
@@ -38,9 +38,24 @@ Fase 3 também já foi adiantada.
 | Além do plano | barras de repetição e casas, barras de colcheia, segno e coda |
 | Avisos que restam nas partituras reais | dinâmicas (o próprio Encore exporta `<dynamics>` vazio) e textos (bloco `TEXT`) |
 
-**As datas da seção 2 não mudaram.** A Fase 2 terminou com 15 du de folga e o G2 está fechado desde
-02/11; antecipar G3 a G5 é decisão de replanejamento (seção 9). Recomendação: decidir, na review,
-entre antecipar as datas ou somar a folga à reserva.
+**As datas da seção 2 mudaram: esta é a v2.2.** Fechados G2 e G3 em 02/11, o replanejamento da seção 9
+antecipou G4 e G5, mantendo 06/01/2027 como limite e sem mexer na reserva.
+
+| Item | v2.1 | v2.2 | Motivo |
+| --- | --- | --- | --- |
+| Fase 3 | 25/11 → 10/12 | **concluída** em 02/11 | melodia, zoom, rolagem, erro e Network verificados |
+| Fase 4 | 11/12 → 28/12 | **03/11 → 27/11** (G4 em 27/11) | 18 du disponíveis para 10 du de trabalho |
+| Fase 5 | 29/12 → 06/01/2027 | **30/11 → 11/12** (G5 em 11/12) | 10 du disponíveis para 6 du de trabalho |
+| Reserva | 07/01 → 13/01/2027 | **14/12/2026 → 06/01/2027** | 17 du de colchão antes do limite |
+| Release | 06/01/2027 | **11/12/2026** (limite 06/01/2027) | antecipação decidida em 02/11 |
+
+A antecipação não muda o escopo nem a definição de pronto dos portões: o que muda é a data-alvo, e o
+limite de 06/01/2027 continua valendo se o G4 escorregar.
+
+**Régua de desempenho e compatibilidade.** Como não existe notebook de referência e não há acesso a
+macOS, o G4 passa a ser medido nesta máquina com CPU limitada a 4× e com a matriz de navegadores
+incompleta no Safari — decisão e ressalvas no
+[ADR 0004](decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md).
 
 ---
 
@@ -57,6 +72,8 @@ O cronograma é dimensionado em **dias úteis (du)** e assume:
 | Versão do Encore | só `0xC4`; outras versões geram erro claro | Outra versão exige amostras e entra no backlog |
 | Partituras reais | 14 do mesmo acervo, recebidas em 02/11/2026, direito de uso aprovado | Novas partituras só ampliam a cobertura |
 | Restrição legal | análise do executável não foi necessária; Enc2MusicXML (GPL-3.0) só como pista | Parecer negativo não muda datas: o formato já está documentado |
+| Régua de desempenho | máquina de desenvolvimento com CPU limitada a 4× ([ADR 0004](decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md)) | Notebook real muda o número; a régua é refeita |
+| Navegadores | Chrome, Edge e Firefox na máquina local; Safari pendente | RNF-04 fica em 3 de 4 e o G4 registra a ressalva |
 | Escopo | exatamente o MVP do PRD (12 RF, 8 RNF) | Qualquer RF extra entra no backlog pós-MVP |
 
 **Regra de ouro:** o formato está comprovado para o MVP, e as 14 partituras reais conferem com o
@@ -71,12 +88,13 @@ continua sendo a defesa para casos sem amostra.
 | --- | --- | --- | --- | --- | --- |
 | **1. Descoberta do formato** | Engenharia reversa e `docs/enc-format.md` | concluída | 01/11/2026 | 02/11/2026 | **G1** ✓ |
 | **2. Núcleo de conversão** | Parser → modelo → MusicXML, com RF-07 | 15 du | 03/11/2026 | 24/11/2026 | **G2** |
-| **3. Interface e renderização** | Upload, status, OSMD, zoom | 12 du | 25/11/2026 | 10/12/2026 | **G3** |
-| **4. Robustez e testes** | Fixtures, erros, desempenho, a11y | 10 du | 11/12/2026 | 28/12/2026 | **G4** |
-| **5. Homologação e release** | Aceite, docs, demo | 6 du | 29/12/2026 | 06/01/2027 | **G5** |
-| **Reserva** | Contingência de cronograma | 5 du | 07/01/2027 | 13/01/2027 | — |
+| **3. Interface e renderização** | Upload, status, OSMD, zoom | 12 du | concluída 02/11/2026 | concluída 02/11/2026 | **G3** ✓ |
+| **4. Robustez e testes** | Fixtures, erros, desempenho, a11y | 18 du disponíveis para 10 | 03/11/2026 | 27/11/2026 | **G4** |
+| **5. Homologação e release** | Aceite, docs, demo | 10 du disponíveis para 6 | 30/11/2026 | 11/12/2026 | **G5** |
+| **Reserva** | Contingência até o limite | 17 du | 14/12/2026 | 06/01/2027 | — |
 
-**Total:** 43 du de execução + 5 du de reserva = 48 du (~9,6 semanas corridas).
+**Total:** 43 du de execução. Com a antecipação, a execução termina em 11/12/2026 e sobram 17 du úteis
+até o limite de 06/01/2027.
 
 ---
 
@@ -84,11 +102,12 @@ continua sendo a defesa para casos sem amostra.
 
 | Fase / trilha | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | W9 | W10 | W11 |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
-| **2. Núcleo (parser → MusicXML)** | ██ | ██ | ██ | ▌ | · | · | · | · | · | · | · |
-| **3. Interface e renderização** | · | · | · | ▐ | ██ | ▌ | · | · | · | · | · |
-| **4. Robustez e testes** | · | · | · | · | · | ▐ | ██ | ██ | ▌ | · | · |
-| **5. Homologação e release** | · | · | · | · | · | · | · | · | ▐ | ▌ | · |
-| **Reserva** | · | · | · | · | · | · | · | · | · | ▐ | ██ |
+| **1–3. Descoberta, núcleo e interface** | ██ | · | · | · | · | · | · | · | · | · | · |
+| **4. Robustez e testes** | ██ | ██ | ██ | ██ | · | · | · | · | · | · | · |
+| **5. Homologação e release** | · | · | · | · | ██ | ██ | · | · | · | · | · |
+| **Reserva** | · | · | · | · | · | · | ██ | ██ | ██ | ██ | · |
+
+G1, G2 e G3 fecharam em 02/11, antes da W1; a barra de 1–3 marca a entrega, não o esforço.
 
 | Semana | Período | Semana | Período |
 | --- | --- | --- | --- |
@@ -99,8 +118,7 @@ continua sendo a defesa para casos sem amostra.
 | W5 | 30/11–04/12 | W11 | 11–15/01 |
 | W6 | 07–11/12 | | |
 
-**Marcos:** G1 02/11 ✓ · G2 02/11 ✓ · G3 10/12 (critérios já verificados em 02/11) · G4 28/12 · G5
-06/01 · Reserva 13/01.
+**Marcos:** G1 02/11 ✓ · G2 02/11 ✓ · G3 02/11 ✓ · **G4 27/11** · **G5 11/12** · limite 06/01/2027.
 
 ---
 
@@ -199,8 +217,10 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 **Portão G4 — Robustez comprovada (28/12/2026)**
 - [ ] 90% das amostras simples abrem sem erro; 100% de fidelidade nas suportadas.
 - [ ] Zero travamentos com arquivos inválidos (teste com lote de arquivos ruins).
-- [ ] Renderização de 50 compassos ≤ 3 s no notebook de referência.
-- [ ] Checklist de acessibilidade e matriz dos 4 navegadores preenchidos.
+- [ ] Renderização de 50 compassos ≤ 3 s na régua provisória: esta máquina com CPU a 4×
+  ([ADR 0004](../decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md)).
+- [ ] Checklist de acessibilidade e matriz dos 4 navegadores preenchidos. **Safari fica pendente** por
+  falta de macOS; a célula é marcada como "pendente", nunca como aprovada.
 
 ---
 
@@ -264,7 +284,10 @@ produto e em partituras fora do acervo.
 **Dependências externas**
 - ~~≥ 10 partituras reais do mesmo acervo até 24/11/2026~~ — cumprida em 02/11/2026, com 14.
 - Acesso ao Encore para novas amostras controladas, se as partituras reais revelarem casos novos.
-- Notebook de referência definido antes de 4.3.
+- ~~Notebook de referência definido antes de 4.3~~ — régua provisória em 02/11/2026
+  ([ADR 0004](decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md)); notebook real
+  segue pendente e não bloqueia o G4.
+- Acesso a macOS/Safari para fechar o RNF-04 — **não disponível**; a linha do Safari fica pendente no G4.
 
 ---
 
