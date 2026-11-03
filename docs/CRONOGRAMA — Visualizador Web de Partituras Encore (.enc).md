@@ -32,6 +32,7 @@ Fase 3 também já foi adiantada.
 | --- | --- |
 | 2.1 a 2.6 | feitas; detalhe na seção 4 |
 | G2 | **5 de 5** — MusicXML abre no OSMD e no Verovio (38 de 38 amostras, 02/11) |
+| G3 | **3 de 3** — zoom/rolagem, arquivo inválido e Network verificados no navegador em 02/11 |
 | 3.3, 3.5 | feitas: o OSMD renderiza o `.enc`, e os avisos do parser aparecem no status |
 | 3.4 | parcial: pipeline no navegador, sem Web Worker (o parse leva milissegundos nas amostras) |
 | Além do plano | barras de repetição e casas, barras de colcheia, segno e coda |
@@ -98,7 +99,8 @@ continua sendo a defesa para casos sem amostra.
 | W5 | 30/11–04/12 | W11 | 11–15/01 |
 | W6 | 07–11/12 | | |
 
-**Marcos:** G1 02/11 ✓ · G2 24/11 · G3 10/12 · G4 28/12 · G5 06/01 · Reserva 13/01.
+**Marcos:** G1 02/11 ✓ · G2 02/11 ✓ · G3 10/12 (critérios já verificados em 02/11) · G4 28/12 · G5
+06/01 · Reserva 13/01.
 
 ---
 
@@ -157,7 +159,7 @@ Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 | --- | --- | --- | --- |
 | 3.1 | `FileUploader`: seleção, arrastar e soltar, filtro de extensão | 2 du | RF-01 |
 | 3.2 | `StatusBar`: vazio, lendo, validando, convertendo, renderizando | 2 du | Estados de UX |
-| 3.3 | `ScoreViewer` com OSMD, zoom e rolagem horizontal/vertical | feito, a revisar no G3 | RF-09, RF-10 |
+| 3.3 | `ScoreViewer` com OSMD, zoom e rolagem horizontal/vertical | feito, verificado no G3 | RF-09, RF-10 |
 | 3.4 | Integração do pipeline no navegador (`ArrayBuffer`, Web Worker para não travar a UI) | parcial: falta o Web Worker | RF-02, RNF-01, RNF-03 |
 | 3.5 | Modo tolerante: avisos do parser chegam à UI sem derrubar a renderização | feito | RF-11 |
 | 3.6 | Textos em pt-BR e mensagens de erro acionáveis | 1 du | RNF-08 |
@@ -166,9 +168,17 @@ Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 
 **Portão G3 — MVP navegável (10/12/2026)**
 - [x] Melodia de uma voz renderizada no navegador a partir de um `.enc` real (verificado em 02/11/2026 com 3 partituras).
-- [ ] Zoom e rolagem funcionando.
-- [ ] Arquivo inválido gera mensagem clara, sem recarregar a página.
-- [ ] Nenhum arquivo sai do navegador (verificado na aba Network).
+- [x] Zoom e rolagem funcionando. Verificado em 02/11/2026 com a `justica-flauta2`: o `scale` vai de
+  100% a 200% e para em 50% no mínimo, e o `.score` rola de verdade (900 px na vertical e 120 px na
+  horizontal em 200%).
+- [x] Arquivo inválido gera mensagem clara, sem recarregar a página. Verificado em 02/11/2026 com um
+  `.enc` truncado (`O arquivo está corrompido: a cadeia de blocos não fecha no fim.`) e outro com a
+  magia zerada (`O arquivo não é uma partitura do Encore.`): a partitura anterior continua na tela, o
+  console fica sem erros e a aba não recarrega.
+- [x] Nenhum arquivo sai do navegador (verificado na aba Network). Em 02/11/2026 a sessão inteira
+  (carregar o app, abrir a partitura e os dois arquivos inválidos) fez 30 requisições, todas `GET` em
+  `localhost:5199` — 1 documento, 28 módulos e o WebSocket do Vite. Nenhum `POST`, nenhum `multipart`
+  e nenhum corpo com os bytes do `.enc`.
 
 ---
 

@@ -4,10 +4,10 @@ Visualizador web de partituras do Encore (`.enc`) que roda inteiramente no naveg
 lido como `ArrayBuffer`, convertido para um modelo musical neutro, exportado como MusicXML e
 renderizado com [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org/) (OSMD).
 
-O formato `.enc` não tem especificação pública, então o projeto começa por engenharia reversa a
-partir de amostras reais. **O parser de produto ainda não existe:** hoje o app lê o arquivo enviado e
-mostra o cabeçalho em hexadecimal, mas a partitura exibida é um exemplo sintético. Um script
-descartável já lê as amostras reais e confere o resultado com o MusicXML do Encore.
+O formato `.enc` não tem especificação pública, então o projeto começou por engenharia reversa a
+partir de amostras reais. Hoje o app abre um `.enc` de verdade: lê o arquivo como `ArrayBuffer`,
+converte com o parser de produto, exporta MusicXML e renderiza no OSMD — tudo local, sem upload. Um
+script descartável (`scripts/enc-spike.mjs`) segue conferindo o parser com o MusicXML do Encore.
 
 O produto e o planejamento estão em [`docs/`](docs/):
 
@@ -19,14 +19,15 @@ O produto e o planejamento estão em [`docs/`](docs/):
 ## Estado atual
 
 Fase 1 concluída e portão G1 aprovado em 02/11/2026 ([ADR 0002](docs/decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md)).
-A Fase 2 (parser de produto) começa em 03/11/2026; o release do MVP está previsto para 06/01/2027:
+A Fase 2 (parser de produto) foi concluída e o G2 fechou em 02/11/2026; o release do MVP está previsto
+para 06/01/2027:
 
 | Item                                                                   | Estado                                                               |
 | ---------------------------------------------------------------------- | -------------------------------------------------------------------- |
 | Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI     | pronto                                                               |
 | Modelo musical neutro (`src/music`) com testes                         | pronto                                                               |
 | Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes      | pronto, validado contra o XSD oficial                                |
-| Arquivo `.enc` renderizado no OSMD (`src/components`)                  | pronto, sem Web Worker                                               |
+| Arquivo `.enc` renderizado no OSMD (`src/components`)                  | pronto — zoom, rolagem e erro verificados no G3; sem Web Worker      |
 | Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                               |
 | Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                   |
 | Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                               |
