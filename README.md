@@ -21,17 +21,17 @@ O produto e o planejamento estão em [`docs/`](docs/):
 Fase 1 concluída e portão G1 aprovado em 02/11/2026 ([ADR 0002](docs/decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md)).
 A Fase 2 (parser de produto) começa em 03/11/2026; o release do MVP está previsto para 06/01/2027:
 
-| Item                                                                   | Estado                                                            |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI     | pronto                                                            |
-| Modelo musical neutro (`src/music`) com testes                         | pronto                                                            |
-| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes      | pronto, validado contra o XSD oficial                             |
-| Arquivo `.enc` renderizado no OSMD (`src/components`)                  | pronto, sem Web Worker                                            |
-| Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                            |
-| Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                |
-| Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                            |
-| Formato documentado (`docs/enc-format.md` v0.9)                        | pronto para até duas partes e duas pautas, com lacunas declaradas |
-| Parser de produto (Fase 2)                                             | **em andamento** — confere nas 38 amostras e abre na interface    |
+| Item                                                                   | Estado                                                               |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI     | pronto                                                               |
+| Modelo musical neutro (`src/music`) com testes                         | pronto                                                               |
+| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes      | pronto, validado contra o XSD oficial                                |
+| Arquivo `.enc` renderizado no OSMD (`src/components`)                  | pronto, sem Web Worker                                               |
+| Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                               |
+| Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                   |
+| Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                               |
+| Formato documentado (`docs/enc-format.md` v0.9)                        | pronto para até duas partes e duas pautas, com lacunas declaradas    |
+| Parser de produto (Fase 2)                                             | pronto — confere nas 38 amostras; MusicXML abre no OSMD e no Verovio |
 
 O que se sabe sobre o formato, com base em 14 partituras reais (1.024 compassos), 24 amostras controladas
 e MusicXML exportado pelo Encore para todas:
@@ -68,6 +68,9 @@ node scripts/enc-dump.mjs tests/fixtures/samples/justica-flauta2.enc --chunks
 node scripts/enc-dump.mjs tests/fixtures/samples/justica-flauta2.enc --notes
 node scripts/enc-diff.mjs tests/fixtures/controlled/controle-02-c4-seminima.enc \
   tests/fixtures/controlled/controle-04-c4-minima.enc --tag MEAS
+
+# MusicXML do parser de produto, para abrir no MuseScore ou no Verovio (portão G2)
+node scripts/export-musicxml.mjs tests/fixtures/samples/justica-flauta2.enc --out "$env:TEMP\justica.musicxml"
 ```
 
 ## Estrutura
@@ -79,7 +82,7 @@ src/
   musicxml/       gerador MusicXML e serializador XML
   components/     App, FileUploader, StatusBar, ScoreViewer (React + OSMD)
   test-utils/     builders de partituras usados só nos testes
-scripts/          ferramentas de engenharia reversa (enc-dump, enc-diff, enc-spike)
+scripts/          ferramentas de engenharia reversa (enc-dump, enc-diff, enc-spike, export-musicxml)
 tests/fixtures/
   samples/        partituras reais
   controlled/     amostras geradas no Encore, um campo por arquivo

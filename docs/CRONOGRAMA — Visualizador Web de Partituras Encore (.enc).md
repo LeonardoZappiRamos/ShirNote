@@ -25,21 +25,21 @@ como manda a seção 9 da v1.0.
 
 ## 0.1 Andamento em 02/11/2026
 
-A Fase 2 foi executada em 02/11/2026, antes do início previsto (03/11). Falta um item do G2: abrir
-o MusicXML gerado num segundo visualizador. Parte da Fase 3 também já foi adiantada.
+A Fase 2 foi executada em 02/11/2026, antes do início previsto (03/11), e o G2 está fechado. Parte da
+Fase 3 também já foi adiantada.
 
 | Item | Situação |
 | --- | --- |
 | 2.1 a 2.6 | feitas; detalhe na seção 4 |
-| G2 | 4 de 5 critérios; falta o segundo visualizador (MuseScore Studio ou Verovio) |
+| G2 | **5 de 5** — MusicXML abre no OSMD e no Verovio (38 de 38 amostras, 02/11) |
 | 3.3, 3.5 | feitas: o OSMD renderiza o `.enc`, e os avisos do parser aparecem no status |
 | 3.4 | parcial: pipeline no navegador, sem Web Worker (o parse leva milissegundos nas amostras) |
 | Além do plano | barras de repetição e casas, barras de colcheia, segno e coda |
 | Avisos que restam nas partituras reais | dinâmicas (o próprio Encore exporta `<dynamics>` vazio) e textos (bloco `TEXT`) |
 
-**As datas da seção 2 não mudaram.** A Fase 2 terminou com 15 du de folga, mas antecipar G3 a G5 é
-decisão de replanejamento (seção 9). Recomendação: fechar o G2 assim que o MusicXML abrir no segundo
-visualizador e decidir, nessa revisão, entre antecipar as datas ou somar a folga à reserva.
+**As datas da seção 2 não mudaram.** A Fase 2 terminou com 15 du de folga e o G2 está fechado desde
+02/11; antecipar G3 a G5 é decisão de replanejamento (seção 9). Recomendação: decidir, na review,
+entre antecipar as datas ou somar a folga à reserva.
 
 ---
 
@@ -140,7 +140,9 @@ várias partes, pautas e vozes.
 
 **Portão G2 — Pipeline completo (24/11/2026)**
 - [x] `.enc` → MusicXML válido via teste, sem tocar na UI (`src/musicxml/schema.test.ts`).
-- [ ] MusicXML abre no OSMD e em um segundo visualizador (MuseScore ou Verovio). **OSMD: sim**; segundo visualizador pendente.
+- [x] MusicXML abre no OSMD e em um segundo visualizador. **OSMD: sim**; **Verovio 6.4.0: sim**, com as
+  38 amostras geradas por `scripts/export-musicxml.mjs` (todas renderizam; a justica sai com 105 grupos
+  de nota, igual ao gabarito). Verificado em 02/11/2026.
 - [x] Comparação elementar passando nas 24 controladas e nas **14 partituras reais** (condição do ADR 0002), inclusive barras e barras de colcheia.
 - [x] Arquivo de outra versão do Encore gera `EncoreFormatError` com mensagem clara.
 - [x] Módulos sem acoplamento (RNF-05): `src/enc` e `src/musicxml` só dependem de `src/music`.
