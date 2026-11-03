@@ -1,4 +1,4 @@
-export type Stage = 'idle' | 'reading' | 'ready' | 'error';
+export type Stage = 'idle' | 'reading' | 'rendering' | 'ready' | 'error';
 
 export interface ViewerStatus {
   readonly stage: Stage;
@@ -9,11 +9,17 @@ export interface ViewerStatus {
 const LABEL: Readonly<Record<Stage, string>> = {
   idle: 'Aguardando',
   reading: 'Lendo',
+  rendering: 'Renderizando',
   ready: 'Pronto',
   error: 'Erro',
 };
 
-/** Estados de UX do PRD: vazio, carregando, sucesso, sucesso com avisos e erro. */
+/**
+ * Estados de UX do PRD: vazio, carregando, sucesso, sucesso com avisos e erro.
+ *
+ * `rendering` separa "o arquivo foi lido" de "a partitura apareceu": o OSMD desenha depois do parse, e
+ * sem esse estado o status prometia sucesso com a tela ainda vazia (tarefa 3.2).
+ */
 export function StatusBar({ status }: { readonly status: ViewerStatus }) {
   return (
     <div className={`status status--${status.stage}`} role="status" aria-live="polite">

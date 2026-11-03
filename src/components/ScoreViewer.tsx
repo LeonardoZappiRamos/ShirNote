@@ -5,6 +5,7 @@ interface ScoreViewerProps {
   readonly musicXml: string;
   readonly zoom: number;
   readonly onError: (error: unknown) => void;
+  readonly onRendered: () => void;
 }
 
 /**
@@ -14,11 +15,13 @@ interface ScoreViewerProps {
  * `transform: scale()` no contêiner, para ampliar de verdade e deixar o `.score`
  * rolar em vez de reengravitar a partitura em outra largura.
  */
-export function ScoreViewer({ musicXml, zoom, onError }: ScoreViewerProps) {
+export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef(onError);
+  const renderedRef = useRef(onRendered);
 
   errorRef.current = onError;
+  renderedRef.current = onRendered;
 
   useEffect(() => {
     const container = containerRef.current;
@@ -39,6 +42,7 @@ export function ScoreViewer({ musicXml, zoom, onError }: ScoreViewerProps) {
       .then(() => {
         if (cancelled) return;
         osmd.render();
+        renderedRef.current();
       })
       .catch((error: unknown) => {
         if (!cancelled) errorRef.current(error);

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { EncoreFormatError, inspectBinary, parseEncore, type BinarySnapshot } from '../enc';
 import { simpleMelody, validateScore } from '../music';
 import { generateMusicXml } from '../musicxml';
@@ -25,8 +25,12 @@ export function App() {
   const [loadedFile, setLoadedFile] = useState<LoadedFile | null>(null);
   const [musicXml, setMusicXml] = useState(demoMusicXml);
   const [zoom, setZoom] = useState(1);
+  /** Resultado do parse que só vira "pronto" quando o OSMD termina de desenhar (tarefa 3.2). */
+  const pendingRef = useRef<{ message: string; warnings: readonly string[] } | null>(null);
 
   const handleFile = useCallback(async (file: File) => {
+    pendingRef.current = null;
+
     if (!file.name.toLowerCase().endsWith('.enc')) {
       setStatus({
         stage: 'error',
@@ -45,10 +49,16 @@ export function App() {
       // com a geração do MusicXML; se passar de 100 ms, o worker entra.
       const { score, warnings } = parseEncore(new Uint8Array(buffer));
       setMusicXml(generateMusicXml(score));
-      setStatus({
-        stage: 'ready',
+
+      const warningMessages = warnings.map((warning) => warning.message);
+      pendingRef.current = {
         message: `"${file.name}" (${formatBytes(buffer.byteLength)}) foi lido no navegador.`,
-        warnings: warnings.map((warning) => warning.message),
+        warnings: warningMessages,
+      };
+      setStatus({
+        stage: 'rendering',
+        message: `Desenhando "${file.name}"…`,
+        warnings: warningMessages,
       });
     } catch (error) {
       setStatus({
@@ -62,7 +72,15 @@ export function App() {
     }
   }, []);
 
+  const handleRendered = useCallback(() => {
+    const pending = pendingRef.current;
+    if (!pending) return;
+    pendingRef.current = null;
+    setStatus({ stage: 'ready', ...pending });
+  }, []);
+
   const handleRenderError = useCallback((error: unknown) => {
+    pendingRef.current = null;
     setStatus({
       stage: 'error',
       message: `Falha ao renderizar a partitura: ${describeError(error)}`,
@@ -87,7 +105,10 @@ export function App() {
       <main className="app__main">
         <section className="panel" aria-labelledby="upload-title">
           <h2 id="upload-title">1. Abrir arquivo</h2>
-          <FileUploader onFile={handleFile} disabled={status.stage === 'reading'} />
+          <FileUploader
+            onFile={handleFile}
+            disabled={status.stage === 'reading' || status.stage === 'rendering'}
+          />
           {loadedFile ? (
             <BinaryPreview fileName={loadedFile.fileName} snapshot={loadedFile.snapshot} />
           ) : null}
@@ -126,7 +147,12 @@ export function App() {
               </button>
             </div>
           </div>
-          <ScoreViewer musicXml={musicXml} zoom={zoom} onError={handleRenderError} />
+          <ScoreViewer
+            musicXml={musicXml}
+            zoom={zoom}
+            onError={handleRenderError}
+            onRendered={handleRendered}
+          />
         </section>
       </main>
     </div>

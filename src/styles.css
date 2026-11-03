@@ -160,7 +160,8 @@ body {
   background: #faf9f6;
 }
 
-.status--reading {
+.status--reading,
+.status--rendering {
   border-left-color: var(--accent);
 }
 
