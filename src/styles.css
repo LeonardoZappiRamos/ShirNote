@@ -7,8 +7,8 @@
   --border: #ddd8ce;
   /* Borda de controle: 3,6:1 sobre o painel (WCAG 1.4.11). */
   --control-border: #8a8478;
-  /* Vermelho da marca (docs/brand): ícone e "Note" do título, texto grande, 3,6:1 na página. */
-  --brand: #f33531;
+  /* Vermelho da marca (docs/brand/shirnote-icon.svg): ícone e "Note" do título, texto grande, 3,6:1 na página. */
+  --brand: #f33633;
   /* Mais escuro para texto branco em botão: 5,7:1 (WCAG 1.4.3). */
   --accent: #c42a22;
   --accent-ink: #ffffff;
