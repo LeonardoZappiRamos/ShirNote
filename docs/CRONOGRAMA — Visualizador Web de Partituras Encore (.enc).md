@@ -223,7 +223,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | feito em 3 de 4: Chrome, Edge e Firefox aprovados; Safari pendente, sem macOS (ver G4) | RNF-04 |
 | 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | feito: checklist no G4; axe sem violação; sem leitor de tela real | RNF-07 |
 | 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | feito: OSMD desenha título e autor do arquivo; sem título não exibe "Untitled Score"; nome de parte só com duas ou mais partes | RF-04, RF-07 |
-| 4.7 | Arquivos de exemplo para demonstração (RF-12) | feito: três amostras controladas no painel de abertura (título e autor, piano, duas vozes); nenhuma obra de terceiros | RF-12 |
+| 4.7 | Arquivos de exemplo para demonstração (RF-12) | feito: três exemplos no painel de abertura — a melodia real `seu-tempo-melodia` (acervo com uso liberado) e as controladas de piano e duas vozes | RF-12 |
 
 **Portão G4 — Robustez comprovada (fechado em 04/11/2026, com a ressalva do Safari)**
 - [x] 90% das amostras simples abrem sem erro; 100% de fidelidade nas suportadas. **38 de 38** abrem e
@@ -294,7 +294,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | --- | --- | --- | --- |
 | 5.1 | `docs/enc-format.md` v1.0 + README + diagrama de arquitetura | feito em 04/11/2026: formato v1.0 com mapa do formato ao código (seção 12); diagrama Mermaid no README | Documentação final |
 | 5.2 | Checklist dos 7 critérios de aceite + validação em visualizador externo | feito em 04/11/2026: 7 de 7 (ver G5) | Aceite assinado |
-| 5.3 | Correções finais e polimento de mensagens | 2 du | Build candidato |
+| 5.3 | Correções finais e polimento de mensagens | feito em 04/11/2026: erro diz o motivo e o que fazer (PRD, seção 9); exemplo com título e autor reais | Build candidato |
 | 5.4 | Deploy estático da demo | 1 du | URL da demo |
 | 5.5 | Retrospectiva e backlog pós-MVP | 1 du | Backlog priorizado |
 
