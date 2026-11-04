@@ -3,6 +3,9 @@ import { EncoreFormatError, inspectBinary, parseEncore, type BinarySnapshot } fr
 import { simpleMelody, validateScore } from '../music';
 import { generateMusicXml } from '../musicxml';
 import logoUrl from '../assets/shirnote-icon.svg';
+import duasPautasUrl from '../../tests/fixtures/controlled/controle-16-duas-pautas.enc?url';
+import duasVozesUrl from '../../tests/fixtures/controlled/controle-18-duas-vozes.enc?url';
+import autorUrl from '../../tests/fixtures/controlled/controle-21-autor.enc?url';
 import { FileUploader } from './FileUploader';
 import { ScoreViewer, type ShownScore } from './ScoreViewer';
 import { StatusBar, type ViewerStatus } from './StatusBar';
@@ -18,6 +21,16 @@ const INITIAL_STATUS: ViewerStatus = {
   message: 'Partitura de exemplo carregada. Abra um arquivo .enc para ver a sua partitura.',
   warnings: demoWarnings,
 };
+
+/**
+ * RF-12: exemplos para demonstração. Só amostras controladas, criadas pelo projeto: as partituras
+ * reais são obras de terceiros. Vêm do próprio site, como o resto do app; nada sai do navegador.
+ */
+const EXAMPLES = [
+  { label: 'Título, autor, claves e tercinas', fileName: 'controle-21-autor.enc', url: autorUrl },
+  { label: 'Piano (duas pautas)', fileName: 'controle-16-duas-pautas.enc', url: duasPautasUrl },
+  { label: 'Duas vozes', fileName: 'controle-18-duas-vozes.enc', url: duasVozesUrl },
+] as const;
 
 const NO_SCORE: ShownScore = { musicXml: null, label: 'Nenhuma partitura aberta' };
 
@@ -80,6 +93,26 @@ export function App() {
     }
   }, []);
 
+  const openExample = useCallback(
+    async ({ fileName, url }: (typeof EXAMPLES)[number]) => {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        await handleFile(new File([await response.blob()], fileName));
+      } catch (error) {
+        setShown(NO_SCORE);
+        setStatus({
+          stage: 'error',
+          message: `Não foi possível carregar o exemplo "${fileName}": ${describeError(error)}`,
+          warnings: [],
+        });
+      }
+    },
+    [handleFile],
+  );
+
+  const busy = status.stage === 'reading' || status.stage === 'rendering';
+
   const handleRendered = useCallback(() => {
     const pending = pendingRef.current;
     if (!pending) return;
@@ -119,10 +152,26 @@ export function App() {
       <main className="app__main">
         <section className="panel" aria-labelledby="upload-title">
           <h2 id="upload-title">1. Abrir arquivo</h2>
-          <FileUploader
-            onFile={handleFile}
-            disabled={status.stage === 'reading' || status.stage === 'rendering'}
-          />
+          <FileUploader onFile={handleFile} disabled={busy} />
+          <div className="examples" role="group" aria-labelledby="examples-title">
+            <p id="examples-title" className="examples__title">
+              Ou abra um exemplo:
+            </p>
+            <ul className="examples__list">
+              {EXAMPLES.map((example) => (
+                <li key={example.fileName}>
+                  <button
+                    type="button"
+                    className="examples__button"
+                    disabled={busy}
+                    onClick={() => void openExample(example)}
+                  >
+                    {example.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
           {loadedFile ? (
             <BinaryPreview fileName={loadedFile.fileName} snapshot={loadedFile.snapshot} />
           ) : null}
