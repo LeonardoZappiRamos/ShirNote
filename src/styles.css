@@ -7,7 +7,10 @@
   --border: #ddd8ce;
   /* Borda de controle: 3,6:1 sobre o painel (WCAG 1.4.11). */
   --control-border: #8a8478;
-  --accent: #7a4b12;
+  /* Vermelho da marca: ícone e "Note" do título (texto grande, 3,6:1 sobre a página). */
+  --brand: #ef3b33;
+  /* Mais escuro para texto branco em botão: 5,7:1 (WCAG 1.4.3). */
+  --accent: #c42a22;
   --accent-ink: #ffffff;
   --ready: #1d5b34;
   --error: #8c1d18;
@@ -49,10 +52,25 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
+.app__brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.app__logo {
+  display: block;
+  flex: none;
+}
+
 .app__title {
   margin: 0;
   font-size: 2rem;
   letter-spacing: -0.02em;
+}
+
+.app__title-accent {
+  color: var(--brand);
 }
 
 .app__tagline {
@@ -121,7 +139,7 @@ body {
 
 .uploader--dragging {
   border-color: var(--accent);
-  background: #fbf5ea;
+  background: #fdf1ef;
 }
 
 .uploader__button {
@@ -136,7 +154,7 @@ body {
 }
 
 .uploader__button:hover {
-  background: #613a0c;
+  background: #951c16;
 }
 
 .uploader__input {

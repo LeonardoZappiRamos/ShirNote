@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { EncoreFormatError, inspectBinary, parseEncore, type BinarySnapshot } from '../enc';
 import { simpleMelody, validateScore } from '../music';
 import { generateMusicXml } from '../musicxml';
+import logoUrl from '../assets/shirnote-icon.svg';
 import { FileUploader } from './FileUploader';
 import { ScoreViewer, type ShownScore } from './ScoreViewer';
 import { StatusBar, type ViewerStatus } from './StatusBar';
@@ -103,9 +104,14 @@ export function App() {
   return (
     <div className="app">
       <header className="app__header">
-        <div>
-          <h1 className="app__title">ShirNote</h1>
-          <p className="app__tagline">Visualizador web de partituras Encore (.enc)</p>
+        <div className="app__brand">
+          <img className="app__logo" src={logoUrl} alt="" width="40" height="58" />
+          <div>
+            <h1 className="app__title">
+              Shir<span className="app__title-accent">Note</span>
+            </h1>
+            <p className="app__tagline">Visualizador web de partituras Encore (.enc)</p>
+          </div>
         </div>
         <p className="app__privacy">Processamento local: nenhum arquivo sai do navegador.</p>
       </header>
