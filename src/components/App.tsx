@@ -1,11 +1,17 @@
 import { useCallback, useRef, useState } from 'react';
-import { EncoreFormatError, inspectBinary, parseEncore, type BinarySnapshot } from '../enc';
+import {
+  EncoreFormatError,
+  inspectBinary,
+  parseEncore,
+  type BinarySnapshot,
+  type EncoreErrorCode,
+} from '../enc';
 import { simpleMelody, validateScore } from '../music';
 import { generateMusicXml } from '../musicxml';
 import logoUrl from '../assets/shirnote-icon.svg';
 import duasPautasUrl from '../../tests/fixtures/controlled/controle-16-duas-pautas.enc?url';
 import duasVozesUrl from '../../tests/fixtures/controlled/controle-18-duas-vozes.enc?url';
-import autorUrl from '../../tests/fixtures/controlled/controle-21-autor.enc?url';
+import seuTempoUrl from '../../tests/fixtures/samples/seu-tempo-melodia.enc?url';
 import { FileUploader } from './FileUploader';
 import { ScoreViewer, type ShownScore } from './ScoreViewer';
 import { StatusBar, type ViewerStatus } from './StatusBar';
@@ -23,14 +29,24 @@ const INITIAL_STATUS: ViewerStatus = {
 };
 
 /**
- * RF-12: exemplos para demonstração. Só amostras controladas, criadas pelo projeto: as partituras
- * reais são obras de terceiros. Vêm do próprio site, como o resto do app; nada sai do navegador.
+ * RF-12: exemplos para demonstração. A melodia real é do acervo com uso liberado para o projeto
+ * (docs/enc-format.md, seção 11); as outras são amostras controladas. Vêm do próprio site, como o
+ * resto do app; nada sai do navegador.
  */
 const EXAMPLES = [
-  { label: 'Título, autor, claves e tercinas', fileName: 'controle-21-autor.enc', url: autorUrl },
+  { label: 'Melodia com título e autor', fileName: 'seu-tempo-melodia.enc', url: seuTempoUrl },
   { label: 'Piano (duas pautas)', fileName: 'controle-16-duas-pautas.enc', url: duasPautasUrl },
   { label: 'Duas vozes', fileName: 'controle-18-duas-vozes.enc', url: duasVozesUrl },
 ] as const;
+
+/** PRD, seção 9: a mensagem de arquivo inválido diz o motivo e o que fazer. */
+const ERROR_HINT: Readonly<Record<EncoreErrorCode, string>> = {
+  'not-encore': 'Confira se o arquivo foi salvo pelo Encore.',
+  'unsupported-version':
+    'Por enquanto o ShirNote abre só a versão do formato das partituras de teste; o arquivo não foi alterado.',
+  truncated: 'Salve o arquivo de novo no Encore ou obtenha outra cópia e tente outra vez.',
+  corrupt: 'Salve o arquivo de novo no Encore ou obtenha outra cópia e tente outra vez.',
+};
 
 const NO_SCORE: ShownScore = { musicXml: null, label: 'Nenhuma partitura aberta' };
 
@@ -86,7 +102,7 @@ export function App() {
         stage: 'error',
         message:
           error instanceof EncoreFormatError
-            ? `Não foi possível abrir "${file.name}": ${error.message}`
+            ? `Não foi possível abrir "${file.name}": ${error.message} ${ERROR_HINT[error.code]}`
             : `Falha ao ler "${file.name}": ${describeError(error)}`,
         warnings: [],
       });
