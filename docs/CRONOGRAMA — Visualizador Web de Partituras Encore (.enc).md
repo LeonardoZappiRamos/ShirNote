@@ -23,6 +23,17 @@ como manda a seção 9 da v1.0.
 | G4 | 21/01/2027 | 28/12/2026 | sai de 24/12, meio período |
 | Release (G5) | 29/01/2027 | 06/01/2027 | — |
 
+## 0.2 Andamento em 04/11/2026
+
+A Fase 4 foi concluída em 04/11/2026, antes da data-alvo de 27/11, e o **G4 fechou com 4 de 4 itens**.
+A única ressalva é a do ADR 0004: o Safari fica pendente por falta de macOS.
+
+| Item | Situação |
+| --- | --- |
+| 4.1 a 4.7 | feitas; detalhe na seção 4 e no G4 |
+| Bugs achados no caminho | partitura anterior redesenhada ao redimensionar; mesmo arquivo travava em "Desenhando…"; partitura anterior visível depois de erro |
+| Fase 5 | pode começar antes de 30/11; as datas da v2.2 continuam como limite |
+
 ## 0.1 Andamento em 02/11/2026
 
 A Fase 2 foi executada em 02/11/2026, antes do início previsto (03/11), e o G2 está fechado. A Fase 3
@@ -118,7 +129,7 @@ G1, G2 e G3 fecharam em 02/11, antes da W1; a barra de 1–3 marca a entrega, n�
 | W5 | 30/11–04/12 | W11 | 11–15/01 |
 | W6 | 07–11/12 | | |
 
-**Marcos:** G1 02/11 ✓ · G2 02/11 ✓ · G3 02/11 ✓ · **G4 27/11** · **G5 11/12** · limite 06/01/2027.
+**Marcos:** G1 02/11 ✓ · G2 02/11 ✓ · G3 02/11 ✓ · G4 04/11 ✓ (Safari pendente) · **G5 11/12** · limite 06/01/2027.
 
 ---
 
@@ -212,10 +223,11 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | feito em 3 de 4: Chrome, Edge e Firefox aprovados; Safari pendente, sem macOS (ver G4) | RNF-04 |
 | 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | feito: checklist no G4; axe sem violação; sem leitor de tela real | RNF-07 |
 | 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | feito: OSMD desenha título e autor do arquivo; sem título não exibe "Untitled Score"; nome de parte só com duas ou mais partes | RF-04, RF-07 |
-| 4.7 | Arquivos de exemplo para demonstração (RF-12) | 1 du | RF-12 |
+| 4.7 | Arquivos de exemplo para demonstração (RF-12) | feito: três amostras controladas no painel de abertura (título e autor, piano, duas vozes); nenhuma obra de terceiros | RF-12 |
 
-**Portão G4 — Robustez comprovada (28/12/2026)**
-- [ ] 90% das amostras simples abrem sem erro; 100% de fidelidade nas suportadas.
+**Portão G4 — Robustez comprovada (fechado em 04/11/2026, com a ressalva do Safari)**
+- [x] 90% das amostras simples abrem sem erro; 100% de fidelidade nas suportadas. **38 de 38** abrem e
+  conferem com o MusicXML do Encore em `src/enc/parser.test.ts` (14 partituras reais e 24 controladas).
 - [x] Zero travamentos com arquivos inválidos (teste com lote de arquivos ruins). Verificado em
   02/11/2026 por `src/enc/robustness.test.ts`: corte em 21 offsets por amostra, bytes aleatórios,
   magia/versão erradas, texto e PDF disfarçados, cabeçalho fora de faixa e **500 mutações de 1 a 3

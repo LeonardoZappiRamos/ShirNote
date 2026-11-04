@@ -3,7 +3,7 @@
 Instruções para agentes de código neste repositório. Visão geral e estado do projeto: `README.md`.
 
 ShirNote abre partituras do Encore (`.enc`) no navegador. O formato não tem especificação pública e
-o projeto está na Fase 4 (G1 a G3 fechados em 02/11/2026; G4 em 27/11/2026; ver o cronograma). O parser de produto é `src/enc/parser.ts`;
+o projeto está na Fase 5 (G1 a G4 fechados; G4 em 04/11/2026, com o Safari pendente; ver o cronograma). O parser de produto é `src/enc/parser.ts`;
 `App.tsx` passa o arquivo por ele, gera o MusicXML e renderiza no OSMD, e abre com a partitura
 sintética `simpleMelody`. O spike `scripts/enc-spike.mjs` é descartável; os testes usam o leitor de
 MusicXML dele (`readReferenceXml`).
