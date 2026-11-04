@@ -37,10 +37,13 @@ export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewer
 
     let cancelled = false;
 
+    // RF-04: sem título no arquivo, nada no lugar (o padrão do OSMD é "Untitled Score").
     void osmd
-      .load(musicXml)
+      .load(musicXml, '')
       .then(() => {
         if (cancelled) return;
+        // RF-07: o nome da parte só distingue partes; o Encore não dá um nome comprovado.
+        osmd.setOptions({ drawPartNames: osmd.Sheet.Instruments.length > 1 });
         osmd.render();
         renderedRef.current();
       })

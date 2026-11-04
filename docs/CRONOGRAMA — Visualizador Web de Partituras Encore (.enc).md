@@ -211,7 +211,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | 1 du | RNF-03 |
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | 1 du | RNF-04 |
 | 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | 1 du | RNF-07 |
-| 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | 2 du | RF-04, RF-07 |
+| 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | feito: OSMD desenha título e autor do arquivo; sem título não exibe "Untitled Score"; nome de parte só com duas ou mais partes | RF-04, RF-07 |
 | 4.7 | Arquivos de exemplo para demonstração (RF-12) | 1 du | RF-12 |
 
 **Portão G4 — Robustez comprovada (28/12/2026)**
