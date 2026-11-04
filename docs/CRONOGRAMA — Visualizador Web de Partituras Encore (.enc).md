@@ -206,7 +206,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
-| 4.1 | Cobertura de fixtures por recurso (todo RF suportado tem `.enc` de teste) | 2 du | RNF-06 |
+| 4.1 | Cobertura de fixtures por recurso (todo RF suportado tem `.enc` de teste) | feito: censo de 29 recursos em `src/enc/coverage.test.ts`; fidelidade em `parser.test.ts` | RNF-06 |
 | 4.2 | Robustez: arquivos truncados, corrompidos, outras versões e outros formatos | feito: fuzz determinístico em `src/enc/robustness.test.ts` | RNF-02, RF-03 |
 | 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | 1 du | RNF-03 |
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | 1 du | RNF-04 |
