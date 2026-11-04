@@ -23,17 +23,31 @@ export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewer
   errorRef.current = onError;
   renderedRef.current = onRendered;
 
+  const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
+
+  // Uma instância por montagem: o OSMD não remove o listener de `resize`, e uma instância antiga
+  // redesenharia a partitura anterior por cima da nova ao redimensionar a janela.
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
-    container.replaceChildren();
 
     const osmd = new OpenSheetMusicDisplay(container, {
       autoResize: true,
       backend: 'svg',
       drawMeasureNumbersOnlyAtSystemStart: true,
     });
+    osmdRef.current = osmd;
+
+    return () => {
+      osmd.AutoResizeEnabled = false;
+      osmdRef.current = null;
+      container.replaceChildren();
+    };
+  }, []);
+
+  useEffect(() => {
+    const osmd = osmdRef.current;
+    if (!osmd) return;
 
     let cancelled = false;
 
@@ -53,7 +67,6 @@ export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewer
 
     return () => {
       cancelled = true;
-      container.replaceChildren();
     };
   }, [musicXml]);
 
