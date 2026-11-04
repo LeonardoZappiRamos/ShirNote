@@ -22,7 +22,13 @@ const LABEL: Readonly<Record<Stage, string>> = {
  */
 export function StatusBar({ status }: { readonly status: ViewerStatus }) {
   return (
-    <div className={`status status--${status.stage}`} role="status" aria-live="polite">
+    // RNF-07: o erro interrompe o leitor de tela; os demais estados esperam a fala atual terminar.
+    <div
+      className={`status status--${status.stage}`}
+      role="status"
+      aria-live={status.stage === 'error' ? 'assertive' : 'polite'}
+      aria-atomic="true"
+    >
       <p className="status__badge">{LABEL[status.stage]}</p>
       <p className="status__message">{status.message}</p>
       {status.warnings.length > 0 ? (

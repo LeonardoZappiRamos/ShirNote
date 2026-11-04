@@ -3,10 +3,13 @@ import { EncoreFormatError, inspectBinary, parseEncore, type BinarySnapshot } fr
 import { simpleMelody, validateScore } from '../music';
 import { generateMusicXml } from '../musicxml';
 import { FileUploader } from './FileUploader';
-import { ScoreViewer } from './ScoreViewer';
+import { ScoreViewer, type ShownScore } from './ScoreViewer';
 import { StatusBar, type ViewerStatus } from './StatusBar';
 
-const demoMusicXml = generateMusicXml(simpleMelody);
+const DEMO: ShownScore = {
+  musicXml: generateMusicXml(simpleMelody),
+  label: scoreLabel(simpleMelody.title, 'partitura de exemplo'),
+};
 const demoWarnings = validateScore(simpleMelody).map((issue) => issue.message);
 
 const INITIAL_STATUS: ViewerStatus = {
@@ -14,6 +17,8 @@ const INITIAL_STATUS: ViewerStatus = {
   message: 'Partitura de exemplo carregada. Abra um arquivo .enc para ver a sua partitura.',
   warnings: demoWarnings,
 };
+
+const NO_SCORE: ShownScore = { musicXml: null, label: 'Nenhuma partitura aberta' };
 
 interface LoadedFile {
   readonly fileName: string;
@@ -23,7 +28,7 @@ interface LoadedFile {
 export function App() {
   const [status, setStatus] = useState<ViewerStatus>(INITIAL_STATUS);
   const [loadedFile, setLoadedFile] = useState<LoadedFile | null>(null);
-  const [musicXml, setMusicXml] = useState(demoMusicXml);
+  const [shown, setShown] = useState<ShownScore>(DEMO);
   const [zoom, setZoom] = useState(1);
   /** Resultado do parse que só vira "pronto" quando o OSMD termina de desenhar (tarefa 3.2). */
   const pendingRef = useRef<{ message: string; warnings: readonly string[] } | null>(null);
@@ -32,6 +37,7 @@ export function App() {
     pendingRef.current = null;
 
     if (!file.name.toLowerCase().endsWith('.enc')) {
+      setShown(NO_SCORE);
       setStatus({
         stage: 'error',
         message: `"${file.name}" não tem extensão .enc. Selecione um arquivo criado no Encore.`,
@@ -48,7 +54,7 @@ export function App() {
       // ADR 0003: parse na thread principal. A maior amostra (63 KB, 417 notas) leva 2,3 ms de mediana
       // com a geração do MusicXML; se passar de 100 ms, o worker entra.
       const { score, warnings } = parseEncore(new Uint8Array(buffer));
-      setMusicXml(generateMusicXml(score));
+      setShown({ musicXml: generateMusicXml(score), label: scoreLabel(score.title, file.name) });
 
       const warningMessages = warnings.map((warning) => warning.message);
       pendingRef.current = {
@@ -61,6 +67,7 @@ export function App() {
         warnings: warningMessages,
       });
     } catch (error) {
+      setShown(NO_SCORE);
       setStatus({
         stage: 'error',
         message:
@@ -81,6 +88,7 @@ export function App() {
 
   const handleRenderError = useCallback((error: unknown) => {
     pendingRef.current = null;
+    setShown(NO_SCORE);
     setStatus({
       stage: 'error',
       message: `Falha ao renderizar a partitura: ${describeError(error)}`,
@@ -148,7 +156,7 @@ export function App() {
             </div>
           </div>
           <ScoreViewer
-            musicXml={musicXml}
+            score={shown}
             zoom={zoom}
             onError={handleRenderError}
             onRendered={handleRendered}
@@ -188,6 +196,10 @@ function BinaryPreview({
       </p>
     </details>
   );
+}
+
+function scoreLabel(title: string | undefined, fallback: string): string {
+  return `Partitura: ${title ?? fallback}`;
 }
 
 function formatBytes(bytes: number): string {

@@ -1,8 +1,16 @@
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import { useEffect, useRef } from 'react';
 
+export interface ShownScore {
+  /** `null` limpa a área: depois de um erro, a partitura anterior não fica na tela. */
+  readonly musicXml: string | null;
+  /** Nome acessível da partitura desenhada (RNF-07); o SVG do OSMD não tem texto útil. */
+  readonly label: string;
+}
+
 interface ScoreViewerProps {
-  readonly musicXml: string;
+  /** Cada objeto novo redesenha, mesmo com o MusicXML igual (o mesmo arquivo aberto de novo). */
+  readonly score: ShownScore;
   readonly zoom: number;
   readonly onError: (error: unknown) => void;
   readonly onRendered: () => void;
@@ -15,7 +23,8 @@ interface ScoreViewerProps {
  * `transform: scale()` no contêiner, para ampliar de verdade e deixar o `.score`
  * rolar em vez de reengravitar a partitura em outra largura.
  */
-export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewerProps) {
+export function ScoreViewer({ score, zoom, onError, onRendered }: ScoreViewerProps) {
+  const { musicXml, label } = score;
   const containerRef = useRef<HTMLDivElement>(null);
   const errorRef = useRef(onError);
   const renderedRef = useRef(onRendered);
@@ -49,6 +58,14 @@ export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewer
     const osmd = osmdRef.current;
     if (!osmd) return;
 
+    const { musicXml } = score;
+    if (musicXml === null) {
+      // Sem isto, o próximo resize redesenharia a partitura que continua carregada no OSMD.
+      osmd.AutoResizeEnabled = false;
+      containerRef.current?.replaceChildren();
+      return;
+    }
+
     let cancelled = false;
 
     // RF-04: sem título no arquivo, nada no lugar (o padrão do OSMD é "Untitled Score").
@@ -58,6 +75,7 @@ export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewer
         if (cancelled) return;
         // RF-07: o nome da parte só distingue partes; o Encore não dá um nome comprovado.
         osmd.setOptions({ drawPartNames: osmd.Sheet.Instruments.length > 1 });
+        osmd.AutoResizeEnabled = true;
         osmd.render();
         renderedRef.current();
       })
@@ -68,11 +86,20 @@ export function ScoreViewer({ musicXml, zoom, onError, onRendered }: ScoreViewer
     return () => {
       cancelled = true;
     };
-  }, [musicXml]);
+  }, [score]);
 
+  // RNF-07: a área rola com as setas quando o zoom passa da largura, por isso entra no Tab.
   return (
-    <div className="score">
-      <div className="score__canvas" ref={containerRef} style={{ transform: `scale(${zoom})` }} />
+    <div className="score" tabIndex={0} role="region" aria-label="Área da partitura">
+      {musicXml === null ? <p className="score__empty">Nenhuma partitura aberta.</p> : null}
+      <div
+        className="score__canvas"
+        ref={containerRef}
+        role="img"
+        aria-label={label}
+        hidden={musicXml === null}
+        style={{ transform: `scale(${zoom})` }}
+      />
     </div>
   );
 }
