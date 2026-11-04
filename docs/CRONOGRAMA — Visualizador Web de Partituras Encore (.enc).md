@@ -210,7 +210,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | 4.2 | Robustez: arquivos truncados, corrompidos, outras versões e outros formatos | feito: fuzz determinístico em `src/enc/robustness.test.ts` | RNF-02, RF-03 |
 | 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | feito: 56 compassos em 494 ms com CPU a 4× (ver G4) | RNF-03 |
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | feito em 3 de 4: Chrome, Edge e Firefox aprovados; Safari pendente, sem macOS (ver G4) | RNF-04 |
-| 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | 1 du | RNF-07 |
+| 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | feito: checklist no G4; axe sem violação; sem leitor de tela real | RNF-07 |
 | 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | feito: OSMD desenha título e autor do arquivo; sem título não exibe "Untitled Score"; nome de parte só com duas ou mais partes | RF-04, RF-07 |
 | 4.7 | Arquivos de exemplo para demonstração (RF-12) | 1 du | RF-12 |
 
@@ -233,9 +233,9 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
   Profiling: parse + MusicXML custa 2,3 ms de mediana na maior amostra
   ([ADR 0003](decisions/0003-adiar-o-web-worker-do-parse.md)); o resto é o
   OSMD. O gatilho do worker (100 ms de parse) segue longe.
-- [ ] Checklist de acessibilidade e matriz dos 4 navegadores preenchidos. **Safari fica pendente** por
-  falta de macOS; a célula é marcada como "pendente", nunca como aprovada. Matriz preenchida em
-  04/11/2026; falta o checklist de acessibilidade (tarefa 4.5).
+- [x] Checklist de acessibilidade e matriz dos 4 navegadores preenchidos. **Safari fica pendente** por
+  falta de macOS; a célula é marcada como "pendente", nunca como aprovada. Os dois preenchidos em
+  04/11/2026.
 
   Roteiro igual nos três navegadores reais, sem cabeça, contra o build de produção: exemplo inicial,
   melodia com título e autor (`seu-tempo-melodia`), duas partes (`controle-17`), duas pautas
@@ -253,6 +253,26 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
   O roteiro achou um bug, corrigido no mesmo dia: cada arquivo criava uma instância nova do OSMD, e a
   antiga redesenhava a partitura anterior por cima da nova quando a janela mudava de tamanho. Agora há
   uma instância por montagem (`src/components/ScoreViewer.test.tsx`).
+
+  Checklist de acessibilidade (RNF-07), no Chrome 156 contra o build de produção:
+
+  | Item | Resultado |
+  | --- | --- |
+  | axe-core 4 (WCAG 2.1 A/AA e boas práticas) no exemplo, em "pronto" com avisos e em erro | 0 violações |
+  | Ordem do Tab: arquivo → diagnóstico → zoom − / + / original → área da partitura | ok |
+  | Foco visível no botão de arquivo (o `<input>` real é invisível) | corrigido: contorno no botão |
+  | Enter no botão de arquivo abre o seletor | ok |
+  | Área da partitura rola pelas setas com zoom alto | corrigido: entra no Tab |
+  | Nome acessível da partitura (o SVG do OSMD só tem números de compasso) | corrigido: "Partitura: título" |
+  | Erro anunciado sem esperar a fala atual | corrigido: `aria-live="assertive"` no erro |
+  | Erro não deixa a partitura anterior na tela | corrigido: área limpa, com "Nenhuma partitura aberta." |
+  | Contraste de texto (menor: 7,4:1) e do contorno de foco (menor: 3,4:1) | ok |
+  | Contraste da borda dos botões de zoom (WCAG 1.4.11) | corrigido: de 1,4:1 para 3,6:1 |
+  | `lang="pt-BR"` no documento | ok |
+  | Leitor de tela real (NVDA, VoiceOver) | **não testado**; a semântica foi conferida pelo axe |
+
+  O roteiro também achou que abrir o mesmo arquivo duas vezes deixava o status preso em
+  "Desenhando…", porque o MusicXML igual não redesenhava. Corrigido junto.
 
 ---
 
