@@ -209,7 +209,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | 4.1 | Cobertura de fixtures por recurso (todo RF suportado tem `.enc` de teste) | feito: censo de 29 recursos em `src/enc/coverage.test.ts`; fidelidade em `parser.test.ts` | RNF-06 |
 | 4.2 | Robustez: arquivos truncados, corrompidos, outras versões e outros formatos | feito: fuzz determinístico em `src/enc/robustness.test.ts` | RNF-02, RF-03 |
 | 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | feito: 56 compassos em 494 ms com CPU a 4× (ver G4) | RNF-03 |
-| 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | 1 du | RNF-04 |
+| 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | feito em 3 de 4: Chrome, Edge e Firefox aprovados; Safari pendente, sem macOS (ver G4) | RNF-04 |
 | 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | 1 du | RNF-07 |
 | 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | feito: OSMD desenha título e autor do arquivo; sem título não exibe "Untitled Score"; nome de parte só com duas ou mais partes | RF-04, RF-07 |
 | 4.7 | Arquivos de exemplo para demonstração (RF-12) | 1 du | RF-12 |
@@ -234,7 +234,25 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
   ([ADR 0003](decisions/0003-adiar-o-web-worker-do-parse.md)); o resto é o
   OSMD. O gatilho do worker (100 ms de parse) segue longe.
 - [ ] Checklist de acessibilidade e matriz dos 4 navegadores preenchidos. **Safari fica pendente** por
-  falta de macOS; a célula é marcada como "pendente", nunca como aprovada.
+  falta de macOS; a célula é marcada como "pendente", nunca como aprovada. Matriz preenchida em
+  04/11/2026; falta o checklist de acessibilidade (tarefa 4.5).
+
+  Roteiro igual nos três navegadores reais, sem cabeça, contra o build de produção: exemplo inicial,
+  melodia com título e autor (`seu-tempo-melodia`), duas partes (`controle-17`), duas pautas
+  (`controle-16`), 56 compassos (`adonai-adoneinu-melodia`), arquivo inválido com mensagem de erro,
+  zoom pelos botões e console sem erro. Desenho conferido por print e pela contagem de elementos do SVG,
+  que bate entre os navegadores.
+
+  | Navegador | Versão | Resultado |
+  | --- | --- | --- |
+  | Chrome | 156.0.8078.74 | aprovado |
+  | Edge | 156.0.4314.58 | aprovado |
+  | Firefox | 159.0 (Microsoft Store) | aprovado |
+  | Safari | — | **pendente — sem macOS** |
+
+  O roteiro achou um bug, corrigido no mesmo dia: cada arquivo criava uma instância nova do OSMD, e a
+  antiga redesenhava a partitura anterior por cima da nova quando a janela mudava de tamanho. Agora há
+  uma instância por montagem (`src/components/ScoreViewer.test.tsx`).
 
 ---
 
