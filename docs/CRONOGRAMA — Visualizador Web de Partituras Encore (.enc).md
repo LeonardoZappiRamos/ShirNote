@@ -293,16 +293,29 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
 | 5.1 | `docs/enc-format.md` v1.0 + README + diagrama de arquitetura | 1 du | Documentação final |
-| 5.2 | Checklist dos 7 critérios de aceite + validação em visualizador externo | 1 du | Aceite assinado |
+| 5.2 | Checklist dos 7 critérios de aceite + validação em visualizador externo | feito em 04/11/2026: 7 de 7 (ver G5) | Aceite assinado |
 | 5.3 | Correções finais e polimento de mensagens | 2 du | Build candidato |
 | 5.4 | Deploy estático da demo | 1 du | URL da demo |
 | 5.5 | Retrospectiva e backlog pós-MVP | 1 du | Backlog priorizado |
 
-**Portão G5 — Release do MVP (06/01/2027)**
-- [ ] Os 7 critérios de aceite do PRD marcados.
+**Portão G5 — Release do MVP (alvo 11/12/2026, limite 06/01/2027)**
+- [x] Os 7 critérios de aceite do PRD marcados. Conferidos em 04/11/2026 contra o build de produção:
+
+  | Critério (PRD, seção 10) | Evidência |
+  | --- | --- |
+  | O usuário envia um `.enc` pelo navegador | seleção e arrastar no `FileUploader`; roteiro da 4.4 em Chrome, Edge e Firefox |
+  | O app identifica se o arquivo é compatível | magia `SCOW` e versão `0xC4` em `parser.test.ts`; fuzz em `robustness.test.ts` |
+  | Uma partitura simples é renderizada corretamente | exemplos e 38 amostras no OSMD; prints da 4.4 |
+  | Notas, pausas, compassos, claves, tonalidades e fórmulas aparecem corretamente | 38 de 38 conferem com o MusicXML do Encore (`parser.test.ts`) |
+  | Arquivos inválidos geram mensagem clara, sem travar a interface | `robustness.test.ts` (corte, mutação, outros formatos); mensagem e área limpa no navegador |
+  | Cada recurso suportado tem ao menos um `.enc` de teste | censo de 29 recursos em `coverage.test.ts` |
+  | O MusicXML abre no OSMD e em outro visualizador | OSMD no app; **Verovio 6.4.0: 38 de 38** abrem de novo em 04/11, `justica` com 105 notas, igual ao gabarito |
+
+  RNF-01 conferido junto: abrir a maior amostra no Chrome não gera nenhuma requisição de rede.
 - [ ] Demo no ar e acessível.
 - [ ] `docs/enc-format.md` publicado e suficiente para outra pessoa dar manutenção.
-- [ ] Nenhum item de prioridade Alta em aberto.
+- [x] Nenhum item de prioridade Alta em aberto. RF-01, RF-02, RF-03, RF-05, RF-06, RF-08, RF-09 e RF-11
+  estão cobertos pelos critérios acima e pelos portões G2 a G4.
 
 ---
 
