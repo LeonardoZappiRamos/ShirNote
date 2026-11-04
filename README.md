@@ -1,5 +1,9 @@
 # ShirNote
 
+<img src="docs/brand/shirnote-logo-readme.png" alt="Logo do ShirNote" width="360">
+
+_Shir_ (שיר) é “canção” em hebraico. Marca e ícone em [`docs/brand/`](docs/brand/).
+
 Visualizador web de partituras do Encore (`.enc`) que roda inteiramente no navegador: o arquivo é
 lido como `ArrayBuffer`, convertido para um modelo musical neutro, exportado como MusicXML e
 renderizado com [OpenSheetMusicDisplay](https://opensheetmusicdisplay.org/) (OSMD).
