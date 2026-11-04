@@ -178,7 +178,7 @@ Objetivo: primeira partitura visível no navegador, com os estados de UX do PRD.
 | 3.1 | `FileUploader`: seleção, arrastar e soltar, filtro de extensão | 2 du | RF-01 |
 | 3.2 | `StatusBar`: vazio, lendo, validando, convertendo, renderizando | 2 du | Estados de UX |
 | 3.3 | `ScoreViewer` com OSMD, zoom e rolagem horizontal/vertical | feito, verificado no G3 | RF-09, RF-10 |
-| 3.4 | Integração do pipeline no navegador (`ArrayBuffer`, Web Worker para não travar a UI) | parcial por decisão: sem Web Worker ([ADR 0003](../decisions/0003-adiar-o-web-worker-do-parse.md)) | RF-02, RNF-01, RNF-03 |
+| 3.4 | Integração do pipeline no navegador (`ArrayBuffer`, Web Worker para não travar a UI) | parcial por decisão: sem Web Worker ([ADR 0003](decisions/0003-adiar-o-web-worker-do-parse.md)) | RF-02, RNF-01, RNF-03 |
 | 3.5 | Modo tolerante: avisos do parser chegam à UI sem derrubar a renderização | feito | RF-11 |
 | 3.6 | Textos em pt-BR e mensagens de erro acionáveis | 1 du | RNF-08 |
 
@@ -208,7 +208,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | --- | --- | --- | --- |
 | 4.1 | Cobertura de fixtures por recurso (todo RF suportado tem `.enc` de teste) | feito: censo de 29 recursos em `src/enc/coverage.test.ts`; fidelidade em `parser.test.ts` | RNF-06 |
 | 4.2 | Robustez: arquivos truncados, corrompidos, outras versões e outros formatos | feito: fuzz determinístico em `src/enc/robustness.test.ts` | RNF-02, RF-03 |
-| 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | 1 du | RNF-03 |
+| 4.3 | Desempenho: 50 compassos em ≤ 3 s + profiling | feito: 56 compassos em 494 ms com CPU a 4× (ver G4) | RNF-03 |
 | 4.4 | Compatibilidade Chrome, Firefox, Edge e Safari | 1 du | RNF-04 |
 | 4.5 | Acessibilidade: navegação por teclado, contraste, ARIA nos estados de erro | 1 du | RNF-07 |
 | 4.6 | Título e autor na interface (RF-04) e partituras com várias partes no OSMD (RF-07) | feito: OSMD desenha título e autor do arquivo; sem título não exibe "Untitled Score"; nome de parte só com duas ou mais partes | RF-04, RF-07 |
@@ -220,8 +220,19 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
   02/11/2026 por `src/enc/robustness.test.ts`: corte em 21 offsets por amostra, bytes aleatórios,
   magia/versão erradas, texto e PDF disfarçados, cabeçalho fora de faixa e **500 mutações de 1 a 3
   bytes por amostra**, todas terminando em `EncoreFormatError` ou partitura íntegra.
-- [ ] Renderização de 50 compassos ≤ 3 s na régua provisória: esta máquina com CPU a 4×
-  ([ADR 0004](../decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md)).
+- [x] Renderização de 50 compassos ≤ 3 s na régua provisória: esta máquina com CPU a 4×
+  ([ADR 0004](decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md)).
+  Medido em 04/11/2026 no Chrome `156.0.8078.74`, build de produção (`vite preview`), do arquivo
+  selecionado até o status "pronto" (OSMD desenhado); 5 execuções após 1 de aquecimento:
+
+  | Partitura | Compassos | Bruto (mediana / pior) | CPU 4× (mediana / pior) |
+  | --- | --- | --- | --- |
+  | `adonai-adoneinu-melodia.enc` | 56 | 76 / 88 ms | **494 / 510 ms** |
+  | `al-ze-flauta.enc` (maior do acervo) | 127 | 130 / 134 ms | 864 / 922 ms |
+
+  Profiling: parse + MusicXML custa 2,3 ms de mediana na maior amostra
+  ([ADR 0003](decisions/0003-adiar-o-web-worker-do-parse.md)); o resto é o
+  OSMD. O gatilho do worker (100 ms de parse) segue longe.
 - [ ] Checklist de acessibilidade e matriz dos 4 navegadores preenchidos. **Safari fica pendente** por
   falta de macOS; a célula é marcada como "pendente", nunca como aprovada.
 
