@@ -1,7 +1,7 @@
 /**
  * Parser `.enc` de produto (Fase 2, tarefa 2.3).
  *
- * Usa só campos comprovados em `docs/enc-format.md` (v0.9). O que o arquivo traz e o modelo ainda
+ * Usa só campos comprovados em `docs/enc-format.md` (v1.0; mapa do formato ao código na seção 12). O que o arquivo traz e o modelo ainda
  * não representa vira `ParseWarning` (modo tolerante, RF-11); arquivo incompatível vira
  * `EncoreFormatError` (RF-03).
  */

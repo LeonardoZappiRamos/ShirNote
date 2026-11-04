@@ -292,7 +292,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 
 | # | Tarefa | Esforço | Saída |
 | --- | --- | --- | --- |
-| 5.1 | `docs/enc-format.md` v1.0 + README + diagrama de arquitetura | 1 du | Documentação final |
+| 5.1 | `docs/enc-format.md` v1.0 + README + diagrama de arquitetura | feito em 04/11/2026: formato v1.0 com mapa do formato ao código (seção 12); diagrama Mermaid no README | Documentação final |
 | 5.2 | Checklist dos 7 critérios de aceite + validação em visualizador externo | feito em 04/11/2026: 7 de 7 (ver G5) | Aceite assinado |
 | 5.3 | Correções finais e polimento de mensagens | 2 du | Build candidato |
 | 5.4 | Deploy estático da demo | 1 du | URL da demo |
@@ -313,7 +313,9 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 
   RNF-01 conferido junto: abrir a maior amostra no Chrome não gera nenhuma requisição de rede.
 - [ ] Demo no ar e acessível.
-- [ ] `docs/enc-format.md` publicado e suficiente para outra pessoa dar manutenção.
+- [x] `docs/enc-format.md` publicado e suficiente para outra pessoa dar manutenção. v1.0 em 04/11/2026:
+  comprovado e hipótese separados, lacunas na seção 8, passo a passo para comprovar um campo e mapa
+  de cada parte do formato até o código na seção 12.
 - [x] Nenhum item de prioridade Alta em aberto. RF-01, RF-02, RF-03, RF-05, RF-06, RF-08, RF-09 e RF-11
   estão cobertos pelos critérios acima e pelos portões G2 a G4.
 

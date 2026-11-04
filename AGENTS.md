@@ -53,7 +53,7 @@ Armadilhas já medidas:
 
 - `MEAS` é um cabeçalho de 54 bytes seguido da lista de eventos, e o tamanho declarado conta só a
   lista. Em `src/enc/container.ts`, esses 54 bytes ainda se chamam “trailer”.
-- O valor 54 está duplicado em `src/enc/container.ts` e nos scripts `enc-dump`, `enc-diff` e
+- O valor 54 está duplicado em `src/enc/parser.ts`, `src/enc/container.ts` e nos scripts `enc-dump`, `enc-diff` e
   `enc-spike`. Mude todos juntos.
 - Percorra os eventos pelo tamanho (`+3`) até o tick `FFFF`. Procurar `50 40` gera falsos positivos.
 - A duração da nota é a tocada (nominal × fator por arquivo). A figura vem de `+5`, e a posição, do

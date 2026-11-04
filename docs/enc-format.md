@@ -1,8 +1,8 @@
-# Formato `.enc` do Encore — v0.12
+# Formato `.enc` do Encore — v1.0
 
-**Versão:** 0.12 · **Data:** 02/11/2026
+**Versão:** 1.0 · **Data:** 04/11/2026
 **Base:** 14 partituras reais (1.024 compassos, 2.945 notas) e 24 amostras controladas, todas com
-**MusicXML de referência** exportado pelo próprio Encore · **Portão G1:** aprovado (seção 11)
+**MusicXML de referência** exportado pelo próprio Encore · **Portões G1 a G4:** fechados (seção 11)
 
 Este documento separa o que está **comprovado** por amostra do que continua **hipótese**. Hipótese
 não entra no parser de produto.
@@ -25,7 +25,8 @@ As outras 11 partituras reais, recebidas em 02/11/2026 do mesmo acervo, estão c
 
 O MusicXML de referência é a evidência central: `scripts/enc-spike.mjs --check` lê o `.enc` e compara
 cada compasso e evento com ele. O teste `src/enc/container.test.ts` roda essa comparação no CI para
-toda amostra com referência de mesmo nome-base.
+toda amostra com referência de mesmo nome-base, e `src/enc/parser.test.ts` repete a comparação com o
+parser de produto.
 
 As exportações de 02/11/2026 vieram em **UTF-16LE** (declarado no cabeçalho XML); as anteriores, em
 UTF-8. O spike aceita as duas. O Encore também passa para a segunda pauta sem `<backup>`, então a
@@ -373,7 +374,22 @@ node scripts/enc-diff.mjs tests/fixtures/controlled/controle-02-c4-seminima.enc 
 npx vitest run src/enc/container.test.ts
 ```
 
-## 11. Status do portão G1
+## 11. Status dos portões
+
+O G1 decidiu se o formato era legível; os seguintes conferem o parser de produto e o app. Detalhe e
+evidência de cada item ficam no cronograma.
+
+| Portão | Data | Resultado |
+| --- | --- | --- |
+| G1 — formato legível | 02/11/2026 | GO, tabela abaixo ([ADR 0002](decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md)) |
+| G2 — núcleo de conversão | 02/11/2026 | 38 de 38 amostras conferem com o MusicXML do Encore e abrem no OSMD e no Verovio |
+| G3 — interface | 02/11/2026 | zoom, rolagem, arquivo inválido e ausência de rede verificados no navegador |
+| G4 — robustez | 04/11/2026 | fuzz sem travar, 56 compassos em 0,5 s com CPU a 4×, Chrome, Edge e Firefox; Safari pendente |
+
+O que mudaria esta seção é uma amostra nova: outra versão do Encore (seção 8) ou um recurso da lista de
+lacunas. Ela entra como amostra controlada, com MusicXML, e o resultado volta para as seções 5 a 7.
+
+### G1 em detalhe
 
 | Critério | Situação |
 | --- | --- |
@@ -395,3 +411,32 @@ Fora do portão, mas na Fase 1:
 **Decisão: GO**, com as condições do ADR 0002: Encore `0xC4` como versão de referência, RF-07 na
 Fase 2 e pelo menos 10 partituras reais até o G2. As datas estão no cronograma v2.0: G2 24/11/2026,
 G3 10/12/2026, G4 28/12/2026, G5 06/01/2027.
+
+## 12. Do formato ao código
+
+Para dar manutenção, cada parte do formato tem um lugar só no parser de produto
+(`src/enc/parser.ts`), que usa apenas o que está comprovado aqui.
+
+| Parte do formato | Seção | Onde está no código |
+| --- | --- | --- |
+| Magia `SCOW`, versão `0xC4` e contagens do cabeçalho | 4 | `parseBody`, em `parser.ts`; `0x04` só recusa outra versão |
+| Registros `TK00`, um por parte | 4 | `parseBody` confere a tag; o conteúdo não é lido |
+| Cadeia de blocos `tag + uint32 + payload` | 5 | `readChunkChain`, em `container.ts` |
+| `LINE`: sistema, clave, armadura e pauta de cada entrada | 5 | `parseBody` e `staffSlots` |
+| `TITL`: título e autor em UTF-16 | 5 | `parseBody`, com `utf16At` |
+| `MEAS`: cabeçalho de 54 bytes, fórmula e barras | 6 | `parseBody` e `barlineOf` |
+| Eventos: nota, pausa, troca de clave e de armadura, sinais | 7 | `readEvents`, `decodeMeasures`, `noteOf`, `restOf`, `durationOf`, `directionOf` |
+| O que o modelo ainda não representa | 8 | `ParseWarning`, montado por `Warnings` e `ignoredMessage` |
+
+Do modelo em diante o formato não aparece mais: `src/music` é neutro e `src/musicxml` gera o MusicXML.
+
+**Como comprovar e adicionar um campo:**
+
+1. Gerar no Encore uma amostra controlada que mude só esse campo e exportar o MusicXML dela (seção 9).
+2. Comparar com uma amostra vizinha: `node scripts/enc-diff.mjs <a.enc> <b.enc> --tag <TAG>`.
+3. Registrar offset, bytes e evidência nas seções 4 a 7, marcando como comprovado.
+4. Ler o campo em `parser.ts`; `parser.test.ts` passa a comparar a amostra nova com a referência sozinho.
+5. Se o campo for um recurso novo, incluí-lo no censo de `src/enc/coverage.test.ts` (RNF-06).
+
+O tamanho de 54 bytes do cabeçalho de `MEAS` aparece em `parser.ts`, `container.ts` e nos scripts
+`enc-dump`, `enc-diff` e `enc-spike`; uma mudança vale para todos.

@@ -36,7 +36,7 @@ O release do MVP está previsto para 11/12/2026, com limite em 06/01/2027:
 | Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                                   |
 | Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, ainda sem uso na interface                                       |
 | Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                                   |
-| Formato documentado (`docs/enc-format.md` v0.9)                        | pronto para até duas partes e duas pautas, com lacunas declaradas        |
+| Formato documentado (`docs/enc-format.md` v1.0)                        | pronto para até duas partes e duas pautas, com lacunas declaradas        |
 | Parser de produto (Fase 2)                                             | pronto — confere nas 38 amostras; MusicXML abre no OSMD e no Verovio     |
 | Robustez, desempenho, navegadores e acessibilidade (Fase 4)            | pronto — G4 fechado; 56 compassos em 0,5 s com CPU a 4×; Safari pendente |
 | Exemplos para demonstração (RF-12)                                     | pronto — três amostras controladas no painel de abertura                 |
@@ -98,8 +98,26 @@ tests/fixtures/
 docs/             PRD, cronograma, enc-format.md, ADRs (decisions/) e arquivos originais (amostra/)
 ```
 
-O fluxo é sempre `ArrayBuffer → src/enc → src/music → src/musicxml → OSMD`. Cada camada conhece só
-a vizinha: o parser não importa MusicXML e o gerador não importa o parser (RNF-05).
+## Arquitetura
+
+Tudo roda no navegador; o arquivo nunca sai da máquina (RNF-01).
+
+```mermaid
+flowchart LR
+  file[".enc do usuário"] -->|ArrayBuffer| enc
+  subgraph core["Núcleo sem React nem DOM (RNF-05)"]
+    enc["src/enc<br/>parser do formato"] -->|Score| music["src/music<br/>modelo neutro"]
+    music --> musicxml["src/musicxml<br/>gerador MusicXML 4.0"]
+  end
+  musicxml -->|string| ui["src/components<br/>React"]
+  ui --> osmd["OSMD<br/>SVG na página"]
+  enc -. "EncoreFormatError / ParseWarning" .-> ui
+```
+
+Cada camada conhece só a vizinha: `src/enc` e `src/musicxml` dependem de `src/music`, nunca um do
+outro, e só `src/components` junta as camadas e usa o OSMD. O núcleo será reaproveitado no app React
+Native. Onde cada parte do formato é lida está na seção 12 de
+[`docs/enc-format.md`](docs/enc-format.md).
 
 ## Decisões
 
