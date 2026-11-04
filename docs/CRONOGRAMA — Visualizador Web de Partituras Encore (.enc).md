@@ -296,7 +296,7 @@ Objetivo: transformar a demo em produto que aguenta arquivo ruim e atende às m�
 | 5.2 | Checklist dos 7 critérios de aceite + validação em visualizador externo | feito em 04/11/2026: 7 de 7 (ver G5) | Aceite assinado |
 | 5.3 | Correções finais e polimento de mensagens | feito em 04/11/2026: erro diz o motivo e o que fazer (PRD, seção 9); exemplo com título e autor reais | Build candidato |
 | 5.4 | Deploy estático da demo | 1 du | URL da demo |
-| 5.5 | Retrospectiva e backlog pós-MVP | 1 du | Backlog priorizado |
+| 5.5 | Retrospectiva e backlog pós-MVP | feito em 04/11/2026: seções 10 e 11 | Backlog priorizado |
 
 **Portão G5 — Release do MVP (alvo 11/12/2026, limite 06/01/2027)**
 - [x] Os 7 critérios de aceite do PRD marcados. Conferidos em 04/11/2026 contra o build de produção:
@@ -401,6 +401,21 @@ produto e em partituras fora do acervo.
 
 ## 10. Fora deste cronograma (backlog pós-MVP)
 
+Backlog priorizado na tarefa 5.5 (04/11/2026). P1 é o que mais aparece para quem usa ou o que protege
+o que já funciona; P3 só entra com pedido ou amostra.
+
+| Prioridade | Item | Por quê | Depende de |
+| --- | --- | --- | --- |
+| P1 | Textos (bloco `TEXT`) e dinâmicas (`0x50`) | são os avisos que as partituras reais mais mostram | amostras controladas com MusicXML |
+| P1 | Versionar o roteiro de navegador da 4.4 e da 4.5 como teste ponta a ponta | os três bugs da Fase 4 só apareceram no navegador; os roteiros ficaram fora do repositório | escolher a ferramenta (Playwright) e o CI |
+| P1 | Verificar no Safari | única célula pendente do RNF-04 | acesso a macOS (ADR 0004) |
+| P2 | Lacunas da seção 8 do formato: vozes 3 e 4, quiálteras além de 3:2, três partes, sol oitavada abaixo | partituras maiores que o acervo atual | amostras controladas |
+| P2 | Teste com leitor de tela real (NVDA no Windows) | o checklist da 4.5 conferiu a semântica, não a fala | — |
+| P2 | Web Worker para o parse | só se o gatilho do ADR 0003 disparar | medição |
+| P3 | Nome da parte ou instrumento | hoje sai "Parte 1"; o campo do `TK00` não está comprovado | amostras |
+| P3 | Versões do Encore além de `0xC4` (`0xC2`, `0xA6`, magic `SCO5`) | nenhuma amostra recebida até agora | amostras de outra versão |
+| P3 | App React Native reaproveitando `src/enc`, `src/music` e `src/musicxml` | o núcleo já não depende de DOM (RNF-05) | decisão de produto |
+
 Itens do PRD declarados como não-objetivo, mantidos aqui para não virarem pressão silenciosa sobre as datas:
 
 - Reprodução MIDI/áudio e exportação (PDF, MIDI, MusicXML).
@@ -409,3 +424,23 @@ Itens do PRD declarados como não-objetivo, mantidos aqui para não virarem pres
 - Percussão avançada, tablatura, letras, cifras e articulações sofisticadas.
 - Suporte a versões do Encore além de `0xC4` (`0xC2`, `0xA6`, magic `SCO5`).
 - Internacionalização além de pt-BR.
+
+## 11. Retrospectiva do MVP (tarefa 5.5, 04/11/2026)
+
+**O que funcionou.** Exportar o MusicXML de cada amostra pelo próprio Encore e usar como gabarito fez o
+formato ser comprovado, não adivinhado: 38 de 38 amostras conferem, e o parser de produto nasceu
+testado. Amostras controladas, um campo por arquivo, isolaram cada byte. As fases 2 a 4 fecharam
+semanas antes das datas, sem cortar escopo.
+
+**O que não funcionou tão bem.**
+
+- Os três bugs da Fase 4 (partitura anterior redesenhada no resize, mesmo arquivo travando em
+  "Desenhando…" e partitura anterior visível depois de erro) passaram pelos testes de unidade e só
+  apareceram no navegador real. Os roteiros que os acharam ficaram fora do repositório: virou P1 no
+  backlog.
+- A régua de desempenho e compatibilidade é provisória (ADR 0004): sem notebook comum e sem Safari.
+- O disco do sistema cheio interrompeu a verificação de navegadores; perfis e arquivos temporários
+  passaram para outra unidade.
+
+**Para o próximo ciclo.** Toda verificação feita no navegador vira teste versionado antes de fechar a
+tarefa; toda lacuna nova do formato começa por uma amostra controlada com MusicXML.
