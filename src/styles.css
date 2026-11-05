@@ -479,16 +479,16 @@ body {
     background: #ffffff;
   }
 
-  /* Só esconde a interface quando há folhas para imprimir; sem isso, Ctrl+P imprime a página. */
-  .app:has(.print-pages) .print-hide {
+  /* Só esconde a interface com a impressão aberta; fora dela, Ctrl+P imprime a página. */
+  body.printing-score .print-hide {
     display: none !important;
   }
 
-  .app:has(.print-pages),
-  .app:has(.print-pages) .app__main,
-  .app:has(.print-pages) .panel--print,
-  .app:has(.print-pages) .print,
-  .print-pages {
+  body.printing-score .app,
+  body.printing-score .app__main,
+  body.printing-score .panel--print,
+  body.printing-score .print,
+  body.printing-score .print-pages {
     display: block;
     max-width: none;
     max-height: none;

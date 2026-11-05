@@ -29,6 +29,14 @@ export function PrintPanel({ musicXml, label }: PrintPanelProps) {
   const [settings, setSettings] = useState<PrintSettings>(DEFAULT_PRINT_SETTINGS);
   const id = useId();
 
+  // A classe no <body> diz ao CSS de impressão para mostrar só as folhas. Não usa `:has()`,
+  // que navegadores mais antigos ignoram e acabam imprimindo a tela inteira.
+  useEffect(() => {
+    if (!open) return;
+    document.body.classList.add('printing-score');
+    return () => document.body.classList.remove('printing-score');
+  }, [open]);
+
   const update = <K extends keyof PrintSettings>(key: K, value: PrintSettings[K]) =>
     setSettings((current) => ({ ...current, [key]: value }));
 

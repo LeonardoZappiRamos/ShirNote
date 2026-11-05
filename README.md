@@ -81,6 +81,7 @@ npm run build         # typecheck + build de produção
 npm run test          # Vitest
 npm run test:watch
 npm run lint
+docker compose up --build -d   # site em http://localhost:8088 (build de produção + nginx)
 npm run format        # Prettier
 npm run format:check
 npm run typecheck
