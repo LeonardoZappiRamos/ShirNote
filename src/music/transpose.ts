@@ -313,6 +313,31 @@ export function keyName(key: KeySignature): string {
   return `${major} / ${minor}`;
 }
 
+/**
+ * Instrumento para o qual a partitura está escrita. A parte de clarinete em si bemol vem escrita
+ * um tom acima do som real; `fifths` é o quanto somar à armadura escrita para chegar à que soa.
+ */
+export interface WrittenFor {
+  readonly id: 'C' | 'Bb' | 'Eb' | 'F';
+  readonly label: string;
+  readonly fifths: number;
+}
+
+export const WRITTEN_FOR: readonly WrittenFor[] = [
+  { id: 'C', label: 'Dó: voz, piano, violão, flauta, violino', fifths: 0 },
+  { id: 'Bb', label: 'Si bemol: clarinete, trompete, sax soprano e tenor', fifths: -2 },
+  { id: 'Eb', label: 'Mi bemol: sax alto e barítono', fifths: -3 },
+  { id: 'F', label: 'Fá: trompa', fifths: -1 },
+];
+
+/** Armadura que soa, a partir da escrita para o instrumento. Fica sempre entre -7 e +7. */
+export function soundingFifths(writtenFifths: number, writtenFor: WrittenFor): number {
+  const sounding = writtenFifths + writtenFor.fifths;
+  if (sounding < -7) return sounding + 12;
+  if (sounding > 7) return sounding - 12;
+  return sounding;
+}
+
 /** Nome do intervalo em pt-BR, como o músico fala: "2ª maior acima", "3ª menor abaixo". */
 export function intervalName(interval: Interval): string {
   if (isUnison(interval)) return 'Tom original';

@@ -3,15 +3,18 @@ import {
   MAX_TRANSPOSE_SEMITONES,
   OCTAVE,
   UNISON,
+  WRITTEN_FOR,
   addIntervals,
   intervalBetweenKeys,
   intervalFifths,
   intervalForSemitones,
   intervalName,
   keyName,
+  soundingFifths,
   type Interval,
   type KeySignature,
   type TransposeDirection,
+  type WrittenFor,
 } from '../music';
 
 interface TransposeControlsProps {
@@ -26,6 +29,9 @@ interface TransposeControlsProps {
 }
 
 const KEY_FIFTHS = Array.from({ length: 15 }, (_, index) => index - 7);
+
+/** Sem instrumento transpositor: o escrito é o que soa. */
+const CONCERT: WrittenFor = WRITTEN_FOR[0] ?? { id: 'C', label: 'Dó', fifths: 0 };
 
 const DIRECTION_LABEL: Readonly<Record<TransposeDirection, string>> = {
   nearest: 'Mais perto',
@@ -46,8 +52,17 @@ export function TransposeControls({
   disabled = false,
 }: TransposeControlsProps) {
   const [direction, setDirection] = useState<TransposeDirection>('nearest');
+  const [writtenFor, setWrittenFor] = useState<WrittenFor>(CONCERT);
   const id = useId();
   const targetFifths = sourceKey.fifths + intervalFifths(interval);
+
+  /** Nome da tonalidade escrita e, se o instrumento transpõe, a que soa. */
+  const describeKey = (fifths: number) => {
+    const mode = sourceKey.mode ? { mode: sourceKey.mode } : {};
+    const written = keyName({ fifths, ...mode });
+    if (writtenFor.fifths === 0) return written;
+    return `${written}, soa ${keyName({ fifths: soundingFifths(fifths, writtenFor), ...mode })}`;
+  };
 
   const chooseTarget = (fifths: number, nextDirection = direction) =>
     onChange(intervalBetweenKeys(sourceKey.fifths, fifths, nextDirection));
@@ -74,10 +89,30 @@ export function TransposeControls({
   return (
     <div className="transpose" role="group" aria-labelledby={`${id}-title`}>
       <p id={`${id}-title`} className="transpose__title">
-        Tom original: <strong>{keyName(sourceKey)}</strong>
+        Tom original: <strong>{describeKey(sourceKey.fifths)}</strong>
       </p>
 
       <div className="transpose__row">
+        <label className="transpose__field" htmlFor={`${id}-written-for`}>
+          Escrita para
+          <select
+            id={`${id}-written-for`}
+            value={writtenFor.id}
+            disabled={disabled}
+            onChange={(event) =>
+              setWrittenFor(
+                WRITTEN_FOR.find((option) => option.id === event.target.value) ?? CONCERT,
+              )
+            }
+          >
+            {WRITTEN_FOR.map((option) => (
+              <option key={option.id} value={option.id}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="transpose__field" htmlFor={`${id}-target`}>
           Transpor para
           <select
@@ -88,7 +123,7 @@ export function TransposeControls({
           >
             {KEY_FIFTHS.map((fifths) => (
               <option key={fifths} value={fifths}>
-                {keyName({ fifths, ...(sourceKey.mode ? { mode: sourceKey.mode } : {}) })}
+                {describeKey(fifths)}
               </option>
             ))}
           </select>
@@ -173,10 +208,7 @@ export function TransposeControls({
       <output className="transpose__result" aria-live="polite">
         {interval.semitones === 0 && interval.steps === 0
           ? 'Sem transposição.'
-          : `${intervalName(interval)} (${signed} semitons): ${keyName({
-              fifths: targetFifths,
-              ...(sourceKey.mode ? { mode: sourceKey.mode } : {}),
-            })}.`}
+          : `${intervalName(interval)} (${signed} semitons): ${describeKey(targetFifths)}.`}
         {tritone
           ? ' Trítono: a mesma distância para os dois lados. Escolha "Para cima" ou "Para baixo" conforme a extensão do instrumento.'
           : ''}

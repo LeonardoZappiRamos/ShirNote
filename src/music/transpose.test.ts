@@ -3,6 +3,8 @@ import { firstMeasureAttributes, measure, note, rest, scoreOf, voice } from '../
 import type { Score } from './model';
 import {
   OCTAVE,
+  WRITTEN_FOR,
+  soundingFifths,
   addIntervals,
   intervalBetweenKeys,
   intervalFifths,
@@ -414,6 +416,18 @@ describe('transposição por grau (docs/transposicao.md)', () => {
     expect(intervalName(interval)).toBe('7ª menor abaixo');
     expect(intervalName(addIntervals(UNISON_CHECK, OCTAVE))).toBe('8ª justa acima');
     expect(spelled(transposeScoreByInterval(melody(cScale()), interval))[0]).toBe('D3');
+  });
+
+  it('T20 partitura escrita para instrumento transpositor mostra o tom que soa', () => {
+    const [concert, bFlat, eFlat, horn] = WRITTEN_FOR;
+    if (!concert || !bFlat || !eFlat || !horn) throw new Error('lista de instrumentos incompleta');
+
+    expect(soundingFifths(2, concert)).toBe(2);
+    expect(soundingFifths(2, bFlat)).toBe(0);
+    expect(soundingFifths(3, eFlat)).toBe(0);
+    expect(soundingFifths(1, horn)).toBe(0);
+    expect(soundingFifths(-6, bFlat)).toBe(4);
+    expect(soundingFifths(-6, eFlat)).toBe(3);
   });
 
   it('dá nome às tonalidades sem modo com a maior e a relativa', () => {

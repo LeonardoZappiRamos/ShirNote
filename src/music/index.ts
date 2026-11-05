@@ -41,6 +41,7 @@ export {
   MAX_TRANSPOSE_SEMITONES,
   OCTAVE,
   UNISON,
+  WRITTEN_FOR,
   addIntervals,
   firstKeyFifths,
   intervalBetweenKeys,
@@ -49,6 +50,7 @@ export {
   intervalName,
   keyName,
   pitchToMidi,
+  soundingFifths,
   spellPitch,
   transposeKey,
   transposePitch,
@@ -57,6 +59,7 @@ export {
   type Interval,
   type TransposeDirection,
   type TransposeOptions,
+  type WrittenFor,
 } from './transpose';
 
 export { simpleMelody } from './examples/simple-melody';

@@ -1,7 +1,7 @@
 # Transposição por grau
 
-- Versão: 1.1
-- Data: 2026-11-05 (v1.1: opção de simplificar dobrados e oitava a critério de quem toca)
+- Versão: 1.2
+- Data: 2026-11-05 (v1.1: simplificar dobrados e oitava; v1.2: partitura escrita para instrumento transpositor)
 - Código: `src/music/transpose.ts`
 - Testes: `src/music/transpose.test.ts`, bloco "transposição por grau". Cada caso da seção 5 tem um
   teste com o mesmo ID.
@@ -33,6 +33,7 @@ Na tela (site) há três jeitos, que dão o mesmo intervalo:
 
 | Controle | O que faz |
 | --- | --- |
+| **Escrita para** | Diz para qual instrumento a partitura está escrita: Dó (voz, piano...), Si bemol (clarinete, trompete, sax soprano e tenor), Mi bemol (sax alto e barítono) ou Fá (trompa). Muda só os nomes na tela: ao lado do tom escrito aparece o tom que soa (regra 6). |
 | **Transpor para** + **Direção** | Escolhe o tom de destino. "Mais perto" pega o caminho mais curto. "Para cima" e "Para baixo" forçam o sentido. |
 | **−½ / +½** | Anda meio tom por vez. O tom de destino é o de **menos acidentes** (regra 4.2); para a outra grafia (ex.: sol bemol em vez de fá sustenido), escolha em "Transpor para". |
 | **8ª abaixo / 8ª acima** | Desloca tudo uma oitava, sem mudar o tom. Junto com os outros controles, o limite é de duas oitavas (24 semitons) para cada lado. |
@@ -83,8 +84,20 @@ aparece.
 5. **Nunca mais de 7 acidentes na armadura.** Se uma modulação cair num tom de 8 ou mais acidentes
    (ex.: sol sustenido maior), aquele trecho é escrito na enarmônica (lá bemol maior), com o mesmo
    som. Só o trecho muda de grafia; o resto da música segue a regra 1.
-6. **Todas as partes andam o mesmo intervalo**, mesmo com armaduras diferentes (instrumento
-   transpositor). O tom de referência é o da primeira parte.
+6. **Partitura de instrumento transpositor já vem no tom do instrumento.** A parte de clarinete
+   em si bemol de uma música em dó maior vem escrita em ré maior; a de sax alto, em lá maior. O
+   arquivo `.enc` não diz para qual instrumento a partitura foi escrita, então a pessoa informa em
+   **Escrita para**. A transposição continua igual (todas as notas e partes andam o mesmo
+   intervalo); a tela só acrescenta o tom que soa: "Ré maior, soa Dó maior" (caso T20).
+
+   | Escrita para | Soa | Exemplo: escrito em dó maior soa em |
+   | --- | --- | --- |
+   | Si bemol | um tom abaixo | Si bemol maior |
+   | Mi bemol | uma 6ª maior abaixo | Mi bemol maior |
+   | Fá | uma 5ª justa abaixo | Fá maior |
+
+   Se as partes do arquivo forem de instrumentos diferentes, os nomes seguem a armadura da
+   primeira parte.
 7. **Dobrados: as duas grafias estão certas.** Seguir o grau pode gerar dobrado sustenido ou
    dobrado bemol (caso T10), que é a grafia da teoria. Com **Simplificar dobrados** ligado, a nota
    vira a simples de mesmo som que menos destoa da armadura (si dobrado bemol → lá; dó dobrado
@@ -121,6 +134,7 @@ Notação: nota + acidente + oitava científica (dó central = C4). `#` = susten
 | T17 | Nota E##4, intervalo uníssono aumentado, destino dó sustenido maior | — | — | G4 (E### não existe; reescrita pelo som) |
 | T18 | Dó maior: Ab4 C#4. Dó maior: A#4 | Ré bemol maior; mi maior | 2ª menor acima; 3ª maior acima | Sem simplificar: Bbb4 D4; C##5. Simplificando: A4 D4; D5 |
 | T19 | Dó maior, escala C4–B4 | Ré maior + 8ª abaixo | 7ª menor abaixo (−10) | Começa em D3 |
+| T20 | Armadura escrita: ré maior (Si bemol); lá maior (Mi bemol); sol maior (Fá); sol bemol maior (Si bemol e Mi bemol) | — | — | Soa dó maior; dó maior; dó maior; mi maior e lá maior (a enarmônica de fá bemol e si dobrado bemol, para não passar de 7 acidentes) |
 
 ## 6. Decisões de quem usa
 
@@ -131,10 +145,8 @@ Respostas de 05/11/2026:
 - **Trítono, oitava e grafia do tom:** dependem da análise por instrumento, então ficam a critério
   de quem toca (seção 2). O padrão só existe para o primeiro clique.
 
-Em aberto:
-
-- **Tom de referência (regra 6):** com instrumento transpositor na primeira parte, o "tom original"
-  mostrado é o escrito para ele, não o de concerto.
+- **Instrumento transpositor (regra 6):** a partitura de clarinete ou sax já vem no tom do
+  instrumento. A pessoa informa em **Escrita para** e a tela mostra também o tom que soa.
 
 ## 7. Como mudar
 
