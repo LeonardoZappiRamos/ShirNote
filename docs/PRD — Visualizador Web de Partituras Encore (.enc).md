@@ -1,5 +1,8 @@
 # PRD — Visualizador Web de Partituras Encore (.enc)
 
+> **Arquivado em 04/11/2026.** Registro do MVP web concluído; não descreve o produto atual.
+> Produto: [PRD do app móvel](PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md). Mapa dos documentos: [`docs/README.md`](README.md).
+
 Nov 1, 2026 · @Zappi
 
 ## 1. Visão geral e problema
