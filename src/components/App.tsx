@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   EncoreFormatError,
   inspectBinary,
@@ -6,18 +6,35 @@ import {
   type BinarySnapshot,
   type EncoreErrorCode,
 } from '../enc';
-import { simpleMelody, validateScore } from '../music';
+import {
+  UNISON,
+  intervalName,
+  simpleMelody,
+  transposeScoreByInterval,
+  validateScore,
+  type Interval,
+  type KeySignature,
+  type Score,
+} from '../music';
 import { generateMusicXml } from '../musicxml';
 import logoUrl from '../assets/shirnote-icon.svg';
 import duasPautasUrl from '../../tests/fixtures/controlled/controle-16-duas-pautas.enc?url';
 import duasVozesUrl from '../../tests/fixtures/controlled/controle-18-duas-vozes.enc?url';
 import seuTempoUrl from '../../tests/fixtures/samples/seu-tempo-melodia.enc?url';
 import { FileUploader } from './FileUploader';
+import { PrintPanel } from './PrintPanel';
 import { ScoreViewer, type ShownScore } from './ScoreViewer';
 import { StatusBar, type ViewerStatus } from './StatusBar';
+import { TransposeControls } from './TransposeControls';
 
-const DEMO: ShownScore = {
-  musicXml: generateMusicXml(simpleMelody),
+/** Partitura aberta, no tom do arquivo; a transposição é aplicada só na hora de desenhar. */
+interface OpenedScore {
+  readonly score: Score;
+  readonly label: string;
+}
+
+const DEMO: OpenedScore = {
+  score: simpleMelody,
   label: scoreLabel(simpleMelody.title, 'partitura de exemplo'),
 };
 const demoWarnings = validateScore(simpleMelody).map((issue) => issue.message);
@@ -58,7 +75,8 @@ interface LoadedFile {
 export function App() {
   const [status, setStatus] = useState<ViewerStatus>(INITIAL_STATUS);
   const [loadedFile, setLoadedFile] = useState<LoadedFile | null>(null);
-  const [shown, setShown] = useState<ShownScore>(DEMO);
+  const [opened, setOpened] = useState<OpenedScore | null>(DEMO);
+  const [transposition, setTransposition] = useState<Interval>(UNISON);
   const [zoom, setZoom] = useState(1);
   /** Resultado do parse que só vira "pronto" quando o OSMD termina de desenhar (tarefa 3.2). */
   const pendingRef = useRef<{ message: string; warnings: readonly string[] } | null>(null);
@@ -67,7 +85,7 @@ export function App() {
     pendingRef.current = null;
 
     if (!file.name.toLowerCase().endsWith('.enc')) {
-      setShown(NO_SCORE);
+      setOpened(null);
       setStatus({
         stage: 'error',
         message: `"${file.name}" não tem extensão .enc. Selecione um arquivo criado no Encore.`,
@@ -84,7 +102,8 @@ export function App() {
       // ADR 0003: parse na thread principal. A maior amostra (63 KB, 417 notas) leva 2,3 ms de mediana
       // com a geração do MusicXML; se passar de 100 ms, o worker entra.
       const { score, warnings } = parseEncore(new Uint8Array(buffer));
-      setShown({ musicXml: generateMusicXml(score), label: scoreLabel(score.title, file.name) });
+      setOpened({ score, label: scoreLabel(score.title, file.name) });
+      setTransposition(UNISON);
 
       const warningMessages = warnings.map((warning) => warning.message);
       pendingRef.current = {
@@ -97,7 +116,7 @@ export function App() {
         warnings: warningMessages,
       });
     } catch (error) {
-      setShown(NO_SCORE);
+      setOpened(null);
       setStatus({
         stage: 'error',
         message:
@@ -116,7 +135,7 @@ export function App() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         await handleFile(new File([await response.blob()], fileName));
       } catch (error) {
-        setShown(NO_SCORE);
+        setOpened(null);
         setStatus({
           stage: 'error',
           message: `Não foi possível carregar o exemplo "${fileName}": ${describeError(error)}`,
@@ -129,6 +148,15 @@ export function App() {
 
   const busy = status.stage === 'reading' || status.stage === 'rendering';
 
+  // Um objeto novo por arquivo aberto ou por intervalo escolhido: o ScoreViewer redesenha.
+  const shown = useMemo<ShownScore>(() => {
+    if (!opened) return NO_SCORE;
+    const transposed = transposeScoreByInterval(opened.score, transposition);
+    const suffix =
+      transposed === opened.score ? '' : ` (transposta: ${intervalName(transposition)})`;
+    return { musicXml: generateMusicXml(transposed), label: `${opened.label}${suffix}` };
+  }, [opened, transposition]);
+
   const handleRendered = useCallback(() => {
     const pending = pendingRef.current;
     if (!pending) return;
@@ -138,7 +166,7 @@ export function App() {
 
   const handleRenderError = useCallback((error: unknown) => {
     pendingRef.current = null;
-    setShown(NO_SCORE);
+    setOpened(null);
     setStatus({
       stage: 'error',
       message: `Falha ao renderizar a partitura: ${describeError(error)}`,
@@ -152,7 +180,7 @@ export function App() {
 
   return (
     <div className="app">
-      <header className="app__header">
+      <header className="app__header print-hide">
         <div className="app__brand">
           <img className="app__logo" src={logoUrl} alt="" width="40" height="58" />
           <div>
@@ -166,7 +194,7 @@ export function App() {
       </header>
 
       <main className="app__main">
-        <section className="panel" aria-labelledby="upload-title">
+        <section className="panel print-hide" aria-labelledby="upload-title">
           <h2 id="upload-title">1. Abrir arquivo</h2>
           <FileUploader onFile={handleFile} disabled={busy} />
           <div className="examples" role="group" aria-labelledby="examples-title">
@@ -193,12 +221,12 @@ export function App() {
           ) : null}
         </section>
 
-        <section className="panel" aria-labelledby="status-title">
+        <section className="panel print-hide" aria-labelledby="status-title">
           <h2 id="status-title">2. Status</h2>
           <StatusBar status={status} />
         </section>
 
-        <section className="panel panel--score" aria-labelledby="score-title">
+        <section className="panel panel--score print-hide" aria-labelledby="score-title">
           <div className="panel__heading">
             <h2 id="score-title">3. Partitura</h2>
             <div className="zoom" role="group" aria-label="Zoom da partitura">
@@ -226,12 +254,27 @@ export function App() {
               </button>
             </div>
           </div>
+          {opened ? (
+            <TransposeControls
+              sourceKey={sourceKeyOf(opened.score)}
+              interval={transposition}
+              onChange={setTransposition}
+              disabled={busy}
+            />
+          ) : null}
           <ScoreViewer
             score={shown}
             zoom={zoom}
             onError={handleRenderError}
             onRendered={handleRendered}
           />
+        </section>
+
+        <section className="panel panel--print" aria-labelledby="print-title">
+          <h2 id="print-title" className="print-hide">
+            4. Imprimir
+          </h2>
+          <PrintPanel musicXml={shown.musicXml} label={shown.label} />
         </section>
       </main>
     </div>
@@ -267,6 +310,14 @@ function BinaryPreview({
       </p>
     </details>
   );
+}
+
+/** Armação e modo da primeira parte; sem armação no arquivo, dó maior. */
+function sourceKeyOf(score: Score): KeySignature {
+  for (const measure of score.parts[0]?.measures ?? []) {
+    if (measure.attributes?.key) return measure.attributes.key;
+  }
+  return { fifths: 0 };
 }
 
 function scoreLabel(title: string | undefined, fallback: string): string {

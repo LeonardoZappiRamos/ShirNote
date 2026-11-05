@@ -39,27 +39,28 @@ Em **04/11/2026 o produto pivotou** para o aplicativo Android mobile-first
 ([PRD do app móvel](docs/PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md)). O PRD web fica como
 registro do MVP; as fases 6 a 11 do novo PRD passam a valer. O núcleo e o site continuam sendo a base.
 
-| Item                                                                   | Estado                                                                      |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI     | pronto                                                                      |
-| Modelo musical neutro (`src/music`) com testes                         | pronto                                                                      |
-| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes      | pronto, validado contra o XSD oficial                                       |
-| Arquivo `.enc` renderizado no OSMD (`src/components`)                  | pronto — zoom, rolagem e erro verificados no G3; sem Web Worker             |
-| Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)   | pronto                                                                      |
-| Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)             | pronto, usado pelo parser de produto                                        |
-| Spike do parser conferido com as referências (`scripts/enc-spike.mjs`) | pronto                                                                      |
-| Formato documentado (`docs/enc-format.md` v1.0)                        | pronto para até duas partes e duas pautas, com lacunas declaradas           |
-| Parser de produto (Fase 2)                                             | pronto — confere nas 38 amostras; MusicXML abre no OSMD e no Verovio        |
-| Robustez, desempenho, navegadores e acessibilidade (Fase 4)            | pronto — G4 fechado; 56 compassos em 0,5 s com CPU a 4×; Safari pendente    |
-| Exemplos para demonstração (RF-12)                                     | pronto — uma melodia real e duas amostras controladas no painel de abertura |
-| Transposição no modelo neutro (`src/music/transpose.ts`)               | pronto — 19 testes; armadura e enarmonia corretas                           |
-| App Android (Expo + React Native + WebView)                            | em andamento — Fases 6 e 7 do PRD móvel                                     |
-| Biblioteca SQLite + MusicXML (ADR 0006)                                | implementada — falta o teste em aparelho (G6)                               |
-| Leitura com zoom, tela cheia, posição salva e metadados (Fase 7)       | implementada — G7 pendente de teste no tablet                               |
-| Transposição no app (RFM-06)                                           | implementada — parte do modelo original; limite de ±12 semitons             |
-| Exportação PDF/MusicXML e impressão                                    | planejado — Fase 8                                                          |
-| OneDrive e Google Drive (ADR 0008)                                     | planejado — Fase 9                                                          |
-| Compra validada no backend (ADR 0007)                                  | planejado — Fase 10                                                         |
+| Item                                                                     | Estado                                                                      |
+| ------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Scaffold Vite + React + TypeScript + Vitest + ESLint/Prettier + CI       | pronto                                                                      |
+| Modelo musical neutro (`src/music`) com testes                           | pronto                                                                      |
+| Gerador MusicXML `score-partwise` 4.0 (`src/musicxml`) com testes        | pronto, validado contra o XSD oficial                                       |
+| Arquivo `.enc` renderizado no OSMD (`src/components`)                    | pronto — zoom, rolagem e erro verificados no G3; sem Web Worker             |
+| Contrato do parser + diagnóstico hexadecimal de amostras (`src/enc`)     | pronto                                                                      |
+| Leitor da cadeia de blocos do contêiner `.enc` (`src/enc`)               | pronto, usado pelo parser de produto                                        |
+| Spike do parser conferido com as referências (`scripts/enc-spike.mjs`)   | pronto                                                                      |
+| Formato documentado (`docs/enc-format.md` v1.0)                          | pronto para até duas partes e duas pautas, com lacunas declaradas           |
+| Parser de produto (Fase 2)                                               | pronto — confere nas 38 amostras; MusicXML abre no OSMD e no Verovio        |
+| Robustez, desempenho, navegadores e acessibilidade (Fase 4)              | pronto — G4 fechado; 56 compassos em 0,5 s com CPU a 4×; Safari pendente    |
+| Exemplos para demonstração (RF-12)                                       | pronto — uma melodia real e duas amostras controladas no painel de abertura |
+| Transposição por grau (`src/music/transpose.ts`, `docs/transposicao.md`) | pronto — 17 casos de validação; no site, tom de destino e meio tom          |
+| Impressão em páginas no site (papel, orientação, escala, margens)        | pronto — imprime ou salva PDF pelo navegador; nenhum compasso cortado       |
+| App Android (Expo + React Native + WebView)                              | em andamento — Fases 6 e 7 do PRD móvel                                     |
+| Biblioteca SQLite + MusicXML (ADR 0006)                                  | implementada — falta o teste em aparelho (G6)                               |
+| Leitura com zoom, tela cheia, posição salva e metadados (Fase 7)         | implementada — G7 pendente de teste no tablet                               |
+| Transposição no app (RFM-06)                                             | implementada — parte do modelo original; limite de ±12 semitons             |
+| Exportação PDF/MusicXML e impressão                                      | planejado — Fase 8                                                          |
+| OneDrive e Google Drive (ADR 0008)                                       | planejado — Fase 9                                                          |
+| Compra validada no backend (ADR 0007)                                    | planejado — Fase 10                                                         |
 
 O que se sabe sobre o formato, com base em 14 partituras reais (1.024 compassos), 24 amostras controladas
 e MusicXML exportado pelo Encore para todas:
