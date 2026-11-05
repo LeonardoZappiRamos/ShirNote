@@ -26,7 +26,7 @@ Legenda: **feito** = no código; **parcial** = parte do requisito no código;
 | RFM-03 Importar e ler PDF | planejado | §6.4 |
 | RFM-04 Biblioteca com busca e ordenação | feito, sem capa | `library/format.ts`, `app/index.tsx` |
 | RFM-05 Zoom, tela cheia, retomada de posição | feito | `library/reading.ts`, `app/score/[id].tsx` |
-| RFM-06 Transposição | feito para `.enc` | `library/transposition.ts`, `src/music/transpose.ts` |
+| RFM-06 Transposição | feito para `.enc`, por grau ([regras](transposicao.md)) | `library/transposition.ts`, `src/music/transpose.ts` |
 | RFM-07 Título e autor | feito | `app/edit/[id].tsx` |
 | RFM-08 a RFM-10 Exportar PDF/MusicXML, imprimir | planejado | §6.5 (Fase 8) |
 | RFM-11, RFM-12 OneDrive e Google Drive | planejado | §6.6 (Fase 9) |
@@ -151,7 +151,9 @@ abertura.
 ### 6.3 Transpor (feito)
 
 `transposeRecord(score, delta)` soma `delta` ao total, recusa além de ±12 e aplica `transposeScore`
-sobre o `score_json` original. O repositório grava o novo total e o novo `musicxml`; `score_json`
+sobre o `score_json` original. `transposeScore` escolhe o intervalo pelo tom de menos acidentes e
+move tudo por grau; regras e casos em [`transposicao.md`](transposicao.md). O app ainda só anda por
+semitons; escolher o tom de destino, como no site, usa `intervalBetweenKeys`. O repositório grava o novo total e o novo `musicxml`; `score_json`
 continua o original. Modelo corrompido vira `TranspositionError`.
 
 ### 6.4 PDF importado (planejado, Fase 6/7)

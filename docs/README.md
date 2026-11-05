@@ -7,6 +7,7 @@ Leia nesta ordem e pare no que responde à sua pergunta.
 | O que o produto faz e por quê? | [PRD do app móvel](PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md) | **vigente** |
 | Como está construído e o que já existe no código? | [TECHSPEC do app móvel](TECHSPEC%20—%20App%20Móvel%20ShirNote.md) | **vigente** |
 | Por que foi decidido assim? | [ADRs](decisions/README.md) | vigentes, salvo os marcados `Superseded` |
+| Como a transposição deve se comportar? | [`transposicao.md`](transposicao.md) | **vigente**, regras e casos para validar |
 | O que se sabe do formato `.enc`? | [`enc-format.md`](enc-format.md) | **vigente**, fonte de verdade do formato |
 | Como trabalhar no repositório? | [`AGENTS.md`](../AGENTS.md) | **vigente** |
 | O que foi o MVP web? | [PRD web](PRD%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md) e [cronograma web](CRONOGRAMA%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md) | **arquivado**, só histórico |
@@ -29,6 +30,7 @@ Quando dois documentos discordarem:
 | Requisito, escopo, plano grátis/Pro | PRD móvel (suba a versão) |
 | Estrutura, tabela, mensagem da ponte, fluxo implementado | TECHSPEC |
 | Decisão de arquitetura ou de qualidade | novo ADR + índice em `decisions/README.md` |
+| Regra de transposição | `transposicao.md` (caso na seção 5) e o teste com o mesmo ID |
 | Campo comprovado do `.enc` | `enc-format.md` (seção 11) e tabela de estado do `README.md` da raiz |
 | Fase ou portão concluído | tabela de estado do `README.md` da raiz e §1 do TECHSPEC |
 
