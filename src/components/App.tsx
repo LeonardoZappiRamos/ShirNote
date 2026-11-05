@@ -77,6 +77,7 @@ export function App() {
   const [loadedFile, setLoadedFile] = useState<LoadedFile | null>(null);
   const [opened, setOpened] = useState<OpenedScore | null>(DEMO);
   const [transposition, setTransposition] = useState<Interval>(UNISON);
+  const [simplifyDoubles, setSimplifyDoubles] = useState(false);
   const [zoom, setZoom] = useState(1);
   /** Resultado do parse que só vira "pronto" quando o OSMD termina de desenhar (tarefa 3.2). */
   const pendingRef = useRef<{ message: string; warnings: readonly string[] } | null>(null);
@@ -151,11 +152,11 @@ export function App() {
   // Um objeto novo por arquivo aberto ou por intervalo escolhido: o ScoreViewer redesenha.
   const shown = useMemo<ShownScore>(() => {
     if (!opened) return NO_SCORE;
-    const transposed = transposeScoreByInterval(opened.score, transposition);
+    const transposed = transposeScoreByInterval(opened.score, transposition, { simplifyDoubles });
     const suffix =
       transposed === opened.score ? '' : ` (transposta: ${intervalName(transposition)})`;
     return { musicXml: generateMusicXml(transposed), label: `${opened.label}${suffix}` };
-  }, [opened, transposition]);
+  }, [opened, transposition, simplifyDoubles]);
 
   const handleRendered = useCallback(() => {
     const pending = pendingRef.current;
@@ -259,6 +260,8 @@ export function App() {
               sourceKey={sourceKeyOf(opened.score)}
               interval={transposition}
               onChange={setTransposition}
+              simplifyDoubles={simplifyDoubles}
+              onSimplifyDoublesChange={setSimplifyDoubles}
               disabled={busy}
             />
           ) : null}

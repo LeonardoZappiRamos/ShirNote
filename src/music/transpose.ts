@@ -23,10 +23,20 @@ export interface Interval {
 
 export type TransposeDirection = 'nearest' | 'up' | 'down';
 
+export interface TransposeOptions {
+  /**
+   * Troca dobrado sustenido e dobrado bemol pela nota simples de mesmo som (si dobrado bemol →
+   * lá). As duas grafias estão certas; a escolha é de quem lê (docs/transposicao.md, regra 7).
+   */
+  readonly simplifyDoubles?: boolean;
+}
+
 export const UNISON: Interval = { steps: 0, semitones: 0 };
 
-/** Maior número de semitons que a interface oferece em cada direção. */
-export const MAX_TRANSPOSE_SEMITONES = 12;
+/** Maior número de semitons que a interface oferece em cada direção (duas oitavas). */
+export const MAX_TRANSPOSE_SEMITONES = 24;
+
+export const OCTAVE: Interval = { steps: 7, semitones: 12 };
 
 interface Candidate {
   readonly step: Step;
@@ -127,15 +137,24 @@ export function transposeScore(score: Score, semitones: number): Score {
 }
 
 /** Transpõe a partitura inteira pelo intervalo, nota a nota e armação a armação. */
-export function transposeScoreByInterval(score: Score, interval: Interval): Score {
+export function transposeScoreByInterval(
+  score: Score,
+  interval: Interval,
+  options: TransposeOptions = {},
+): Score {
   assertInteger(interval.steps);
   assertInteger(interval.semitones);
   if (isUnison(interval)) return score;
 
   return {
     ...score,
-    parts: score.parts.map((part) => transposePart(part, interval)),
+    parts: score.parts.map((part) => transposePart(part, interval, options)),
   };
+}
+
+/** Soma dois intervalos (ex.: 2ª maior acima + 8ª abaixo = 7ª menor abaixo). */
+export function addIntervals(a: Interval, b: Interval): Interval {
+  return { steps: a.steps + b.steps, semitones: a.semitones + b.semitones };
 }
 
 /**
@@ -195,12 +214,20 @@ export function pitchToMidi(pitch: Pitch): number {
 
 /**
  * Transpõe uma altura pelo intervalo, mantendo o grau. Se a grafia exigir mais que um dobrado
- * sustenido ou bemol, a nota é reescrita na armação `keyFifths` (ver `spellPitch`).
+ * sustenido ou bemol, a nota é reescrita na armação `keyFifths` (ver `spellPitch`). Com
+ * `simplifyDoubles`, o dobrado também é reescrito, só com acidentes simples.
  */
-export function transposePitch(pitch: Pitch, interval: Interval, keyFifths = 0): Pitch {
+export function transposePitch(
+  pitch: Pitch,
+  interval: Interval,
+  keyFifths = 0,
+  options: TransposeOptions = {},
+): Pitch {
   const moved = moveByInterval(pitch, interval);
-  if (moved.alter < -2 || moved.alter > 2) {
-    return spellPitch(pitchToMidi(pitch) + interval.semitones, keyFifths, interval.semitones);
+  const limit = options.simplifyDoubles ? 1 : 2;
+  if (Math.abs(moved.alter) > limit) {
+    const midi = pitchToMidi(pitch) + interval.semitones;
+    return spellPitch(midi, keyFifths, interval.semitones, limit);
   }
 
   return moved.alter === 0
@@ -227,13 +254,18 @@ export function transposeKey(key: KeySignature, semitones: number): KeySignature
  * tonalidade e exige menos acidentes; no empate, segue a direção da armação (sustenidos
  * em tonalidades de sustenidos, bemóis em tonalidades de bemóis).
  */
-export function spellPitch(midi: number, keyFifths: number, semitones = 0): Pitch {
+export function spellPitch(
+  midi: number,
+  keyFifths: number,
+  semitones = 0,
+  maxAlter: 1 | 2 = 2,
+): Pitch {
   const pitchClass = mod(midi, 12);
   const preferSharp = keyFifths > 0 || (keyFifths === 0 && semitones >= 0);
 
   const candidates: Candidate[] = [];
   for (const step of STEPS) {
-    for (let alter = -2; alter <= 2; alter += 1) {
+    for (let alter = -maxAlter; alter <= maxAlter; alter += 1) {
       if (mod(STEP_SEMITONES[step] + alter, 12) !== pitchClass) continue;
 
       const octave = (midi - STEP_SEMITONES[step] - alter) / 12 - 1;
@@ -313,7 +345,7 @@ export function firstKeyFifths(score: Score): number {
   return 0;
 }
 
-function transposePart(part: Part, interval: Interval): Part {
+function transposePart(part: Part, interval: Interval, options: TransposeOptions): Part {
   const shift = intervalFifths(interval);
   let fifths = shift;
   let segment = interval;
@@ -342,7 +374,7 @@ function transposePart(part: Part, interval: Interval): Part {
       attributes,
       voices: measure.voices.map((voice) => ({
         ...voice,
-        events: voice.events.map((event) => transposeEvent(event, segment, fifths)),
+        events: voice.events.map((event) => transposeEvent(event, segment, fifths, options)),
       })),
     };
   });
@@ -350,9 +382,14 @@ function transposePart(part: Part, interval: Interval): Part {
   return { ...part, measures };
 }
 
-function transposeEvent(event: MusicEvent, interval: Interval, fifths: number): MusicEvent {
+function transposeEvent(
+  event: MusicEvent,
+  interval: Interval,
+  fifths: number,
+  options: TransposeOptions,
+): MusicEvent {
   if (event.type !== 'note') return event;
-  return { ...event, pitch: transposePitch(event.pitch, interval, fifths) };
+  return { ...event, pitch: transposePitch(event.pitch, interval, fifths, options) };
 }
 
 /** Anda o grau e acerta o acidente pelo tamanho real; o acidente pode passar de ±2. */

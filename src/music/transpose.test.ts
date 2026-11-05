@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { firstMeasureAttributes, measure, note, rest, scoreOf, voice } from '../test-utils/scores';
 import type { Score } from './model';
 import {
+  OCTAVE,
+  addIntervals,
   intervalBetweenKeys,
   intervalFifths,
   intervalForSemitones,
@@ -16,6 +18,7 @@ import {
   type Interval,
 } from './transpose';
 
+const UNISON_CHECK: Interval = { steps: 0, semitones: 0 };
 const M2_UP: Interval = { steps: 1, semitones: 2 };
 const MINOR_2_DOWN: Interval = { steps: -1, semitones: -1 };
 const MINOR_2_UP: Interval = { steps: 1, semitones: 1 };
@@ -383,6 +386,34 @@ describe('transposição por grau (docs/transposicao.md)', () => {
       7,
     );
     expect(triple).toEqual({ step: 'G', octave: 4 });
+  });
+
+  it('T18 simplificar dobrados: si dobrado bemol vira lá, a pedido de quem lê', () => {
+    const score = melody([
+      note('A', 4, 'quarter', { alter: -1 }),
+      note('C', 4, 'quarter', { alter: 1 }),
+    ]);
+    const toDb = intervalBetweenKeys(0, -5);
+    expect(spelled(transposeScoreByInterval(score, toDb))).toEqual(['Bbb4', 'D4']);
+    expect(spelled(transposeScoreByInterval(score, toDb, { simplifyDoubles: true }))).toEqual([
+      'A4',
+      'D4',
+    ]);
+
+    const toE = intervalBetweenKeys(0, 4);
+    const sharp = melody([note('A', 4, 'quarter', { alter: 1 })]);
+    expect(spelled(transposeScoreByInterval(sharp, toE))).toEqual(['C##5']);
+    expect(spelled(transposeScoreByInterval(sharp, toE, { simplifyDoubles: true }))).toEqual([
+      'D5',
+    ]);
+  });
+
+  it('T19 oitava a critério de quem toca: 2ª maior acima + 8ª abaixo = 7ª menor abaixo', () => {
+    const interval = addIntervals(intervalBetweenKeys(0, 2), { steps: -7, semitones: -12 });
+    expect(interval).toEqual({ steps: -6, semitones: -10 });
+    expect(intervalName(interval)).toBe('7ª menor abaixo');
+    expect(intervalName(addIntervals(UNISON_CHECK, OCTAVE))).toBe('8ª justa acima');
+    expect(spelled(transposeScoreByInterval(melody(cScale()), interval))[0]).toBe('D3');
   });
 
   it('dá nome às tonalidades sem modo com a maior e a relativa', () => {

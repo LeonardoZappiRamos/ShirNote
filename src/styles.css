@@ -422,6 +422,7 @@ body {
   color: var(--ink-muted);
 }
 
+.transpose__check,
 .print__check {
   display: inline-flex;
   gap: 8px;

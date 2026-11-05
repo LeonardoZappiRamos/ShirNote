@@ -39,7 +39,9 @@ export { validateScore, type IssueSeverity, type ScoreIssue } from './validate';
 
 export {
   MAX_TRANSPOSE_SEMITONES,
+  OCTAVE,
   UNISON,
+  addIntervals,
   firstKeyFifths,
   intervalBetweenKeys,
   intervalFifths,
@@ -54,6 +56,7 @@ export {
   transposeScoreByInterval,
   type Interval,
   type TransposeDirection,
+  type TransposeOptions,
 } from './transpose';
 
 export { simpleMelody } from './examples/simple-melody';

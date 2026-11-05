@@ -1,7 +1,7 @@
 # Transposição por grau
 
-- Versão: 1.0
-- Data: 2026-11-05
+- Versão: 1.1
+- Data: 2026-11-05 (v1.1: opção de simplificar dobrados e oitava a critério de quem toca)
 - Código: `src/music/transpose.ts`
 - Testes: `src/music/transpose.test.ts`, bloco "transposição por grau". Cada caso da seção 5 tem um
   teste com o mesmo ID.
@@ -33,9 +33,15 @@ Na tela (site) há três jeitos, que dão o mesmo intervalo:
 
 | Controle | O que faz |
 | --- | --- |
-| **Transpor para** + **Direção** | Escolhe o tom de destino. "Mais perto" pega o caminho mais curto; no empate (trítono, 6 semitons), sobe. "Para cima" e "Para baixo" forçam o sentido. |
-| **−½ / +½** | Anda meio tom por vez, até 12 para cada lado. O tom de destino é o de **menos acidentes** (regra 4.2). |
+| **Transpor para** + **Direção** | Escolhe o tom de destino. "Mais perto" pega o caminho mais curto. "Para cima" e "Para baixo" forçam o sentido. |
+| **−½ / +½** | Anda meio tom por vez. O tom de destino é o de **menos acidentes** (regra 4.2); para a outra grafia (ex.: sol bemol em vez de fá sustenido), escolha em "Transpor para". |
+| **8ª abaixo / 8ª acima** | Desloca tudo uma oitava, sem mudar o tom. Junto com os outros controles, o limite é de duas oitavas (24 semitons) para cada lado. |
+| **Simplificar dobrados** | Troca dobrado sustenido e dobrado bemol pela nota simples de mesmo som (regra 7). Desligado por padrão. |
 | **Tom original** | Volta ao arquivo. A partitura original nunca é alterada; a transposição é recalculada a partir dela. |
+
+**Direção, oitava e grafia ficam a critério de quem toca.** A escolha certa depende da análise de
+cada instrumento (extensão, leitura, afinação), então o ShirNote não decide sozinho: os padrões
+abaixo são só o ponto de partida, e a pessoa ajusta com os controles.
 
 O resultado aparece por extenso: "2ª maior abaixo (−2 semitons): Sol maior / Mi menor".
 
@@ -69,20 +75,25 @@ aparece.
    acompanha (si 4 + 2ª maior = dó sustenido 5).
 2. **Semitons escolhem a armadura com menos acidentes.** Dó maior + 1 semitom = ré bemol maior
    (5 ♭), não dó sustenido maior (7 ♯). No empate de 6 (fá sustenido × sol bemol), subir dá
-   sustenidos e descer dá bemóis.
-3. **Armadura acompanha o intervalo.** Cada troca de armadura no meio da música é transposta pelo
+   sustenidos e descer dá bemóis. A pessoa pode trocar pela enarmônica em "Transpor para".
+3. **Trítono (6 semitons) não tem lado mais perto.** "Mais perto" sobe e a tela avisa para escolher
+   "Para cima" ou "Para baixo" conforme o instrumento.
+4. **Armadura acompanha o intervalo.** Cada troca de armadura no meio da música é transposta pelo
    mesmo intervalo.
-4. **Nunca mais de 7 acidentes na armadura.** Se uma modulação cair num tom de 8 ou mais acidentes
+5. **Nunca mais de 7 acidentes na armadura.** Se uma modulação cair num tom de 8 ou mais acidentes
    (ex.: sol sustenido maior), aquele trecho é escrito na enarmônica (lá bemol maior), com o mesmo
    som. Só o trecho muda de grafia; o resto da música segue a regra 1.
-5. **Todas as partes andam o mesmo intervalo**, mesmo com armaduras diferentes (instrumento
+6. **Todas as partes andam o mesmo intervalo**, mesmo com armaduras diferentes (instrumento
    transpositor). O tom de referência é o da primeira parte.
-6. **Dobrados são aceitos.** Seguir o grau pode gerar dobrado sustenido ou dobrado bemol
-   (caso T10). Isso é o certo pela teoria; se o grupo preferir a nota simples, é uma regra nova a
-   decidir (seção 6).
-7. **Acidente triplo não existe na escrita.** Se o grau pedir um (só com dobrados no original), a
+7. **Dobrados: as duas grafias estão certas.** Seguir o grau pode gerar dobrado sustenido ou
+   dobrado bemol (caso T10), que é a grafia da teoria. Com **Simplificar dobrados** ligado, a nota
+   vira a simples de mesmo som que menos destoa da armadura (si dobrado bemol → lá; dó dobrado
+   sustenido → ré). Só os dobrados mudam; sustenido e bemol simples (como mi sustenido em fá
+   sustenido maior) ficam como estão (caso T18).
+8. **Acidente triplo não existe na escrita.** Se o grau pedir um (só com dobrados no original), a
    nota é reescrita pelo som na armadura de destino (caso T17).
-8. Pausas, durações, ligaduras, vozes e pautas não mudam.
+9. **Oitava é um intervalo como outro.** 2ª maior acima + 8ª abaixo = 7ª menor abaixo (caso T19).
+10. Pausas, durações, ligaduras, vozes e pautas não mudam.
 
 ## 5. Casos de validação
 
@@ -108,14 +119,21 @@ Notação: nota + acidente + oitava científica (dó central = C4). `#` = susten
 | T15 | Dó maior com modulação para fá sustenido maior (6 ♯), nota F#4 | Ré maior (+2) | 2ª maior acima | Trecho modulado: armadura 4 ♭ (lá bemol maior, em vez de sol sustenido maior); F#4 → Ab4 |
 | T16 | Voz em dó maior (C4) + clarinete em ré maior (D4) | Ré maior | 2ª maior acima | Voz: 2 ♯, D4. Clarinete: 4 ♯ (mi maior), E4 |
 | T17 | Nota E##4, intervalo uníssono aumentado, destino dó sustenido maior | — | — | G4 (E### não existe; reescrita pelo som) |
+| T18 | Dó maior: Ab4 C#4. Dó maior: A#4 | Ré bemol maior; mi maior | 2ª menor acima; 3ª maior acima | Sem simplificar: Bbb4 D4; C##5. Simplificando: A4 D4; D5 |
+| T19 | Dó maior, escala C4–B4 | Ré maior + 8ª abaixo | 7ª menor abaixo (−10) | Começa em D3 |
 
-## 6. Questões para validar com quem usa
+## 6. Decisões de quem usa
 
-- **T10:** o grupo prefere `Bbb` (certo pela teoria) ou `A` (mais fácil de ler)? Se for `A`, a
-  regra 6 vira uma opção "simplificar dobrados".
-- **Empate do trítono (T05, T06):** subir é o padrão. Faz sentido para voz, ou o padrão deveria ser
-  descer?
-- **Tom de referência (regra 5):** com instrumento transpositor na primeira parte, o "tom original"
+Respostas de 05/11/2026:
+
+- **Dobrados (T10, T18):** as duas grafias estão certas; vira a opção **Simplificar dobrados**,
+  desligada por padrão.
+- **Trítono, oitava e grafia do tom:** dependem da análise por instrumento, então ficam a critério
+  de quem toca (seção 2). O padrão só existe para o primeiro clique.
+
+Em aberto:
+
+- **Tom de referência (regra 6):** com instrumento transpositor na primeira parte, o "tom original"
   mostrado é o escrito para ele, não o de concerto.
 
 ## 7. Como mudar
