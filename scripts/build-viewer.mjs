@@ -40,6 +40,10 @@ async function buildViewer() {
   html = await inlineStyles(html, outDir);
   html = html.replace(/<link\b[^>]*\brel="modulepreload"[^>]*>/gi, '');
 
+  if ((html.match(/<!doctype html/gi) ?? []).length !== 1) {
+    throw new Error('O visualizador gerado ficou com o HTML duplicado dentro do script.');
+  }
+
   if (/<(?:script|link)\b[^>]*(?:src|href)=/i.test(html)) {
     throw new Error('O visualizador gerado ainda referencia um arquivo externo.');
   }
@@ -73,7 +77,10 @@ async function inlineScripts(html, baseDir) {
     const sourcePath = resolveOutputPath(baseDir, match[1]);
     const code = await readFile(sourcePath, 'utf8');
     const safeCode = code.replace(/<\/script/gi, '<\\/script');
-    result = result.replace(match[0], `<script>${safeCode}</script>`);
+    // Função como substituto: o código minificado do OSMD tem `$&`/`` $` ``, que uma string de
+    // substituição expandiria em pedaços do HTML e quebraria o script.
+    // `type="module"` mantém o adiamento: o script fica no <head> e precisa de #score já no DOM.
+    result = result.replace(match[0], () => `<script type="module">${safeCode}</script>`);
   }
 
   return result;
@@ -86,7 +93,7 @@ async function inlineStyles(html, baseDir) {
   for (const match of html.matchAll(pattern)) {
     const sourcePath = resolveOutputPath(baseDir, match[1]);
     const css = await readFile(sourcePath, 'utf8');
-    result = result.replace(match[0], `<style>${css}</style>`);
+    result = result.replace(match[0], () => `<style>${css}</style>`);
   }
 
   return result;

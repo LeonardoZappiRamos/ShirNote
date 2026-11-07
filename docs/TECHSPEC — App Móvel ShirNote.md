@@ -219,6 +219,17 @@ Antes de concluir: o comando do `AGENTS.md` na raiz e `npm run typecheck` em `ap
 Rodar o app: `npm run viewer:build` na raiz e `npm run android` em `apps/mobile` (o script já
 regenera o viewer). Módulo nativo novo exige build de desenvolvimento, não Expo Go.
 
+APK local para teste em aparelho (Windows):
+
+1. `npm run viewer:build` na raiz e `npx expo prebuild --platform android` em `apps/mobile`.
+2. O prebuild apaga `android/local.properties`. Recrie com `sdk.dir` e `cmake.dir` apontando para
+   um CMake 3.31 ou mais novo. O ninja do CMake 3.22.1 do SDK não aceita caminhos acima de 260
+   caracteres e quebra o build C++ neste repositório.
+3. `./gradlew assembleRelease` em `apps/mobile/android`. Depois de mudar só o `viewer.html`, acrescente
+   `:app:createBundleReleaseJsAndAssets --rerun`: o Gradle não vê a mudança e reaproveita o bundle.
+4. `adb install -r app/build/outputs/apk/release/app-release.apk`. O APK sai assinado com a chave de
+   debug: serve para teste, não para a loja.
+
 ## 8. Dependências instaladas e ainda sem uso
 
 `expo-print`, `expo-sharing` (Fase 8), `expo-auth-session`, `expo-web-browser`, `expo-secure-store`
@@ -231,3 +242,10 @@ versão do SDK em `apps/mobile/package.json` (ver `apps/mobile/AGENTS.md`).
 - `ParseWarning` só é contado na importação; a tela não mostra o detalhe.
 - MusicXML importado não transpõe nem tem compositor extraído (exige leitor para o modelo neutro).
 - Intent "Abrir com" do Android ainda não configurado (RFM-01).
+- Teste de fumaça de 06/11/2026 no Galaxy Tab S7 FE (Android 14, APK de release): importação e
+  leitura do `.enc` funcionam. Pendências achadas:
+  - a posição de leitura volta só em parte depois de fechar o app, e entrar ou sair da tela cheia
+    leva a leitura ao topo. Suspeita: o redesenho do OSMD ao redimensionar (`autoResize`) perde a
+    rolagem, ainda não comprovada;
+  - o zoom não refaz as quebras de sistema: acima de 100% os compassos saem pela direita;
+  - transposição e metadados não foram testados, porque o build de produção fica no grátis.
