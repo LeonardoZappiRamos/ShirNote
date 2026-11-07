@@ -16,7 +16,7 @@ RNFM) são definidos só no PRD; aqui eles são apenas citados.
 ## 1. Estado por requisito
 
 Legenda: **feito** = no código; **parcial** = parte do requisito no código;
-**planejado** = sem código ainda. Nenhum item passou por teste em aparelho (G6 e G7 pendentes).
+**planejado** = sem código ainda. Os fluxos de G6 e G7 passaram no teste de fumaça do tablet em 06/11/2026 (§9); o fechamento formal dos portões ainda não foi registrado.
 
 | Requisito | Estado | Onde |
 | --- | --- | --- |
@@ -242,10 +242,10 @@ versão do SDK em `apps/mobile/package.json` (ver `apps/mobile/AGENTS.md`).
 - `ParseWarning` só é contado na importação; a tela não mostra o detalhe.
 - MusicXML importado não transpõe nem tem compositor extraído (exige leitor para o modelo neutro).
 - Intent "Abrir com" do Android ainda não configurado (RFM-01).
-- Teste de fumaça de 06/11/2026 no Galaxy Tab S7 FE (Android 14, APK de release): importação e
-  leitura do `.enc` funcionam. Pendências achadas:
-  - a posição de leitura volta só em parte depois de fechar o app, e entrar ou sair da tela cheia
-    leva a leitura ao topo. Suspeita: o redesenho do OSMD ao redimensionar (`autoResize`) perde a
-    rolagem, ainda não comprovada;
-  - o zoom não refaz as quebras de sistema: acima de 100% os compassos saem pela direita;
-  - transposição e metadados não foram testados, porque o build de produção fica no grátis.
+- Teste de fumaça de 06/11/2026 no Galaxy Tab S7 FE (Android 14): importação, leitura, tela cheia,
+  posição salva (inclusive depois de fechar o app), transposição (+2: Ré maior vira Mi maior) e
+  edição de metadados funcionam; no grátis, Tom e Editar mostram o aviso do Pro. Pendência:
+  o zoom não refaz as quebras de sistema, e acima de 100% os compassos saem pela direita.
+- O viewer trata o `resize` sozinho (`autoResize: false`). O do OSMD redesenhava a partitura em
+  qualquer mudança de altura, zerava a rolagem e o app gravava 0 como posição (medido pela
+  inspeção da WebView no build de desenvolvimento).

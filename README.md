@@ -55,8 +55,8 @@ registro do MVP; as fases 6 a 11 do novo PRD passam a valer. O núcleo e o site 
 | Transposição por grau (`src/music/transpose.ts`, `docs/transposicao.md`) | pronto — 17 casos de validação; no site, tom de destino e meio tom          |
 | Impressão em páginas no site (papel, orientação, escala, margens)        | pronto — imprime ou salva PDF pelo navegador; nenhum compasso cortado       |
 | App Android (Expo + React Native + WebView)                              | em andamento — Fases 6 e 7 do PRD móvel                                     |
-| Biblioteca SQLite + MusicXML (ADR 0006)                                  | implementada — falta o teste em aparelho (G6)                               |
-| Leitura com zoom, tela cheia, posição salva e metadados (Fase 7)         | implementada — G7 pendente de teste no tablet                               |
+| Biblioteca SQLite + MusicXML (ADR 0006)                                  | implementada — testada no tablet em 06/11/2026 (G6)                         |
+| Leitura com zoom, tela cheia, posição salva e metadados (Fase 7)         | implementada — testada no tablet em 06/11/2026 (G7); zoom sem refluxo       |
 | Transposição no app (RFM-06)                                             | implementada — parte do modelo original; limite de ±12 semitons             |
 | Exportação PDF/MusicXML e impressão                                      | planejado — Fase 8                                                          |
 | OneDrive e Google Drive (ADR 0008)                                       | planejado — Fase 9                                                          |

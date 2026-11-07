@@ -34,6 +34,10 @@ const scrollElement: HTMLElement = scrollRoot;
 
 let osmd: OpenSheetMusicDisplay | null = null;
 let renderToken = 0;
+let renderedWidth = 0;
+// Última posição de leitura estável. No evento `resize` a altura visível já mudou, então a
+// fração calculada ali seria outra.
+let lastScrollRatio = 0;
 
 function post(message: unknown): void {
   window.ReactNativeWebView?.postMessage(JSON.stringify(message));
@@ -41,7 +45,8 @@ function post(message: unknown): void {
 
 function getOsmd(): OpenSheetMusicDisplay {
   osmd ??= new OpenSheetMusicDisplay(scoreElement, {
-    autoResize: true,
+    // O redimensionamento é tratado em `handleResize`: o do OSMD redesenha e zera a rolagem.
+    autoResize: false,
     backend: 'svg',
     drawMeasureNumbersOnlyAtSystemStart: true,
     drawTitle: false,
@@ -86,19 +91,19 @@ async function render(
 
   try {
     const instance = getOsmd();
-    instance.AutoResizeEnabled = false;
 
     await instance.load(musicXml, '');
     if (token !== renderToken) return;
 
     instance.setOptions({ drawPartNames: instance.Sheet.Instruments.length > 1 });
-    instance.AutoResizeEnabled = true;
     instance.render();
+    renderedWidth = window.innerWidth;
 
     applyZoom(zoom);
     scoreElement.setAttribute('aria-label', label);
 
     // Espera o layout do OSMD para medir a altura certa antes de restaurar a posição.
+    lastScrollRatio = scrollRatio;
     window.requestAnimationFrame(() => applyScrollRatio(scrollRatio));
 
     post({
@@ -119,15 +124,40 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 let scrollTimer: number | null = null;
+let resizeTimer: number | null = null;
+
+/**
+ * Tela cheia, barra do sistema e a WebView se acomodando depois do primeiro desenho mudam o
+ * tamanho. Só a largura muda as quebras de sistema; nos dois casos a leitura volta ao mesmo ponto.
+ */
+function handleResize(): void {
+  const ratio = lastScrollRatio;
+
+  if (osmd?.IsReadyToRender() && window.innerWidth !== renderedWidth) {
+    osmd.render();
+    renderedWidth = window.innerWidth;
+  }
+
+  applyScrollRatio(ratio);
+}
+
+window.addEventListener('resize', () => {
+  if (resizeTimer !== null) window.clearTimeout(resizeTimer);
+  resizeTimer = window.setTimeout(() => {
+    resizeTimer = null;
+    handleResize();
+  }, 150);
+});
 
 scrollElement.addEventListener(
   'scroll',
   () => {
+    if (resizeTimer === null) lastScrollRatio = currentScrollRatio();
     if (scrollTimer !== null) return;
 
     scrollTimer = window.setTimeout(() => {
       scrollTimer = null;
-      post({ type: 'scroll', ratio: currentScrollRatio() });
+      post({ type: 'scroll', ratio: lastScrollRatio });
     }, SCROLL_REPORT_INTERVAL_MS);
   },
   { passive: true },
