@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { usePlan } from '../../billing/planStore';
 import { transpositionLabel } from '../../library/format';
-import { canEditMetadata, canTranspose, proFeatureMessage } from '../../library/plan';
+import { canEditMetadata, canTranspose, isPro, proFeatureMessage } from '../../library/plan';
 import {
   clampScrollRatio,
   clampZoom,
@@ -401,7 +401,7 @@ export default function ScoreScreen() {
                   onPress={() => handleTranspose(1)}
                 />
 
-                {transposable && plan === 'free' ? <Text style={styles.proBadge}>Pro</Text> : null}
+                {transposable && !isPro(plan) ? <Text style={styles.proBadge}>Pro</Text> : null}
 
                 <View style={styles.toolbarSpacer} />
 

@@ -17,7 +17,7 @@ import { ScoreCard } from '../components/ScoreCard';
 import { filterScores, sortScores, type LibrarySort } from '../library/format';
 import { ImportError } from '../library/importFile';
 import { pickAndImportScore } from '../library/importScore';
-import { FREE_SCORE_LIMIT, remainingSlots } from '../library/plan';
+import { FREE_SCORE_LIMIT, isPro, remainingSlots } from '../library/plan';
 import { getScoreRepository } from '../library/repositoryInstance';
 import type { ScoreSummary } from '../library/types';
 import { colors, MIN_TOUCH_TARGET, spacing } from '../theme';
@@ -93,10 +93,9 @@ export default function LibraryScreen() {
 
   const visibleScores = sortScores(filterScores(scores, query), sort);
   const slots = remainingSlots(plan, scores.length);
-  const planLabel =
-    plan === 'pro'
-      ? 'Pro'
-      : `Grátis · ${Math.min(scores.length, FREE_SCORE_LIMIT)}/${FREE_SCORE_LIMIT}`;
+  const planLabel = isPro(plan)
+    ? 'Pro'
+    : `Grátis · ${Math.min(scores.length, FREE_SCORE_LIMIT)}/${FREE_SCORE_LIMIT}`;
 
   const emptyState = renderEmptyState({
     loading,
@@ -160,7 +159,7 @@ export default function LibraryScreen() {
                     : undefined
                 }
                 disabled={!DEV_PLAN_SWITCH}
-                onPress={() => setPlan(plan === 'pro' ? 'free' : 'pro')}
+                onPress={() => setPlan(isPro(plan) ? 'free' : 'pro')}
                 style={({ pressed }) => [
                   styles.planPill,
                   DEV_PLAN_SWITCH && styles.planPillDev,
