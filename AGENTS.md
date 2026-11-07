@@ -2,11 +2,14 @@
 
 Instruções para agentes de código neste repositório. Visão geral e estado do projeto: `README.md`.
 
-ShirNote abre partituras do Encore (`.enc`) no navegador. O formato não tem especificação pública e
-o projeto está na Fase 5 (G1 a G4 fechados; G4 em 04/11/2026, com o Safari pendente; ver o cronograma). O parser de produto é `src/enc/parser.ts`;
-`App.tsx` passa o arquivo por ele, gera o MusicXML e renderiza no OSMD, e abre com a partitura
-sintética `simpleMelody`. O spike `scripts/enc-spike.mjs` é descartável; os testes usam o leitor de
-MusicXML dele (`readReferenceXml`).
+ShirNote é um **app Android mobile-first** de biblioteca, leitura e edição simples de partituras. O
+MVP web está concluído e o site continua como demonstração do núcleo. O produto atual é descrito no
+[PRD do app móvel](docs/PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md); o PRD web fica como
+registro do que já foi entregue. Qual documento vale para quê, e qual vence em conflito, está em
+[`docs/README.md`](docs/README.md). O formato `.enc` não tem especificação pública. O parser de produto é
+`src/enc/parser.ts`; no web, `App.tsx` passa o arquivo por ele, gera o MusicXML e renderiza no OSMD. No
+móvel, o mesmo núcleo alimenta uma WebView com OSMD. O spike `scripts/enc-spike.mjs` é descartável; os
+testes usam o leitor de MusicXML dele (`readReferenceXml`).
 
 ## Antes de concluir uma alteração
 
@@ -22,20 +25,47 @@ não os encontra.
 
 ## Arquitetura
 
-`ArrayBuffer → src/enc → src/music → src/musicxml → OSMD`
+Web: `ArrayBuffer → src/enc → src/music → src/musicxml → OSMD (React DOM)`.
+Móvel: o mesmo núcleo alimenta uma WebView com OSMD; a biblioteca, a edição e a nuvem são React Native.
 
 Limites que nenhuma ferramenta verifica (o ESLint não restringe imports), então confira na revisão:
 
-- `src/enc`, `src/music` e `src/musicxml` não importam React, `react-dom`, OSMD nem APIs de DOM
-  (RNF-05, ADR 0001). Esse núcleo será reaproveitado no app React Native.
+- `src/enc`, `src/music` e `src/musicxml` não importam React, `react-dom`, React Native, OSMD nem APIs
+  de DOM/plataforma (RNF-05, RNFM-05, ADR 0001, ADR 0005). Esse núcleo é compartilhado com o app
+  móvel **sem cópia**.
 - `src/music` não conhece Encore nem MusicXML. `src/enc` e `src/musicxml` dependem de `src/music`,
   nunca um do outro.
-- Só `src/components` junta as camadas e usa OSMD.
-- Nada de upload ou chamada de rede com o arquivo do usuário (RNF-01).
+- Só `src/components` (web) e `apps/mobile/src/viewer` (móvel) juntam as camadas e usam OSMD.
+- Nada de upload ou chamada de rede com o arquivo do usuário. No móvel, a única saída é a
+  sincronização explícita com a nuvem do próprio usuário (RNFM-02, ADR 0008).
 - Arquivo inválido nunca derruba a interface: use `EncoreFormatError` e leve avisos do modo tolerante
-  como `ParseWarning` (RNF-02, RF-11).
+  como `ParseWarning` (RNF-02, RF-11, RFM-17).
 
 O parser deve implementar o contrato `EncoreParser` de `src/enc/types.ts`.
+
+## App móvel
+
+Estrutura, banco, ponte da WebView, fluxos e o que já está implementado ficam no
+[TECHSPEC do app móvel](docs/TECHSPEC%20—%20App%20Móvel%20ShirNote.md). Leia antes de mexer em
+`apps/mobile` e atualize-o na mesma alteração que mudar o código. `apps/mobile/AGENTS.md` traz as
+regras do Expo (versão do SDK, `npx expo install`, pasta `android/` gerada).
+
+Regras do app móvel:
+
+- O núcleo entra por import relativo; o Metro usa `watchFolders` na raiz e resolve os módulos do app
+  antes dos da raiz. **Nunca copie** `src/enc`, `src/music` ou `src/musicxml` para dentro do app
+  (ADR 0005).
+- `npm run viewer:build` gera o HTML do visualizador antes de iniciar ou empacotar o app. O HTML não
+  pode buscar nada na rede: o OSMD vai embutido.
+- A ponte React Native ↔ WebView só transporta MusicXML, SVGs de página e eventos tipados. Nada de
+  HTML arbitrário vindo do app.
+- O limite do grátis (8 itens) e o direito Pro são regras de domínio, não `if` espalhado na tela
+  (ADR 0006, ADR 0007).
+- Em build de desenvolvimento, a pílula do plano na biblioteca alterna entre grátis e Pro para testar
+  transposição e metadados. O build de produção ignora o atalho e mantém o grátis até a cobrança
+  (Fase 10).
+- Testes de domínio do app ficam em `apps/mobile/src/**/*.test.ts` e não importam React Native. O
+  resto é teste de fumaça em aparelho/emulador antes de cada release (RNFM-06).
 
 ## Trabalhando no formato `.enc`
 
@@ -81,7 +111,8 @@ Armadilhas já medidas:
 - Prettier: aspas simples, 100 colunas. A pasta `docs/` fica fora do Prettier, mas `README.md`,
   `AGENTS.md` e `tests/fixtures/**/README.md` não.
 - Requisitos são citados por ID (`RF-03`, `RNF-05`) em comentários e documentos.
-- Escopo do MVP: não adicione áudio, edição, exportação nem layout fiel ao Encore (PRD, seção 2).
+- Escopo da v1 móvel: não adicione áudio, edição nota a nota, layout fiel ao Encore nem iOS (PRD
+  móvel, seção 2). O editor completo é evolução futura, não v1.
 
 ## Decisões
 

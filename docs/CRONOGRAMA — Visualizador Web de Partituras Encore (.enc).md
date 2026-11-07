@@ -1,5 +1,8 @@
 # Cronograma — Visualizador Web de Partituras Encore (.enc)
 
+> **Arquivado em 04/11/2026.** Registro do MVP web concluído; não descreve o produto atual.
+> Produto: [PRD do app móvel](PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md). Mapa dos documentos: [`docs/README.md`](README.md).
+
 **Versão:** 2.2 · **Data:** 02/11/2026 · **Base:** `docs/PRD — Visualizador Web de Partituras Encore (.enc).md`
 **Horizonte:** 03/11/2026 → 11/12/2026 (release do MVP), com limite em 06/01/2027 e reserva até 13/01/2027
 **Decisões de origem:** G1 aprovado em 02/11/2026 ([ADR 0002](decisions/0002-aprovar-portao-g1-e-iniciar-fase-2.md)); régua de desempenho e compatibilidade ([ADR 0004](decisions/0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md))

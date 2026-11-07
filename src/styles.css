@@ -346,6 +346,182 @@ body {
   outline-offset: 2px;
 }
 
+.transpose {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: #faf9f6;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.transpose__title,
+.transpose__result {
+  margin: 0;
+}
+
+.transpose__result {
+  color: var(--ink-muted);
+}
+
+.transpose__row,
+.print__settings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.transpose__field,
+.print__field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.transpose__field select,
+.print__field select {
+  min-height: 38px;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: #fbfaf7;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+}
+
+.transpose__steps,
+.print__buttons {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.zoom__button:disabled,
+.zoom__reset:disabled,
+.print__action:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.panel--print {
+  grid-column: 1 / -1;
+}
+
+.print {
+  display: grid;
+  gap: 12px;
+}
+
+.print__intro,
+.print__summary {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.transpose__check,
+.print__check {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 38px;
+}
+
+.print__action {
+  justify-self: start;
+  padding: 10px 20px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--accent-ink);
+  cursor: pointer;
+  background: var(--accent);
+  border: 0;
+  border-radius: 8px;
+}
+
+.print__secondary {
+  padding: 10px 16px;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  background: #fbfaf7;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+}
+
+/* Pré-visualização: cada folha do OSMD é um <div> com um <svg> do tamanho do papel. */
+.print-pages {
+  max-height: 80vh;
+  padding: 16px;
+  overflow: auto;
+  background: #e9e6df;
+  border-radius: 10px;
+}
+
+.print-pages__sheet {
+  margin: 0 auto;
+}
+
+.print-pages__sheet > div {
+  margin-bottom: 16px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.print-pages__sheet svg {
+  display: block;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  /* Só esconde a interface com a impressão aberta; fora dela, Ctrl+P imprime a página. */
+  body.printing-score .print-hide {
+    display: none !important;
+  }
+
+  body.printing-score .app,
+  body.printing-score .app__main,
+  body.printing-score .panel--print,
+  body.printing-score .print,
+  body.printing-score .print-pages {
+    display: block;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    background: none;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .print-pages__sheet {
+    width: auto !important;
+  }
+
+  .print-pages__sheet > div {
+    margin: 0;
+    box-shadow: none;
+    break-after: page;
+  }
+
+  .print-pages__sheet > div:last-child {
+    break-after: auto;
+  }
+
+  .print-pages__sheet svg {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 100vh;
+  }
+}
+
 @media (max-width: 720px) {
   .app {
     padding: 24px 16px 40px;
