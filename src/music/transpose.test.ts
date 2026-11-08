@@ -245,10 +245,10 @@ describe('transposeScore', () => {
 });
 
 /**
- * Casos de validação de `docs/transposicao.md`, seção 5. O ID de cada caso é o mesmo do
+ * Casos de validação de `docs/feature/transposicao.md`, seção 5. O ID de cada caso é o mesmo do
  * documento: quem valida a música confere a tabela; o teste garante que o código faz o mesmo.
  */
-describe('transposição por grau (docs/transposicao.md)', () => {
+describe('transposição por grau (docs/feature/transposicao.md)', () => {
   const name = (from: number, to: number, direction?: 'nearest' | 'up' | 'down') =>
     intervalName(intervalBetweenKeys(from, to, direction));
 

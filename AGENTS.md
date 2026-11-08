@@ -36,8 +36,9 @@ Limites que nenhuma ferramenta verifica (o ESLint não restringe imports), entã
 - `src/music` não conhece Encore nem MusicXML. `src/enc` e `src/musicxml` dependem de `src/music`,
   nunca um do outro.
 - Só `src/components` (web) e `apps/mobile/src/viewer` (móvel) juntam as camadas e usam OSMD.
-- Nada de upload ou chamada de rede com o arquivo do usuário. No móvel, a única saída é a
-  sincronização explícita com a nuvem do próprio usuário (RNFM-02, ADR 0008).
+- Nada de upload ou chamada de rede com o arquivo do usuário, exceto as saídas do RNFM-02: a
+  biblioteca da conta do próprio usuário no backend do ShirNote (ADR 0010) e a nuvem pessoal que ele
+  conectar (ADR 0008). Sem conta, nada sai do aparelho; a web sem login continua 100% local.
 - Arquivo inválido nunca derruba a interface: use `EncoreFormatError` e leve avisos do modo tolerante
   como `ParseWarning` (RNF-02, RF-11, RFM-17).
 
@@ -94,10 +95,10 @@ Armadilhas já medidas:
 
 ## Fixtures
 
-- `samples/` guarda cópias com nome ASCII dos originais em `docs/amostra/`.
+- `samples/` guarda cópias com nome ASCII dos originais em `tests/fixtures/originals/`.
 - `controlled/` usa nomes `controle-NN-descricao.enc`. Todo arquivo novo ali entra no teste da cadeia
   de blocos sozinho.
-- Os arquivos de `docs/amostra/Experimento/` não seguem a numeração `controle-NN`; o mapeamento das
+- Os arquivos de `tests/fixtures/originals/Experimento/` não seguem a numeração `controle-NN`; o mapeamento das
   cópias usadas está em `tests/fixtures/controlled/README.md`.
 - Não versione obra de terceiros sem direito de uso confirmado. Pergunte antes de adicionar amostra
   real.
@@ -108,7 +109,7 @@ Armadilhas já medidas:
 - Código em inglês; comentários, documentação e textos da interface em pt-BR (RNF-08).
 - Commits no padrão Conventional Commits, com a descrição em pt-BR: `feat(enc): ...`.
 - TypeScript estrito com `noUncheckedIndexedAccess`: trate `undefined` ao indexar bytes e arrays.
-- Prettier: aspas simples, 100 colunas. A pasta `docs/` fica fora do Prettier, mas `README.md`,
+- Prettier: aspas simples, 100 colunas. As pastas `docs/` e `archive/` ficam fora do Prettier, mas `README.md`,
   `AGENTS.md` e `tests/fixtures/**/README.md` não.
 - Requisitos são citados por ID (`RF-03`, `RNF-05`) em comentários e documentos.
 - Escopo da v1 móvel: não adicione áudio, edição nota a nota, layout fiel ao Encore nem iOS (PRD

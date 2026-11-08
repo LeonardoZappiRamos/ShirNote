@@ -134,7 +134,7 @@ do aplicativo ainda não foi escolhida.
 ## Mais informações
 
 - [`README.md`](../../README.md) — estrutura de pastas e fluxo `ArrayBuffer → src/enc → src/music → src/musicxml → OSMD`.
-- [`docs/PRD — Visualizador Web de Partituras Encore (.enc).md`](../PRD%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md) — RNF-01 (processamento local) e RNF-05 (camadas desacopladas).
-- [`docs/CRONOGRAMA — Visualizador Web de Partituras Encore (.enc).md`](../CRONOGRAMA%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md) — fases 1 a 5.
+- [`archive/PRD — Visualizador Web de Partituras Encore (.enc).md`](../../archive/PRD%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md) — RNF-01 (processamento local) e RNF-05 (camadas desacopladas).
+- [`archive/CRONOGRAMA — Visualizador Web de Partituras Encore (.enc).md`](../../archive/CRONOGRAMA%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md) — fases 1 a 5.
 - Supersede: —
 - Supersedido por: —

@@ -1,7 +1,7 @@
 # MusicXML exportado pelo Encore: UTF-16LE sem BOM, com CRLF. O Git guarda em UTF-8 para mostrar o
 # diff e devolve os bytes originais no checkout.
 tests/fixtures/reference/*.xml working-tree-encoding=UTF-16LE eol=crlf
-docs/amostra/*.xml working-tree-encoding=UTF-16LE eol=crlf
+tests/fixtures/originals/*.xml working-tree-encoding=UTF-16LE eol=crlf
 
 # Exportações antigas, já em UTF-8.
 tests/fixtures/reference/justica-flauta2.xml -working-tree-encoding -eol

@@ -1,6 +1,6 @@
 # 0007 — Validar a compra no backend e conceder o direito de uso
 
-- Status: Accepted
+- Status: Accepted; item 7 (identidade) Superseded by ADR-0009
 - Data: 2026-11-04
 - Decisores: Leonardo (Zappi)
 - Consultados: —
@@ -148,4 +148,4 @@ Modelo de dados do backend:
 - [Google Play Developer API — subscriptionsv2](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.subscriptionsv2/get)
 - [Real-time developer notifications](https://developer.android.com/google/play/billing/rtdn-reference)
 - Supersede: —
-- Supersedido por: —
+- Supersedido por: [ADR 0009](0009-adotar-conta-shirnote-com-senha-e-login-google.md), só o item 7 (identidade)

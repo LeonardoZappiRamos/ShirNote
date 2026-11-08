@@ -2,7 +2,7 @@ import type { KeySignature, MusicEvent, Part, Pitch, Score, Step } from './model
 
 /**
  * Transposição por grau no modelo neutro (RFM-06). Regras e casos de validação:
- * `docs/transposicao.md`.
+ * `docs/feature/transposicao.md`.
  *
  * Toda nota anda o mesmo intervalo: o mesmo número de graus (letras) e o mesmo número de
  * semitons. Assim cada nota mantém a sua função na escala: a terça continua terça e o acidente
@@ -26,7 +26,7 @@ export type TransposeDirection = 'nearest' | 'up' | 'down';
 export interface TransposeOptions {
   /**
    * Troca dobrado sustenido e dobrado bemol pela nota simples de mesmo som (si dobrado bemol →
-   * lá). As duas grafias estão certas; a escolha é de quem lê (docs/transposicao.md, regra 7).
+   * lá). As duas grafias estão certas; a escolha é de quem lê (docs/feature/transposicao.md, regra 7).
    */
   readonly simplifyDoubles?: boolean;
 }

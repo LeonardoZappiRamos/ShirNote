@@ -1,10 +1,10 @@
 # TECHSPEC — App Móvel ShirNote
 
-- Versão: 1.0
-- Data: 2026-11-05
+- Versão: 1.1
+- Data: 2026-11-08 (v1.0 em 2026-11-05; v1.1: fases e requisitos do PRD v2.0)
 - Responsável: Leonardo (Zappi)
 - Produto: [PRD do app móvel](PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md) (o quê e por quê)
-- Decisões: [ADRs 0005 a 0008](decisions/README.md) (por que esta forma)
+- Decisões: [ADRs 0005 a 0013](decisions/README.md) (por que esta forma)
 - Formato `.enc`: [`enc-format.md`](enc-format.md) (o que está comprovado)
 
 Este documento diz **como** o app é construído e **o que já existe no código**. Quando ele e o código
@@ -23,15 +23,21 @@ Legenda: **feito** = no código; **parcial** = parte do requisito no código;
 | RFM-01 Importar `.enc` pelo seletor | feito | `library/importFile.ts`, `library/importScore.ts` |
 | RFM-01 Importar pelo "Abrir com" do Android | planejado | intent filter no `app.json` (Fase 6) |
 | RFM-02 Importar MusicXML | feito, sem modelo neutro | `convertMusicXml` |
-| RFM-03 Importar e ler PDF | planejado | §6.4 |
-| RFM-04 Biblioteca com busca e ordenação | feito, sem capa | `library/format.ts`, `app/index.tsx` |
-| RFM-05 Zoom, tela cheia, retomada de posição | feito | `library/reading.ts`, `app/score/[id].tsx` |
-| RFM-06 Transposição | feito para `.enc`, por grau ([regras](transposicao.md)) | `library/transposition.ts`, `src/music/transpose.ts` |
+| RFM-03 Importar e ler PDF; converter (ADR 0013) | planejado | §6.4; conversão no backend depois da Fase 9 |
+| RFM-04 Biblioteca com busca e ordenação ([feature](feature/biblioteca.md)) | feito, sem capa | `library/format.ts`, `app/index.tsx` |
+| RFM-05 Zoom, tela cheia, retomada de posição ([feature](feature/leitura.md)) | feito | `library/reading.ts`, `app/score/[id].tsx` |
+| RFM-06 Transposição | feito para `.enc`, por grau ([regras](feature/transposicao.md)) | `library/transposition.ts`, `src/music/transpose.ts` |
 | RFM-07 Título e autor | feito | `app/edit/[id].tsx` |
 | RFM-08 a RFM-10 Exportar PDF/MusicXML, imprimir | planejado | §6.5 (Fase 8) |
-| RFM-11, RFM-12 OneDrive e Google Drive | planejado | §6.6 (Fase 9) |
+| RFM-11, RFM-12 OneDrive e Google Drive (espelho, Pro) | planejado | §6.6 (Fase 12) |
+| RFM-19, RFM-23 Conta, login Google, excluir conta ([feature](feature/contas.md)) | planejado | backend + app (Fase 9), ADR 0009 |
+| RFM-20 Sincronizar com a conta ([feature](feature/sincronizacao.md)) | planejado | backend + app (Fase 9), ADR 0010 |
+| RFM-21, RFM-24 a RFM-26 Pastas, etiquetas, setlists, filtros ([feature](feature/organizacao.md)) | planejado | Fase 9 |
+| RFM-27 Nome único, duplicados numerados (ADR 0012) | planejado | `library/` (domínio) + índice único no backend, Fase 9 |
+| RFM-13 Pro com 50 itens (PRD v2.1) | divergente | `library/plan.ts` ainda trata o Pro como ilimitado |
+| RFM-22 Web logada | planejado | `src/components` (Fase 10) |
 | RFM-13 Limite do grátis | feito | `library/plan.ts` |
-| RFM-14, RFM-15 Compra e restauração | planejado | §6.7 (Fase 10) |
+| RFM-14, RFM-15 Compra e restauração | planejado | §6.7 (Fase 11) |
 | RFM-16 Excluir com confirmação | feito | `repository.remove`, `app/score/[id].tsx` |
 | RFM-17 Mensagens de erro | parcial | `ImportError`, `TranspositionError`; faltam nuvem e compra |
 | RFM-18 Offline | feito para o que existe | nenhum código de rede no app |
@@ -57,7 +63,8 @@ apps/mobile/
 scripts/build-viewer.mjs   gera apps/mobile/assets/viewer.html
 ```
 
-Ainda não existem: `src/cloud/` (Fase 9) e o backend de direitos (Fase 10).
+Ainda não existem: o backend de contas, biblioteca e direitos (Fase 9; ADRs 0007, 0009, 0010), a área
+logada da web (Fase 10) e `src/cloud/` (Fase 12).
 
 ## 3. Regras de dependência
 
@@ -152,7 +159,7 @@ abertura.
 
 `transposeRecord(score, delta)` soma `delta` ao total, recusa além de ±12 e aplica `transposeScore`
 sobre o `score_json` original. `transposeScore` escolhe o intervalo pelo tom de menos acidentes e
-move tudo por grau; regras e casos em [`transposicao.md`](transposicao.md). O app ainda só anda por
+move tudo por grau; regras e casos em [`transposicao.md`](feature/transposicao.md). O app ainda só anda por
 semitons; escolher o tom de destino, como no site, usa `intervalBetweenKeys`. O repositório grava o novo total e o novo `musicxml`; `score_json`
 continua o original. Modelo corrompido vira `TranspositionError`.
 
@@ -176,7 +183,11 @@ continua o original. Modelo corrompido vira `TranspositionError`.
 
 Critério G8: nenhum compasso cortado entre páginas. Medir com as amostras de `tests/fixtures`.
 
-### 6.6 Sincronizar (planejado, Fase 9)
+### 6.6 OneDrive e Google Drive (planejado, Fase 12)
+
+Com conta, a nuvem pessoal é espelho da biblioteca da conta (ADR 0010). A sincronização com a conta
+está em [`feature/sincronizacao.md`](feature/sincronizacao.md) e ganha seção aqui quando a Fase 9
+começar.
 
 Interface única em `src/cloud/` com dois provedores (ADR 0008): OneDrive pela Graph com
 `Files.ReadWrite.AppFolder` + `offline_access`; Google Drive com `drive.file`. OAuth 2.0 com PKCE
@@ -194,14 +205,15 @@ Decisão por item, sempre contra o `content_hash` da última sincronização:
 `content_hash` é SHA-256 (`expo-crypto`) do conteúdo sincronizado. `updated_at` não decide nada:
 o relógio de cada aparelho pode estar errado. Sincronização manual na v1.
 
-### 6.7 Plano e cobrança (planejado, Fase 10)
+### 6.7 Plano e cobrança (planejado, Fase 11)
 
 - Hoje `CURRENT_PLAN = 'free'`. Em `__DEV__`, a pílula do plano alterna grátis/Pro; em produção,
   `setPlan` não faz nada.
 - Toda regra de plano passa por `library/plan.ts` (`canAddScore`, `canTranspose`, `canExport`...).
   Tela nenhuma compara `plan === 'pro'` direto.
-- Fase 10 troca `CURRENT_PLAN` pelo direito assinado do backend (ADR 0007): Play Billing no app,
-  validação na Google Play Developer API, RTDN, carência offline de 14 dias.
+- Fase 11 troca `CURRENT_PLAN` pelo direito assinado do backend (ADR 0007), vinculado à conta
+  (ADR 0009): Play Billing no app, validação na Google Play Developer API, RTDN, carência offline de
+  14 dias.
 - Volta do Pro para o grátis com mais de 8 itens: tudo continua legível; só a importação fica
   bloqueada (PRD §7, regra 2). `canAddScore` já se comporta assim.
 
@@ -233,7 +245,7 @@ APK local para teste em aparelho (Windows):
 ## 8. Dependências instaladas e ainda sem uso
 
 `expo-print`, `expo-sharing` (Fase 8), `expo-auth-session`, `expo-web-browser`, `expo-secure-store`
-(Fase 9 e 10). Instale novas com `npx expo install`. Antes de usar uma API do Expo, leia a doc da
+(Fases 9, 11 e 12). Instale novas com `npx expo install`. Antes de usar uma API do Expo, leia a doc da
 versão do SDK em `apps/mobile/package.json` (ver `apps/mobile/AGENTS.md`).
 
 ## 9. Pendências técnicas conhecidas

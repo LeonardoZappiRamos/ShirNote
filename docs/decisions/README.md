@@ -11,8 +11,14 @@ Formato: [MADR](https://adr.github.io/madr/) completo, em pt-BR.
 | [0004](0004-adotar-regua-provisoria-de-desempenho-e-compatibilidade.md) | Accepted | 2026-11-02 | Régua provisória: máquina de dev com 4× de CPU; Safari pendente |
 | [0005](0005-adotar-expo-e-webview-com-osmd-no-app-movel.md) | Accepted | 2026-11-04 | Expo + React Native, partitura numa WebView com OSMD |
 | [0006](0006-adotar-sqlite-e-musicxml-como-formato-da-biblioteca.md) | Accepted | 2026-11-04 | SQLite local e MusicXML como formato canônico |
-| [0007](0007-validar-compra-no-backend-e-conceder-direito.md) | Accepted | 2026-11-04 | Compra validada no backend, direito assinado e RTDN |
-| [0008](0008-sincronizar-biblioteca-com-onedrive-e-google-drive.md) | Accepted | 2026-11-04 | Sincronização direta com OneDrive e Google Drive |
+| [0007](0007-validar-compra-no-backend-e-conceder-direito.md) | Accepted (item 7 → 0009) | 2026-11-04 | Compra validada no backend, direito assinado e RTDN |
+| [0008](0008-sincronizar-biblioteca-com-onedrive-e-google-drive.md) | Accepted (item 10 → 0010) | 2026-11-04 | Sincronização direta com OneDrive e Google Drive |
+| [0009](0009-adotar-conta-shirnote-com-senha-e-login-google.md) | Accepted | 2026-11-08 | Conta ShirNote com e-mail e senha e Google (Better Auth); Pro exige conta |
+| [0010](0010-guardar-a-biblioteca-da-conta-no-backend-em-musicxml.md) | Accepted (item 4 → PRD v2.1) | 2026-11-08 | Biblioteca da conta no PostgreSQL em MusicXML; app e web sincronizam |
+| [0011](0011-adotar-envio-de-e-mail-por-ambiente.md) | Accepted | 2026-11-08 | E-mail: Mailpit local, Mailtrap em staging, Resend ou Brevo em produção |
+| [0012](0012-exigir-nome-unico-na-biblioteca.md) | Accepted (item 4 → 0014) | 2026-11-08 | Nome único na biblioteca (nome do arquivo); duplicado aceito vira "Nome 1" |
+| [0013](0013-converter-pdf-em-musicxml-como-importacao-assistida.md) | Accepted (itens 1 e 5 → 0014) | 2026-11-08 | PDF → MusicXML opcional (Audiveris no backend), com aviso; PDF original local e na nuvem pessoal |
+| [0014](0014-importar-pdf-para-leitura-converter-no-pro-e-substituir-duplicado.md) | Accepted | 2026-11-08 | PDF só leitura até converter; converter é Pro; duplicado pode substituir |
 
 ## Regras
 
