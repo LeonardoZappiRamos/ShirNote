@@ -117,7 +117,8 @@ tests/fixtures/
   samples/        partituras reais
   controlled/     amostras geradas no Encore, um campo por arquivo
   reference/      MusicXML exportado pelo Encore para as partituras reais
-docs/             PRD, TECHSPEC, enc-format.md, features (feature/), ADRs (decisions/) e originais (amostra/)
+  originals/      arquivos originais (nomes com acento) das cópias em samples/ e controlled/
+docs/             PRD, TECHSPEC, enc-format.md, features (feature/) e ADRs (decisions/)
 archive/          documentos finalizados (PRD e cronograma do MVP web), só histórico
 ```
 

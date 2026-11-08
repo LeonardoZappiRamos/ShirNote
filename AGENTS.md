@@ -94,10 +94,10 @@ Armadilhas já medidas:
 
 ## Fixtures
 
-- `samples/` guarda cópias com nome ASCII dos originais em `docs/amostra/`.
+- `samples/` guarda cópias com nome ASCII dos originais em `tests/fixtures/originals/`.
 - `controlled/` usa nomes `controle-NN-descricao.enc`. Todo arquivo novo ali entra no teste da cadeia
   de blocos sozinho.
-- Os arquivos de `docs/amostra/Experimento/` não seguem a numeração `controle-NN`; o mapeamento das
+- Os arquivos de `tests/fixtures/originals/Experimento/` não seguem a numeração `controle-NN`; o mapeamento das
   cópias usadas está em `tests/fixtures/controlled/README.md`.
 - Não versione obra de terceiros sem direito de uso confirmado. Pergunte antes de adicionar amostra
   real.

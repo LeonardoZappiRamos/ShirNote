@@ -45,7 +45,7 @@ A lista dos próximos arquivos está na seção 9 de [`docs/enc-format.md`](../.
 | `controle-24-armaduras.enc`                  | 2 partes; 6♭ no compasso 1 e troca para 5♯ no compasso 2         | 2      | sim      | códigos 6♭ e 5♯; `0x20` por pauta      |
 
 - `controle-01` a `07` têm **2 pautas** (`LINE` de 86 bytes), embora o pedido fosse uma.
-- `controle-08` a `12` são cópias de `docs/amostra/Experimento/` (6, 8, 9, 10 e 11). A correspondência
+- `controle-08` a `12` são cópias de `tests/fixtures/originals/Experimento/` (6, 8, 9, 10 e 11). A correspondência
   e os nomes foram deduzidos dos bytes: não há registro de como cada arquivo foi criado.
 - `controle-10` deveria ter duas vozes, mas o conteúdo não bate com o pedido (C4 e E4) e as notas vieram
   como acorde. Por isso **não** comprova voz; o `controle-18` comprova.

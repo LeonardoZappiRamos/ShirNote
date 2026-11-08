@@ -50,5 +50,5 @@ Quando dois documentos discordarem:
 | Fase ou portão concluído | tabela de estado do `README.md` da raiz e §1 do TECHSPEC |
 | Documento finalizado | mova para `archive/` e corrija os links |
 
-Outras pastas: [`brand/`](brand/) (logo e ícone) e `amostra/` (arquivos originais, não versionar obra
-de terceiros sem direito de uso).
+Outra pasta: [`brand/`](brand/) (logo e ícone). Os arquivos originais das amostras ficam em
+[`tests/fixtures/originals/`](../tests/fixtures/originals/) (não versionar obra de terceiros sem direito de uso).

@@ -11,7 +11,7 @@ não entra no parser de produto.
 
 | Item | justica | tora | alegrei |
 | --- | --- | --- | --- |
-| Arquivo original | `docs/amostra/A JUSTIÇA - Flauta 2.enc` | `docs/amostra/A TORÁ DE ADONAI - Sax tenor.enc` | `docs/amostra/ALEGREI-ME QUANDO ME DISSERAM (SALMO 122) - Sax Alto.enc` |
+| Arquivo original | `tests/fixtures/originals/A JUSTIÇA - Flauta 2.enc` | `tests/fixtures/originals/A TORÁ DE ADONAI - Sax tenor.enc` | `tests/fixtures/originals/ALEGREI-ME QUANDO ME DISSERAM (SALMO 122) - Sax Alto.enc` |
 | Cópia de teste | `tests/fixtures/samples/justica-flauta2.enc` | `tora-sax-tenor.enc` | `alegrei-sax-alto.enc` |
 | MusicXML de referência | `tests/fixtures/reference/justica-flauta2.xml` | `tora-sax-tenor.xml` | `alegrei-sax-alto.xml` |
 | Tamanho | 39.094 B | 37.112 B | 42.198 B |
