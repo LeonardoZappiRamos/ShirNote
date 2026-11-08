@@ -4,7 +4,7 @@
 - Data: 2026-11-08 (v1.0 em 2026-11-05; v1.1: fases e requisitos do PRD v2.0)
 - Responsável: Leonardo (Zappi)
 - Produto: [PRD do app móvel](PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md) (o quê e por quê)
-- Decisões: [ADRs 0005 a 0010](decisions/README.md) (por que esta forma)
+- Decisões: [ADRs 0005 a 0012](decisions/README.md) (por que esta forma)
 - Formato `.enc`: [`enc-format.md`](enc-format.md) (o que está comprovado)
 
 Este documento diz **como** o app é construído e **o que já existe no código**. Quando ele e o código
@@ -32,7 +32,9 @@ Legenda: **feito** = no código; **parcial** = parte do requisito no código;
 | RFM-11, RFM-12 OneDrive e Google Drive (espelho, Pro) | planejado | §6.6 (Fase 12) |
 | RFM-19, RFM-23 Conta, login Google, excluir conta ([feature](feature/contas.md)) | planejado | backend + app (Fase 9), ADR 0009 |
 | RFM-20 Sincronizar com a conta ([feature](feature/sincronizacao.md)) | planejado | backend + app (Fase 9), ADR 0010 |
-| RFM-21 Pastas | planejado | Fase 9, detalhe em Q10 do PRD |
+| RFM-21, RFM-24 a RFM-26 Pastas, etiquetas, setlists, filtros ([feature](feature/organizacao.md)) | planejado | Fase 9 |
+| RFM-27 Nome único, duplicados numerados (ADR 0012) | planejado | `library/` (domínio) + índice único no backend, Fase 9 |
+| RFM-13 Pro com 50 itens (PRD v2.1) | divergente | `library/plan.ts` ainda trata o Pro como ilimitado |
 | RFM-22 Web logada | planejado | `src/components` (Fase 10) |
 | RFM-13 Limite do grátis | feito | `library/plan.ts` |
 | RFM-14, RFM-15 Compra e restauração | planejado | §6.7 (Fase 11) |

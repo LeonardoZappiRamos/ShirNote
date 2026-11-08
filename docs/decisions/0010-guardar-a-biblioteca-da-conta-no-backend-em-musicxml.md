@@ -1,6 +1,6 @@
 # 0010 — Guardar a biblioteca da conta no backend em MusicXML
 
-- Status: Accepted
+- Status: Accepted; item 4 (Pro sem limite) substituído pelo PRD v2.1 (Pro com 50 itens)
 - Data: 2026-11-08
 - Decisores: Leonardo (Zappi), owner do produto
 - Consultados: usuário de teste (Beit)

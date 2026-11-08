@@ -14,7 +14,9 @@ Formato: [MADR](https://adr.github.io/madr/) completo, em pt-BR.
 | [0007](0007-validar-compra-no-backend-e-conceder-direito.md) | Accepted (item 7 → 0009) | 2026-11-04 | Compra validada no backend, direito assinado e RTDN |
 | [0008](0008-sincronizar-biblioteca-com-onedrive-e-google-drive.md) | Accepted (item 10 → 0010) | 2026-11-04 | Sincronização direta com OneDrive e Google Drive |
 | [0009](0009-adotar-conta-shirnote-com-senha-e-login-google.md) | Accepted | 2026-11-08 | Conta ShirNote com e-mail e senha e Google (Better Auth); Pro exige conta |
-| [0010](0010-guardar-a-biblioteca-da-conta-no-backend-em-musicxml.md) | Accepted | 2026-11-08 | Biblioteca da conta no PostgreSQL em MusicXML; app e web sincronizam |
+| [0010](0010-guardar-a-biblioteca-da-conta-no-backend-em-musicxml.md) | Accepted (item 4 → PRD v2.1) | 2026-11-08 | Biblioteca da conta no PostgreSQL em MusicXML; app e web sincronizam |
+| [0011](0011-adotar-envio-de-e-mail-por-ambiente.md) | Accepted | 2026-11-08 | E-mail: Mailpit local, Mailtrap em staging, Resend ou Brevo em produção |
+| [0012](0012-exigir-nome-unico-na-biblioteca.md) | Accepted | 2026-11-08 | Nome único na biblioteca (nome do arquivo); duplicado aceito vira "Nome 1" |
 
 ## Regras
 

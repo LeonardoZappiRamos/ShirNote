@@ -24,10 +24,14 @@ está no [TECHSPEC](../TECHSPEC%20—%20App%20Móvel%20ShirNote.md) (§4 e §6.1
 Regras:
 
 1. O título vem do próprio arquivo. Se o `.enc` não tiver título, vale o nome do arquivo sem
-   extensão; se nem isso existir, "Partitura sem título".
+   extensão; se nem isso existir, "Partitura sem título". **Muda na Fase 9 (ADR 0012):** o nome
+   principal do item passa a ser o nome do arquivo, único na biblioteca; o título do `.enc` vira
+   metadado, porque partes de instrumentos diferentes trazem o mesmo título.
 2. O autor vem do `.enc` quando existe. MusicXML entra sem autor.
 3. Nada sai do aparelho: a conversão é local (RNFM-02).
 4. No grátis, o limite é conferido **antes** de abrir o seletor (seção 4).
+5. **Duplicados (Fase 9, ADR 0012):** mesmo nome ou mesmo conteúdo pergunta antes; o padrão é
+   cancelar, e aceitar importa como "*Nome* 1". Renomear para nome existente é recusado.
 
 Mensagens de erro (RFM-17):
 
@@ -64,7 +68,7 @@ são contados; a tela ainda não mostra o detalhe.
 | Grátis guarda até 8 itens | O 9º não entra; a mensagem sugere excluir um item ou o Pro |
 | O limite conta itens, não importações | Excluir libera vaga |
 | Quem volta do Pro com mais de 8 | Tudo continua legível e excluível; só a importação fica bloqueada |
-| Pro | Sem limite |
+| Pro | Até 50 itens (PRD v2.1). **Hoje o código ainda trata o Pro como ilimitado** (`plan.ts`) |
 
 Toda regra de plano mora em `plan.ts`. Tela nenhuma decide sozinha o que é Pro (ADR 0006, 0007).
 

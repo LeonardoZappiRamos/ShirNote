@@ -83,5 +83,6 @@ compra. A senha só como hash. Nada disso aparece para outros usuários.
 
 ## 8. Em aberto
 
-- Serviço de envio de e-mail (PRD, Q7).
+- Resend ou Brevo em produção e o domínio de envio (ADR 0011). Em desenvolvimento os e-mails ficam
+  no Mailpit e em staging no Mailtrap: nenhum chega a pessoa real.
 - Login com Apple quando chegar o iOS (a App Store exige quando há login social).

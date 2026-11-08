@@ -1,11 +1,13 @@
 # PRD — App Móvel de Partituras ShirNote
 
-- Versão: 2.0
-- Data: 2026-11-08 (v1.0 em 2026-11-04; v1.1 em 2026-11-05)
+- Versão: 2.1
+- Data: 2026-11-08 (v1.0 em 2026-11-04; v1.1 em 2026-11-05; v2.0 e v2.1 em 2026-11-08)
 - Decisores: Leonardo (Zappi), Benjamim (uso e prioridade), owner do produto
 - v2.0: revisão do owner em 08/11/2026: conta ShirNote opcional (e-mail e senha, login com Google),
   biblioteca da conta no servidor em MusicXML, web com área logada, organização em pastas.
   OneDrive e Google Drive continuam como opção do Pro (ADRs 0009 e 0010).
+- v2.1: respostas do owner às Q7 a Q10: e-mail por ambiente (ADR 0011), estudo de PDF para
+  MusicXML, nome único sem duplicados (ADR 0012), Pro com 50 itens, pastas, etiquetas e setlists.
 - Substitui como produto: [`PRD — Visualizador Web de Partituras Encore (.enc)`](../archive/PRD%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md), que fica como registro do MVP web concluído.
 - Como implementar: [`TECHSPEC — App Móvel ShirNote`](TECHSPEC%20—%20App%20Móvel%20ShirNote.md). Mapa dos documentos: [`docs/README.md`](README.md).
 
@@ -52,7 +54,8 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 - Conta ShirNote opcional, com e-mail e senha ou Google (ADR 0009).
 - Biblioteca da conta guardada no servidor em MusicXML e sincronizada com o app e a web (ADR 0010).
 - Web com área logada: ver, organizar e, no Pro, transpor e exportar a mesma biblioteca.
-- Organizar a biblioteca em pastas, iguais no app e na web.
+- Organizar a biblioteca em pastas, etiquetas e setlists, iguais no app e na web.
+- Não aceitar partitura duplicada: nome único na biblioteca (ADR 0012).
 - Cópia opcional no OneDrive e no Google Drive para o Pro (ADR 0008).
 - Vender o plano Pro com validação de compra no backend, vinculado à conta.
 - Limitar o plano grátis a 8 partituras e à visualização.
@@ -96,7 +99,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | Android 10+ (API 29), foco em tablet de 8" a 13" | iOS e desktop |
 | Biblioteca local em SQLite com busca e ordenação | Compartilhar partitura entre contas |
 | Conta ShirNote opcional (e-mail e senha, Google) | Login com Apple, Microsoft ou outros |
-| Biblioteca da conta no servidor em MusicXML, organizada em pastas | PDF no servidor |
+| Biblioteca da conta no servidor em MusicXML, organizada em pastas, etiquetas e setlists | PDF no servidor (depende do estudo da Q8) |
 | Web logada com a mesma biblioteca; web sem login como demonstração | App de desktop |
 | Importação `.enc`, `.musicxml`/`.xml` e `.pdf` | Importação de MIDI, MuseScore, `.mscz` |
 | Leitura com zoom, rolagem, tela cheia e retomada de posição | Anotações à mão livre sobre a partitura |
@@ -111,7 +114,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | --- | --- | --- |
 | RFM-01 | Importar `.enc` por seletor de arquivos e compartilhamento do Android, com processamento local | Alta |
 | RFM-02 | Importar MusicXML (`.musicxml`, `.xml`) e exibir como partitura | Alta |
-| RFM-03 | Importar PDF e exibir com paginação, zoom e rolagem | Alta |
+| RFM-03 | Importar PDF e exibir com paginação, zoom e rolagem; converter para MusicXML se o estudo da Q8 aprovar ([estudo](feature/pdf-para-musicxml.md)) | Alta |
 | RFM-04 | Manter biblioteca local com capa/primeira página, título, autor, tipo e data; buscar e ordenar | Alta |
 | RFM-05 | Visualizar partitura com zoom, rolagem, tela cheia e retomada da última posição | Alta |
 | RFM-06 | Transpor a partitura por semitons (aumentar/diminuir), corrigindo armadura e acidentes | Alta |
@@ -121,7 +124,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | RFM-10 | Imprimir pelo serviço de impressão do Android | Média |
 | RFM-11 | Copiar a biblioteca para o OneDrive na pasta do aplicativo e importar o que for colocado lá (Pro) | Média |
 | RFM-12 | O mesmo do RFM-11 no Google Drive, escopo `drive.file` (Pro) | Baixa |
-| RFM-13 | Aplicar o limite do grátis: até 8 itens na biblioteca, no aparelho e na conta; importar, ler, excluir e sincronizar com a conta, sem transpor, editar, exportar nem usar OneDrive/Google Drive (seção 7) | Alta |
+| RFM-13 | Aplicar os limites do plano: grátis até 8 itens e Pro até 50, no aparelho e na conta; no grátis, importar, ler, excluir e sincronizar com a conta, sem transpor, editar, exportar nem usar OneDrive/Google Drive (seção 7) | Alta |
 | RFM-14 | Comprar o plano Pro pela Play Store, logado, e liberar os recursos após validação no backend, no app e na web | Alta |
 | RFM-15 | Restaurar a compra em outro aparelho da mesma conta e revalidar o direito periodicamente | Alta |
 | RFM-16 | Excluir item da biblioteca com confirmação e liberar o espaço | Média |
@@ -129,9 +132,13 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | RFM-18 | Funcionar sem rede em tudo, exceto conta, sincronização e compra | Alta |
 | RFM-19 | Criar conta e entrar com e-mail e senha ou com Google, no app e na web; verificar e-mail e recuperar senha ([feature](feature/contas.md)) | Alta |
 | RFM-20 | Sincronizar automaticamente a biblioteca entre aparelho, servidor e web para quem tem conta, sem perder versão em conflito ([feature](feature/sincronizacao.md)) | Alta |
-| RFM-21 | Organizar a biblioteca em pastas, iguais no app e na web (detalhe em Q10) | Média |
+| RFM-21 | Organizar a biblioteca em pastas e subpastas, iguais no app e na web ([feature](feature/organizacao.md)) | Alta |
 | RFM-22 | Ver, buscar, abrir e organizar a biblioteca da conta na web; no Pro, transpor, editar e exportar | Alta |
 | RFM-23 | Excluir a conta pelo app e pela web, apagando os dados no servidor | Alta |
+| RFM-24 | Marcar partituras com etiquetas e filtrar por elas | Média |
+| RFM-25 | Montar setlists ordenadas e ler em sequência (anterior/próxima) | Alta |
+| RFM-26 | Filtrar por pasta, etiqueta, tipo e tom; recentes e favoritas | Média |
+| RFM-27 | Recusar partitura duplicada (mesmo nome ou mesmo conteúdo); se a pessoa aceitar, numerar o nome ("Nome 1") (ADR 0012) | Alta |
 
 ## 6. Requisitos não funcionais
 
@@ -154,9 +161,9 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 
 | Recurso | Grátis sem conta | Grátis com conta | Pro (exige conta) |
 | --- | --- | --- | --- |
-| Itens na biblioteca | Até 8, no aparelho | Até 8, no aparelho e na conta | Ilimitado (cota antiabuso em Q9) |
+| Itens na biblioteca | Até 8, no aparelho | Até 8, no aparelho e na conta | Até 50 (inicial; planos maiores depois) |
 | Biblioteca na web e em outro aparelho | Não | Sim | Sim |
-| Organizar em pastas | Sim, no aparelho | Sim | Sim |
+| Pastas, etiquetas, setlists, favoritas | Sim, no aparelho | Sim | Sim |
 | Leitura, zoom e tela cheia | Sim | Sim | Sim |
 | Importar `.enc`, MusicXML e PDF | Sim, até o limite | Sim, até o limite | Sim |
 | Transpor e editar metadados | Não | Não | Sim |
@@ -176,6 +183,9 @@ Regras:
    (proposta: 14 dias de carência) e revalida quando voltar a ter rede.
 5. Reembolso ou cancelamento revoga o Pro no próximo contato com o backend, respeitando a carência.
 6. O Pro pertence à conta, não ao aparelho: vale no app, na web e em qualquer aparelho logado.
+   O limite inicial do Pro é 50 itens, para caber na infraestrutura do começo. Planos com mais espaço
+   virão depois, conforme o custo de manter o servidor. Quem passa do limite segue a mesma regra 2:
+   tudo continua legível, só importar fica bloqueado.
 7. A conta nunca é obrigatória para importar e ler no aparelho.
 
 ## 8. Arquitetura e stack
@@ -355,7 +365,8 @@ vale o escopo das seções 2 e 4.
 | Q4 | ~~Exportar PDF e transpor no site atual, antes do app, resolve a dor imediata do Almir?~~ | **Respondida:** o site já transpõe e imprime/salva PDF (README, estado atual) |
 | Q5 | ~~O web e o app vão ser o mesmo produto?~~ | **Respondida em 08/11/2026:** sim, com conta; v2.0 e ADR 0010 |
 | Q6 | ~~Haverá contas?~~ | **Respondida em 08/11/2026:** e-mail e senha + Google, opcional no grátis, obrigatória no Pro (ADR 0009) |
-| Q7 | Qual serviço envia os e-mails de verificação e recuperação, e de qual domínio? | Sem ele não há cadastro por e-mail (Fase 9) |
-| Q8 | PDF importado deve ir para o servidor e aparecer na web? | Exige object storage e muda custo (ADR 0010, opção C) |
-| Q9 | Qual cota protege o servidor no Pro (itens ou MB por conta)? | Evita abuso sem atrapalhar acervos grandes |
-| Q10 | Organizar é só pasta, ou precisa de etiquetas, setlist de ensaio e ordem manual? | Define RFM-21 e o modelo de dados antes da Fase 9 |
+| Q7 | ~~Qual serviço envia os e-mails?~~ | **Respondida:** Mailpit local, Mailtrap em staging, Resend ou Brevo em produção (ADR 0011). Falta escolher entre Resend e Brevo e o domínio de envio |
+| Q8 | PDF importado deve ir para o servidor e aparecer na web? | **Em estudo:** converter PDF em MusicXML ([estudo](feature/pdf-para-musicxml.md)); se não for viável, PDF não vai ao servidor |
+| Q9 | ~~Qual cota no Pro?~~ | **Respondida:** 50 itens no início; planos maiores depois, conforme a infraestrutura |
+| Q10 | ~~Organizar é só pasta?~~ | **Respondida:** pastas, etiquetas, setlists e o que ajudar a navegar ([feature](feature/organizacao.md)) |
+| Q11 | Preço e nomes dos planos maiores que o Pro de 50 itens | Depende do custo medido da infraestrutura depois da Fase 9 |

@@ -28,6 +28,8 @@ diz _o que_ e _por quê_; o TECHSPEC diz _onde_ está no código.
 | Transposição por grau (RFM-06) | [`feature/transposicao.md`](feature/transposicao.md) |
 | Contas: e-mail e senha, Google, sair, excluir (RFM-19, RFM-23) — proposta | [`feature/contas.md`](feature/contas.md) |
 | Sincronização: conta, web, OneDrive e Google Drive (RFM-11, RFM-12, RFM-20 a RFM-22) — proposta | [`feature/sincronizacao.md`](feature/sincronizacao.md) |
+| Organização: pastas, etiquetas, setlists, filtros (RFM-21, RFM-24 a RFM-26) — proposta | [`feature/organizacao.md`](feature/organizacao.md) |
+| PDF para MusicXML (RFM-03, Q8) — estudo | [`feature/pdf-para-musicxml.md`](feature/pdf-para-musicxml.md) |
 
 ## Precedência
 

@@ -44,7 +44,7 @@ Acontece quando o mesmo item mudou em dois lugares antes de um deles sincronizar
 transposto no tablet sem rede e renomeado na web).
 
 - Nada é sobrescrito. A versão do servidor fica com o item original; a do aparelho vira um item novo
-  "*título* (conflito)".
+  "*Nome* (conflito)", ou "*Nome* (conflito) 1" se esse nome já existir (ADR 0012).
 - Aviso: "Esta partitura mudou em outro aparelho. As duas versões foram mantidas."
 - A pessoa abre as duas e exclui a que não quer.
 
@@ -58,10 +58,11 @@ o protocolo compara o item inteiro. Mesclar campo a campo fica para depois, se i
   a biblioteca inteira de novo e os itens excluídos somem dele.
 - Não há lixeira nesta versão.
 
-## 5. Limite do grátis com conta
+## 5. Limites do plano com conta
 
-- O servidor guarda até 8 itens. O 9º é recusado no aparelho, antes de importar, com a mesma mensagem
-  de hoje ([`biblioteca.md`](biblioteca.md), seção 4).
+- O servidor guarda até 8 itens no grátis e 50 no Pro. O item além do limite é recusado no
+  aparelho, antes de importar, com a mesma mensagem de hoje ([`biblioteca.md`](biblioteca.md),
+  seção 4).
 - Quem volta do Pro para o grátis com mais de 8 itens: tudo continua legível no app e na web; nada é
   apagado. Só importar e criar ficam bloqueados até voltar a menos de 8.
 
@@ -83,8 +84,10 @@ pessoal é **espelho** da biblioteca da conta.
 - Conflito entre a conta e a nuvem pessoal não existe: a conta decide.
 - Desconectar não apaga nada na nuvem.
 
-## 8. Organização (RFM-21)
+## 8. Organização e duplicados
 
-Pastas criadas no app ou na web valem nos dois. Uma partitura fica em uma pasta ou em nenhuma.
-**A confirmar com o owner:** se basta pasta ou se precisa de etiquetas, setlists de ensaio ou
-ordem manual (PRD, Q10).
+- Pastas, etiquetas, setlists e favoritas sincronizam como metadados: ver
+  [`organizacao.md`](organizacao.md).
+- O servidor recusa nome repetido na biblioteca da conta e sugere o próximo número livre
+  ([ADR 0012](../decisions/0012-exigir-nome-unico-na-biblioteca.md)). Arquivo que chega pela pasta do
+  OneDrive com nome repetido entra na lista de duplicados da importação em lote.
