@@ -1,9 +1,10 @@
 # PDF para MusicXML (estudo)
 
-- Versão: 0.2 (primeira medição feita; decisão do owner pendente)
+- Versão: 1.0 (decidido: importação assistida, ADR 0013)
 - Data: 2026-11-08
 - Requisitos: RFM-03 (PRD móvel v2.1), questão Q8
-- Decisão: pendente. Se aprovada, vira ADR; se não, PDF não vai para o servidor (ADR 0010).
+- Decisão: [ADR 0013](../decisions/0013-converter-pdf-em-musicxml-como-importacao-assistida.md):
+  conversão opcional, a cargo de quem importa, com aviso e o PDF original sempre disponível
 - Scripts: `scripts/omr/render.py` (gera os PDFs de teste) e `scripts/omr/compare.py` (mede)
 
 Pedido do owner (Q8): estudar se dá para transformar o PDF importado em MusicXML. Se der, o PDF entra
@@ -82,7 +83,12 @@ O que os erros mostram:
 - **Título e letra:** o OCR (Tesseract) veio sem idiomas instalados e não leu texto. Não importa para
   a regra de nome (ADR 0012, nome do arquivo), mas a letra se perderia.
 
-## 6. Recomendação
+## 6. Recomendação do estudo
+
+> **Decisão do owner (08/11/2026), no ADR 0013:** a conversão fica a cargo de quem importa; o
+> ShirNote avisa que pode haver erro e mantém o PDF original no aparelho e, se conectado, no
+> OneDrive/Google Drive. A recomendação abaixo foi aceita, com uma diferença: escaneado e foto também
+> podem ser tentados, com o mesmo aviso (item 2 abaixo não vale).
 
 1. **Converter só como "importação assistida", nunca em silêncio.** Ao importar um PDF, a pessoa
    escolhe entre "Guardar como PDF" (padrão, sem conversão) e "Tentar converter em partitura". O
@@ -98,8 +104,6 @@ O que os erros mostram:
    na requisição da API.
 5. **Quando:** depois da Fase 9 (contas e servidor). Não muda nada no app antes disso.
 
-Se o owner preferir não ter conferência manual, a resposta à Q8 é **não converter**: o PDF fica no
-aparelho e no OneDrive/Google Drive.
 
 ## 7. Próximos passos do estudo
 

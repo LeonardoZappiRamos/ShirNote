@@ -25,7 +25,9 @@ Sem conta, nada sincroniza: a biblioteca fica só no aparelho.
 
 O que vai para o servidor, por item: título, autor, tipo, tom atual, pasta e o **MusicXML original**
 (sem transposição). Itens de `.enc` levam também o modelo neutro, para transpor na web. O `.enc` e os
-PDFs não vão (PDF: questão Q8 do PRD).
+PDFs não vão: o PDF original fica no aparelho e, se conectado, no
+OneDrive/Google Drive. Uma partitura convertida de PDF sincroniza o MusicXML; o PDF original segue
+esse mesmo caminho (ADR 0013).
 
 Quando sincroniza, sem tocar em botão:
 

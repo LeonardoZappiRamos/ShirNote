@@ -69,7 +69,8 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 - Importar `.enc` de versões diferentes de `0xC4` (continua valendo o ADR 0002).
 - iOS (fica para a v1.1, com o mesmo código).
 - Compra do Pro pela web; na v1 o Pro é comprado só na Play Store e vale também na web.
-- PDF guardado no servidor (Q8).
+- PDF guardado no servidor; o original fica no aparelho e na nuvem pessoal (ADR 0013).
+- Corrigir dentro do ShirNote a partitura convertida de PDF (depende do editor futuro).
 - Internacionalização além de pt-BR.
 
 **Métricas propostas**
@@ -99,7 +100,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | Android 10+ (API 29), foco em tablet de 8" a 13" | iOS e desktop |
 | Biblioteca local em SQLite com busca e ordenação | Compartilhar partitura entre contas |
 | Conta ShirNote opcional (e-mail e senha, Google) | Login com Apple, Microsoft ou outros |
-| Biblioteca da conta no servidor em MusicXML, organizada em pastas, etiquetas e setlists | PDF no servidor (depende do estudo da Q8) |
+| Biblioteca da conta no servidor em MusicXML, organizada em pastas, etiquetas e setlists | PDF guardado no servidor (só passa por lá para converter, ADR 0013) |
 | Web logada com a mesma biblioteca; web sem login como demonstração | App de desktop |
 | Importação `.enc`, `.musicxml`/`.xml` e `.pdf` | Importação de MIDI, MuseScore, `.mscz` |
 | Leitura com zoom, rolagem, tela cheia e retomada de posição | Anotações à mão livre sobre a partitura |
@@ -114,7 +115,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | --- | --- | --- |
 | RFM-01 | Importar `.enc` por seletor de arquivos e compartilhamento do Android, com processamento local | Alta |
 | RFM-02 | Importar MusicXML (`.musicxml`, `.xml`) e exibir como partitura | Alta |
-| RFM-03 | Importar PDF e exibir com paginação, zoom e rolagem; converter para MusicXML se o estudo da Q8 aprovar ([estudo](feature/pdf-para-musicxml.md)) | Alta |
+| RFM-03 | Importar PDF e exibir com paginação, zoom e rolagem; com conta, tentar converter para MusicXML, com aviso de possível erro e o PDF original sempre disponível (ADR 0013, [estudo](feature/pdf-para-musicxml.md)) | Alta |
 | RFM-04 | Manter biblioteca local com capa/primeira página, título, autor, tipo e data; buscar e ordenar | Alta |
 | RFM-05 | Visualizar partitura com zoom, rolagem, tela cheia e retomada da última posição | Alta |
 | RFM-06 | Transpor a partitura por semitons (aumentar/diminuir), corrigindo armadura e acidentes | Alta |
@@ -366,7 +367,7 @@ vale o escopo das seções 2 e 4.
 | Q5 | ~~O web e o app vão ser o mesmo produto?~~ | **Respondida em 08/11/2026:** sim, com conta; v2.0 e ADR 0010 |
 | Q6 | ~~Haverá contas?~~ | **Respondida em 08/11/2026:** e-mail e senha + Google, opcional no grátis, obrigatória no Pro (ADR 0009) |
 | Q7 | ~~Qual serviço envia os e-mails?~~ | **Respondida:** Mailpit local, Mailtrap em staging, Resend ou Brevo em produção (ADR 0011). Falta escolher entre Resend e Brevo e o domínio de envio |
-| Q8 | PDF importado deve ir para o servidor e aparecer na web? | **Estudo v0.2 feito:** Audiveris acerta 99% das alturas em PDF limpo, mas erra ritmo (89% a 98%). Recomendação: conversão opcional e conferida, depois da Fase 9 ([estudo](feature/pdf-para-musicxml.md)). Falta o OK do owner e o teste com PDFs do Encore |
+| Q8 | ~~PDF importado deve ir para o servidor e aparecer na web?~~ | **Respondida em 08/11/2026:** conversão opcional, a cargo de quem importa, com aviso; o PDF original fica no aparelho e no OneDrive/Google Drive; o servidor guarda só o MusicXML (ADR 0013) |
 | Q9 | ~~Qual cota no Pro?~~ | **Respondida:** 50 itens no início; planos maiores depois, conforme a infraestrutura |
 | Q10 | ~~Organizar é só pasta?~~ | **Respondida:** pastas, etiquetas, setlists e o que ajudar a navegar ([feature](feature/organizacao.md)) |
 | Q11 | Preço e nomes dos planos maiores que o Pro de 50 itens | Depende do custo medido da infraestrutura depois da Fase 9 |

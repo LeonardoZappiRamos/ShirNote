@@ -17,6 +17,7 @@ Formato: [MADR](https://adr.github.io/madr/) completo, em pt-BR.
 | [0010](0010-guardar-a-biblioteca-da-conta-no-backend-em-musicxml.md) | Accepted (item 4 → PRD v2.1) | 2026-11-08 | Biblioteca da conta no PostgreSQL em MusicXML; app e web sincronizam |
 | [0011](0011-adotar-envio-de-e-mail-por-ambiente.md) | Accepted | 2026-11-08 | E-mail: Mailpit local, Mailtrap em staging, Resend ou Brevo em produção |
 | [0012](0012-exigir-nome-unico-na-biblioteca.md) | Accepted | 2026-11-08 | Nome único na biblioteca (nome do arquivo); duplicado aceito vira "Nome 1" |
+| [0013](0013-converter-pdf-em-musicxml-como-importacao-assistida.md) | Accepted | 2026-11-08 | PDF → MusicXML opcional (Audiveris no backend), com aviso; PDF original local e na nuvem pessoal |
 
 ## Regras
 

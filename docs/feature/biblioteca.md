@@ -18,7 +18,7 @@ está no [TECHSPEC](../TECHSPEC%20—%20App%20Móvel%20ShirNote.md) (§4 e §6.1
 | --- | --- | --- |
 | `.enc` | Convertido no aparelho para o modelo neutro e para MusicXML. Pode ser transposto. | feito |
 | `.musicxml`, `.xml` | Guardado como está. Abre para leitura, mas não transpõe. | feito |
-| `.pdf` | Leitura com paginação e zoom. | planejado (TECHSPEC §6.4) |
+| `.pdf` | Leitura com paginação e zoom. Com conta, opção de tentar converter em partitura, com aviso de possível erro; o PDF original fica junto ([ADR 0013](../decisions/0013-converter-pdf-em-musicxml-como-importacao-assistida.md)). | planejado (TECHSPEC §6.4) |
 | "Abrir com" do Android | Importar direto de outro app. | planejado |
 
 Regras:

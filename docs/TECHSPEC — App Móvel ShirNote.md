@@ -4,7 +4,7 @@
 - Data: 2026-11-08 (v1.0 em 2026-11-05; v1.1: fases e requisitos do PRD v2.0)
 - Responsável: Leonardo (Zappi)
 - Produto: [PRD do app móvel](PRD%20—%20App%20Móvel%20de%20Partituras%20ShirNote.md) (o quê e por quê)
-- Decisões: [ADRs 0005 a 0012](decisions/README.md) (por que esta forma)
+- Decisões: [ADRs 0005 a 0013](decisions/README.md) (por que esta forma)
 - Formato `.enc`: [`enc-format.md`](enc-format.md) (o que está comprovado)
 
 Este documento diz **como** o app é construído e **o que já existe no código**. Quando ele e o código
@@ -23,7 +23,7 @@ Legenda: **feito** = no código; **parcial** = parte do requisito no código;
 | RFM-01 Importar `.enc` pelo seletor | feito | `library/importFile.ts`, `library/importScore.ts` |
 | RFM-01 Importar pelo "Abrir com" do Android | planejado | intent filter no `app.json` (Fase 6) |
 | RFM-02 Importar MusicXML | feito, sem modelo neutro | `convertMusicXml` |
-| RFM-03 Importar e ler PDF | planejado | §6.4 |
+| RFM-03 Importar e ler PDF; converter (ADR 0013) | planejado | §6.4; conversão no backend depois da Fase 9 |
 | RFM-04 Biblioteca com busca e ordenação ([feature](feature/biblioteca.md)) | feito, sem capa | `library/format.ts`, `app/index.tsx` |
 | RFM-05 Zoom, tela cheia, retomada de posição ([feature](feature/leitura.md)) | feito | `library/reading.ts`, `app/score/[id].tsx` |
 | RFM-06 Transposição | feito para `.enc`, por grau ([regras](feature/transposicao.md)) | `library/transposition.ts`, `src/music/transpose.ts` |

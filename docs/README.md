@@ -29,7 +29,7 @@ diz _o que_ e _por quê_; o TECHSPEC diz _onde_ está no código.
 | Contas: e-mail e senha, Google, sair, excluir (RFM-19, RFM-23) — proposta | [`feature/contas.md`](feature/contas.md) |
 | Sincronização: conta, web, OneDrive e Google Drive (RFM-11, RFM-12, RFM-20 a RFM-22) — proposta | [`feature/sincronizacao.md`](feature/sincronizacao.md) |
 | Organização: pastas, etiquetas, setlists, filtros (RFM-21, RFM-24 a RFM-26) — proposta | [`feature/organizacao.md`](feature/organizacao.md) |
-| PDF para MusicXML (RFM-03, Q8) — estudo v0.2, Audiveris medido | [`feature/pdf-para-musicxml.md`](feature/pdf-para-musicxml.md) |
+| PDF para MusicXML (RFM-03): estudo e decisão (ADR 0013) | [`feature/pdf-para-musicxml.md`](feature/pdf-para-musicxml.md) |
 
 ## Precedência
 
