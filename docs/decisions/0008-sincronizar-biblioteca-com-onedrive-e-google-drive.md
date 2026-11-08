@@ -1,6 +1,6 @@
 # 0008 — Sincronizar a biblioteca direto com OneDrive e Google Drive
 
-- Status: Accepted
+- Status: Accepted; item 10 (sem conta ShirNote) Superseded by ADR-0010
 - Data: 2026-11-04
 - Decisores: Leonardo (Zappi)
 - Consultados: —
@@ -132,4 +132,4 @@ segurança, decidir o que acontece quando os dois lados mudaram e não perder pa
 - [Microsoft Graph — app folder](https://learn.microsoft.com/graph/api/drive-get-specialfolder)
 - [Google Drive API — escopos](https://developers.google.com/drive/api/guides/api-specific-auth)
 - Supersede: —
-- Supersedido por: —
+- Supersedido por: [ADR 0010](0010-guardar-a-biblioteca-da-conta-no-backend-em-musicxml.md), só o item 10; o resto continua valendo, com a nuvem pessoal como espelho da conta

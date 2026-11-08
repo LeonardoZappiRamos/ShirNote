@@ -36,8 +36,9 @@ Limites que nenhuma ferramenta verifica (o ESLint não restringe imports), entã
 - `src/music` não conhece Encore nem MusicXML. `src/enc` e `src/musicxml` dependem de `src/music`,
   nunca um do outro.
 - Só `src/components` (web) e `apps/mobile/src/viewer` (móvel) juntam as camadas e usam OSMD.
-- Nada de upload ou chamada de rede com o arquivo do usuário. No móvel, a única saída é a
-  sincronização explícita com a nuvem do próprio usuário (RNFM-02, ADR 0008).
+- Nada de upload ou chamada de rede com o arquivo do usuário, exceto as saídas do RNFM-02: a
+  biblioteca da conta do próprio usuário no backend do ShirNote (ADR 0010) e a nuvem pessoal que ele
+  conectar (ADR 0008). Sem conta, nada sai do aparelho; a web sem login continua 100% local.
 - Arquivo inválido nunca derruba a interface: use `EncoreFormatError` e leve avisos do modo tolerante
   como `ParseWarning` (RNF-02, RF-11, RFM-17).
 

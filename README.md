@@ -59,8 +59,10 @@ registro do MVP; as fases 6 a 11 do novo PRD passam a valer. O núcleo e o site 
 | Leitura com zoom, tela cheia, posição salva e metadados (Fase 7)                 | implementada — testada no tablet em 06/11/2026 (G7); zoom sem refluxo       |
 | Transposição no app (RFM-06)                                                     | implementada — parte do modelo original; limite de ±12 semitons             |
 | Exportação PDF/MusicXML e impressão                                              | planejado — Fase 8                                                          |
-| OneDrive e Google Drive (ADR 0008)                                               | planejado — Fase 9                                                          |
-| Compra validada no backend (ADR 0007)                                            | planejado — Fase 10                                                         |
+| Contas, biblioteca no servidor e sincronização (ADRs 0009 e 0010)                | planejado — Fase 9                                                          |
+| Web logada com a biblioteca da conta (RFM-22)                                    | planejado — Fase 10                                                         |
+| Compra validada no backend, Pro por conta (ADRs 0007 e 0009)                     | planejado — Fase 11                                                         |
+| OneDrive e Google Drive como espelho (ADR 0008)                                  | planejado — Fase 12                                                         |
 
 O que se sabe sobre o formato, com base em 14 partituras reais (1.024 compassos), 24 amostras controladas
 e MusicXML exportado pelo Encore para todas:

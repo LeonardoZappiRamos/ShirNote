@@ -76,5 +76,5 @@ Toda regra de plano mora em `plan.ts`. Tela nenhuma decide sozinha o que é Pro 
 
 ## 6. Fora desta versão
 
-Pastas, etiquetas e coleções; organização compartilhada com a web. Entram com contas e
-sincronização, ainda sem documento de feature.
+Pastas e a biblioteca compartilhada com a web chegam com a conta (Fase 9, RFM-21): ver
+[`sincronizacao.md`](sincronizacao.md), seções 6 e 8. Etiquetas e setlists dependem da Q10 do PRD.

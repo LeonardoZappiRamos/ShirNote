@@ -26,6 +26,8 @@ diz _o que_ e _por quê_; o TECHSPEC diz _onde_ está no código.
 | Biblioteca: importar, buscar, editar, limite do plano, excluir (RFM-01/02/04/07/13/16) | [`feature/biblioteca.md`](feature/biblioteca.md) |
 | Leitura: zoom, posição salva, tela cheia (RFM-05) | [`feature/leitura.md`](feature/leitura.md) |
 | Transposição por grau (RFM-06) | [`feature/transposicao.md`](feature/transposicao.md) |
+| Contas: e-mail e senha, Google, sair, excluir (RFM-19, RFM-23) — proposta | [`feature/contas.md`](feature/contas.md) |
+| Sincronização: conta, web, OneDrive e Google Drive (RFM-11, RFM-12, RFM-20 a RFM-22) — proposta | [`feature/sincronizacao.md`](feature/sincronizacao.md) |
 
 ## Precedência
 
