@@ -24,8 +24,8 @@ Legenda: **feito** = no código; **parcial** = parte do requisito no código;
 | RFM-01 Importar pelo "Abrir com" do Android | planejado | intent filter no `app.json` (Fase 6) |
 | RFM-02 Importar MusicXML | feito, sem modelo neutro | `convertMusicXml` |
 | RFM-03 Importar e ler PDF | planejado | §6.4 |
-| RFM-04 Biblioteca com busca e ordenação | feito, sem capa | `library/format.ts`, `app/index.tsx` |
-| RFM-05 Zoom, tela cheia, retomada de posição | feito | `library/reading.ts`, `app/score/[id].tsx` |
+| RFM-04 Biblioteca com busca e ordenação ([feature](feature/biblioteca.md)) | feito, sem capa | `library/format.ts`, `app/index.tsx` |
+| RFM-05 Zoom, tela cheia, retomada de posição ([feature](feature/leitura.md)) | feito | `library/reading.ts`, `app/score/[id].tsx` |
 | RFM-06 Transposição | feito para `.enc`, por grau ([regras](feature/transposicao.md)) | `library/transposition.ts`, `src/music/transpose.ts` |
 | RFM-07 Título e autor | feito | `app/edit/[id].tsx` |
 | RFM-08 a RFM-10 Exportar PDF/MusicXML, imprimir | planejado | §6.5 (Fase 8) |
