@@ -22,7 +22,7 @@ interface TransposeControlsProps {
   readonly sourceKey: KeySignature;
   readonly interval: Interval;
   readonly onChange: (interval: Interval) => void;
-  /** Troca dobrados pela nota simples de mesmo som (docs/transposicao.md, regra 7). */
+  /** Troca dobrados pela nota simples de mesmo som (docs/feature/transposicao.md, regra 7). */
   readonly simplifyDoubles: boolean;
   readonly onSimplifyDoublesChange: (value: boolean) => void;
   readonly disabled?: boolean;
@@ -40,7 +40,7 @@ const DIRECTION_LABEL: Readonly<Record<TransposeDirection, string>> = {
 };
 
 /**
- * Transposição por grau (docs/transposicao.md): a pessoa escolhe o tom de destino e a direção,
+ * Transposição por grau (docs/feature/transposicao.md): a pessoa escolhe o tom de destino e a direção,
  * ou anda meio tom por vez. Tudo vira um intervalo; o modelo neutro faz o resto.
  */
 export function TransposeControls({
@@ -73,7 +73,7 @@ export function TransposeControls({
     onChange(intervalForSemitones(semitones, sourceKey.fifths));
   };
 
-  // Oitava a critério de quem toca: a extensão do instrumento decide (docs/transposicao.md).
+  // Oitava a critério de quem toca: a extensão do instrumento decide (docs/feature/transposicao.md).
   const shiftOctave = (sign: 1 | -1) => {
     const next = addIntervals(interval, {
       steps: sign * OCTAVE.steps,

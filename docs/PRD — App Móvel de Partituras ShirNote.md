@@ -3,7 +3,7 @@
 - Versão: 1.1
 - Data: 2026-11-05 (v1.0 em 2026-11-04)
 - Decisores: Leonardo (Zappi), Benjamim (uso e prioridade)
-- Substitui como produto: [`PRD — Visualizador Web de Partituras Encore (.enc)`](PRD%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md), que fica como registro do MVP web concluído.
+- Substitui como produto: [`PRD — Visualizador Web de Partituras Encore (.enc)`](../archive/PRD%20—%20Visualizador%20Web%20de%20Partituras%20Encore%20(.enc).md), que fica como registro do MVP web concluído.
 - Como implementar: [`TECHSPEC — App Móvel ShirNote`](TECHSPEC%20—%20App%20Móvel%20ShirNote.md). Mapa dos documentos: [`docs/README.md`](README.md).
 
 ---

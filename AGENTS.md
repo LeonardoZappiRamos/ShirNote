@@ -108,7 +108,7 @@ Armadilhas já medidas:
 - Código em inglês; comentários, documentação e textos da interface em pt-BR (RNF-08).
 - Commits no padrão Conventional Commits, com a descrição em pt-BR: `feat(enc): ...`.
 - TypeScript estrito com `noUncheckedIndexedAccess`: trate `undefined` ao indexar bytes e arrays.
-- Prettier: aspas simples, 100 colunas. A pasta `docs/` fica fora do Prettier, mas `README.md`,
+- Prettier: aspas simples, 100 colunas. As pastas `docs/` e `archive/` ficam fora do Prettier, mas `README.md`,
   `AGENTS.md` e `tests/fixtures/**/README.md` não.
 - Requisitos são citados por ID (`RF-03`, `RNF-05`) em comentários e documentos.
 - Escopo da v1 móvel: não adicione áudio, edição nota a nota, layout fiel ao Encore nem iOS (PRD
