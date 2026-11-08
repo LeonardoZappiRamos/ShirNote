@@ -1,6 +1,6 @@
 # 0012 — Exigir nome único na biblioteca e numerar duplicados aceitos
 
-- Status: Accepted
+- Status: Accepted; item 4 Superseded by ADR-0014 (duplicado ganha "Substituir")
 - Data: 2026-11-08
 - Decisores: Leonardo (Zappi), owner do produto
 - Consultados: —
@@ -75,4 +75,4 @@ título como chave, a segunda parte viraria "ANA BEKOACH 1".
 - [`feature/sincronizacao.md`](../feature/sincronizacao.md) — conflito.
 - [ADR 0010](0010-guardar-a-biblioteca-da-conta-no-backend-em-musicxml.md) — biblioteca no servidor.
 - Supersede: —
-- Supersedido por: —
+- Supersedido por: [ADR 0014](0014-importar-pdf-para-leitura-converter-no-pro-e-substituir-duplicado.md), só o item 4

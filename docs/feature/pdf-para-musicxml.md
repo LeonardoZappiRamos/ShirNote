@@ -3,8 +3,11 @@
 - Versão: 1.0 (decidido: importação assistida, ADR 0013)
 - Data: 2026-11-08
 - Requisitos: RFM-03 (PRD móvel v2.1), questão Q8
-- Decisão: [ADR 0013](../decisions/0013-converter-pdf-em-musicxml-como-importacao-assistida.md):
-  conversão opcional, a cargo de quem importa, com aviso e o PDF original sempre disponível
+- Decisão: [ADR 0013](../decisions/0013-converter-pdf-em-musicxml-como-importacao-assistida.md) e
+  [ADR 0014](../decisions/0014-importar-pdf-para-leitura-converter-no-pro-e-substituir-duplicado.md):
+  PDF entra só para leitura; no Pro, a pessoa converte quando quiser, com aviso, e o PDF original
+  fica disponível. Na v1, corrigir é fora do ShirNote: exportar o MusicXML, ajustar num programa
+  externo e importar de novo com "Substituir"
 - Scripts: `scripts/omr/render.py` (gera os PDFs de teste) e `scripts/omr/compare.py` (mede)
 
 Pedido do owner (Q8): estudar se dá para transformar o PDF importado em MusicXML. Se der, o PDF entra

@@ -1,6 +1,6 @@
 # 0013 — Converter PDF em MusicXML como importação assistida, com o PDF original local
 
-- Status: Accepted
+- Status: Accepted; itens 1 e 5 (quem converte) Superseded by ADR-0014
 - Data: 2026-11-08
 - Decisores: Leonardo (Zappi), owner do produto
 - Consultados: —
@@ -89,4 +89,4 @@ conectou OneDrive ou Google Drive, sincronizado lá.
 - [ADR 0012](0012-exigir-nome-unico-na-biblioteca.md) — duplicados.
 - [Audiveris](https://github.com/Audiveris/audiveris) — AGPL-3.0.
 - Supersede: —
-- Supersedido por: —
+- Supersedido por: [ADR 0014](0014-importar-pdf-para-leitura-converter-no-pro-e-substituir-duplicado.md): PDF entra só para leitura; converter é ação do Pro

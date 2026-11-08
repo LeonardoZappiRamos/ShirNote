@@ -115,7 +115,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | --- | --- | --- |
 | RFM-01 | Importar `.enc` por seletor de arquivos e compartilhamento do Android, com processamento local | Alta |
 | RFM-02 | Importar MusicXML (`.musicxml`, `.xml`) e exibir como partitura | Alta |
-| RFM-03 | Importar PDF e exibir com paginação, zoom e rolagem; com conta, tentar converter para MusicXML, com aviso de possível erro e o PDF original sempre disponível (ADR 0013, [estudo](feature/pdf-para-musicxml.md)) | Alta |
+| RFM-03 | Importar PDF só para leitura, com paginação, zoom e rolagem; no Pro, converter o item em MusicXML quando a pessoa quiser, com aviso de possível erro e o PDF original sempre disponível (ADRs 0013 e 0014, [estudo](feature/pdf-para-musicxml.md)) | Alta |
 | RFM-04 | Manter biblioteca local com capa/primeira página, título, autor, tipo e data; buscar e ordenar | Alta |
 | RFM-05 | Visualizar partitura com zoom, rolagem, tela cheia e retomada da última posição | Alta |
 | RFM-06 | Transpor a partitura por semitons (aumentar/diminuir), corrigindo armadura e acidentes | Alta |
@@ -139,7 +139,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | RFM-24 | Marcar partituras com etiquetas e filtrar por elas | Média |
 | RFM-25 | Montar setlists ordenadas e ler em sequência (anterior/próxima) | Alta |
 | RFM-26 | Filtrar por pasta, etiqueta, tipo e tom; recentes e favoritas | Média |
-| RFM-27 | Recusar partitura duplicada (mesmo nome ou mesmo conteúdo); se a pessoa aceitar, numerar o nome ("Nome 1") (ADR 0012) | Alta |
+| RFM-27 | Recusar partitura duplicada (mesmo nome ou mesmo conteúdo); a pessoa pode cancelar, substituir o item existente ou importar numerado ("Nome 1") (ADRs 0012 e 0014) | Alta |
 
 ## 6. Requisitos não funcionais
 
@@ -169,6 +169,7 @@ obrigatória no Pro. OneDrive e Google Drive continuam como cópia na nuvem da p
 | Importar `.enc`, MusicXML e PDF | Sim, até o limite | Sim, até o limite | Sim |
 | Transpor e editar metadados | Não | Não | Sim |
 | Exportar PDF/MusicXML e imprimir | Não | Não | Sim |
+| Converter PDF em partitura | Não | Não | Sim |
 | Cópia no OneDrive/Google Drive | Não | Não | Sim |
 | Excluir item | Sim | Sim | Sim |
 
@@ -371,3 +372,4 @@ vale o escopo das seções 2 e 4.
 | Q9 | ~~Qual cota no Pro?~~ | **Respondida:** 50 itens no início; planos maiores depois, conforme a infraestrutura |
 | Q10 | ~~Organizar é só pasta?~~ | **Respondida:** pastas, etiquetas, setlists e o que ajudar a navegar ([feature](feature/organizacao.md)) |
 | Q11 | Preço e nomes dos planos maiores que o Pro de 50 itens | Depende do custo medido da infraestrutura depois da Fase 9 |
+| Q12 | ~~Converter PDF é só do Pro?~~ | **Respondida em 08/11/2026:** sim; PDF importado é só leitura até a pessoa converter (ADR 0014) |

@@ -18,7 +18,7 @@ está no [TECHSPEC](../TECHSPEC%20—%20App%20Móvel%20ShirNote.md) (§4 e §6.1
 | --- | --- | --- |
 | `.enc` | Convertido no aparelho para o modelo neutro e para MusicXML. Pode ser transposto. | feito |
 | `.musicxml`, `.xml` | Guardado como está. Abre para leitura, mas não transpõe. | feito |
-| `.pdf` | Leitura com paginação e zoom. Com conta, opção de tentar converter em partitura, com aviso de possível erro; o PDF original fica junto ([ADR 0013](../decisions/0013-converter-pdf-em-musicxml-como-importacao-assistida.md)). | planejado (TECHSPEC §6.4) |
+| `.pdf` | Só leitura, com paginação e zoom; continua PDF até a pessoa converter. No Pro, "Converter em partitura" transforma o item em MusicXML, com aviso de possível erro e o PDF original junto (ADRs 0013 e 0014). | planejado (TECHSPEC §6.4) |
 | "Abrir com" do Android | Importar direto de outro app. | planejado |
 
 Regras:
@@ -30,8 +30,10 @@ Regras:
 2. O autor vem do `.enc` quando existe. MusicXML entra sem autor.
 3. Nada sai do aparelho: a conversão é local (RNFM-02).
 4. No grátis, o limite é conferido **antes** de abrir o seletor (seção 4).
-5. **Duplicados (Fase 9, ADR 0012):** mesmo nome ou mesmo conteúdo pergunta antes; o padrão é
-   cancelar, e aceitar importa como "*Nome* 1". Renomear para nome existente é recusado.
+5. **Duplicados (Fase 9, ADRs 0012 e 0014):** mesmo nome ou mesmo conteúdo pergunta antes, com
+   **Cancelar** (padrão), **Substituir** (conteúdo novo no item existente; pasta, etiquetas e
+   setlists ficam; o tom volta ao original) e **Importar como "*Nome* 1"**. Renomear para nome
+   existente é recusado.
 
 Mensagens de erro (RFM-17):
 
