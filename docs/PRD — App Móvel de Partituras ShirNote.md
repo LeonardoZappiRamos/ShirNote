@@ -366,7 +366,7 @@ vale o escopo das seções 2 e 4.
 | Q5 | ~~O web e o app vão ser o mesmo produto?~~ | **Respondida em 08/11/2026:** sim, com conta; v2.0 e ADR 0010 |
 | Q6 | ~~Haverá contas?~~ | **Respondida em 08/11/2026:** e-mail e senha + Google, opcional no grátis, obrigatória no Pro (ADR 0009) |
 | Q7 | ~~Qual serviço envia os e-mails?~~ | **Respondida:** Mailpit local, Mailtrap em staging, Resend ou Brevo em produção (ADR 0011). Falta escolher entre Resend e Brevo e o domínio de envio |
-| Q8 | PDF importado deve ir para o servidor e aparecer na web? | **Em estudo:** converter PDF em MusicXML ([estudo](feature/pdf-para-musicxml.md)); se não for viável, PDF não vai ao servidor |
+| Q8 | PDF importado deve ir para o servidor e aparecer na web? | **Estudo v0.2 feito:** Audiveris acerta 99% das alturas em PDF limpo, mas erra ritmo (89% a 98%). Recomendação: conversão opcional e conferida, depois da Fase 9 ([estudo](feature/pdf-para-musicxml.md)). Falta o OK do owner e o teste com PDFs do Encore |
 | Q9 | ~~Qual cota no Pro?~~ | **Respondida:** 50 itens no início; planos maiores depois, conforme a infraestrutura |
 | Q10 | ~~Organizar é só pasta?~~ | **Respondida:** pastas, etiquetas, setlists e o que ajudar a navegar ([feature](feature/organizacao.md)) |
 | Q11 | Preço e nomes dos planos maiores que o Pro de 50 itens | Depende do custo medido da infraestrutura depois da Fase 9 |
